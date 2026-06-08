@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Create Payment Request — Aptura AI</title>
+  <style>body{font-family:Arial,Helvetica,sans-serif;margin:0;padding:24px;background:#fafafa;color:#111}header{display:flex;justify-content:space-between;align-items:center}a{color:#2b6cb0;text-decoration:none}form{max-width:700px;margin-top:20px}input,select{display:block;padding:10px;margin:8px 0;width:100%;box-sizing:border-box}</style>
+</head>
+<body>
+  <header>
+    <h1>Create Payment Request</h1>
+    <nav><a href="/plans">Plans</a> · <a href="/dashboard">Dashboard</a></nav>
+  </header>
+  <main>
+    <p>Generate a unique reference to include with your bank transfer. Use this reference as the transfer description so we can match your payment.</p>
+
+    {% if created %}
+      <div style="padding:12px;border:1px solid #ccc;background:#f6f6f6;margin-bottom:16px">
+        <strong>Reference:</strong> {{ ref }}<br/>
+        <strong>Plan:</strong> {{ plan }}<br/>
+        <strong>Amount:</strong> {{ amount }} NGN<br/>
+        <p>Copy the reference exactly into your bank transfer description and complete the transfer. After payment, we will activate your plan once the transfer is verified.</p>
+      </div>
+    {% endif %}
+
+    <form method="post" action="/create-request">
+      <label for="plan">Plan</label>
+      <select name="plan" id="plan">
+        <option value="PRO">PRO</option>
+        <option value="ENTERPRISE">ENTERPRISE</option>
+      </select>
+
+      <label for="amount">Amount (NGN)</label>
+      <input name="amount" id="amount" type="number" required />
+
+      <button type="submit">Generate Reference</button>
+    </form>
+  </main>
+</body>
+</html>

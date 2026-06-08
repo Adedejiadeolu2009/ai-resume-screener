@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Screen Candidates — Aptura AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0A0B0E;--card:#13151C;--elev:#1A1D27;--input:#1F2330;
+  --border:rgba(255,255,255,0.07);--border-lit:rgba(201,168,76,0.35);
+  --gold:#C9A84C;--gold-light:#E8D5A3;--gold-bg:rgba(201,168,76,0.1);
+  --teal:#2DD4BF;--teal-bg:rgba(45,212,191,0.1);
+  --red:#F87171;--amber:#FBBF24;--green:#4ADE80;
+  --text:#F0EDE6;--muted:#9A9691;--hint:#5A5750;
+  --ff-serif:'Cormorant Garamond',Georgia,serif;
+  --ff-sans:'Outfit',system-ui,sans-serif;
+  --radius:12px;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--ff-sans);min-height:100vh}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 80% 60% at 15% 0%,rgba(201,168,76,0.05),transparent 60%),
+             radial-gradient(ellipse 50% 40% at 85% 100%,rgba(45,212,191,0.04),transparent 50%)}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(255,255,255,0.012) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(255,255,255,0.012) 1px,transparent 1px);background-size:48px 48px}
+
+/* ── Nav ── */
+nav{display:flex;align-items:center;justify-content:space-between;padding:16px 32px;
+  border-bottom:1px solid var(--border);background:rgba(10,11,14,0.85);
+  backdrop-filter:blur(12px);position:sticky;top:0;z-index:100}
+.brand{display:flex;align-items:center;gap:12px}
+.back-btn{display:flex;align-items:center;gap:6px;color:var(--muted);text-decoration:none;
+  font-size:13px;padding:6px 12px;border:1px solid var(--border);border-radius:6px;
+  transition:all .2s;margin-right:8px}
+.back-btn:hover{border-color:var(--border-lit);color:var(--gold)}
+.brand-mark{width:32px;height:32px;background:linear-gradient(135deg,var(--gold),#8B6914);
+  border-radius:8px;display:flex;align-items:center;justify-content:center;
+  font:600 14px var(--ff-serif);color:#0A0B0E}
+.brand-name{font:500 17px var(--ff-serif)}.brand-name span{color:var(--gold)}
+.nav-right{display:flex;align-items:center;gap:12px}
+.user-chip{display:flex;align-items:center;gap:8px;padding:5px 12px 5px 5px;
+  background:var(--card);border:1px solid var(--border);border-radius:40px}
+.user-av{width:26px;height:26px;border-radius:50%;background:var(--gold-bg);
+  border:1px solid var(--border-lit);display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:600;color:var(--gold);overflow:hidden}
+.user-av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.user-nm{font-size:13px;color:var(--muted)}
+.btn-logout{background:none;border:1px solid var(--border);border-radius:6px;
+  color:var(--muted);font:13px var(--ff-sans);padding:6px 14px;cursor:pointer;
+  text-decoration:none;transition:all .2s}
+.btn-logout:hover{border-color:var(--red);color:var(--red)}
+
+/* ── Layout ── */
+main{max-width:1300px;margin:0 auto;padding:32px 32px 60px;position:relative;z-index:1}
+.page-header{margin-bottom:28px}
+.page-title{font:400 36px var(--ff-serif);color:var(--text);margin-bottom:6px}
+.page-sub{font-size:14px;color:var(--muted);font-weight:300}
+
+/* ── Steps indicator ── */
+.steps{display:flex;align-items:center;gap:0;margin-bottom:32px;
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  overflow:hidden}
+.step{flex:1;display:flex;align-items:center;gap:10px;padding:14px 20px;
+  font-size:13px;color:var(--hint);border-right:1px solid var(--border);
+  transition:all .3s;position:relative}
+.step:last-child{border-right:none}
+.step.active{background:var(--gold-bg);color:var(--gold)}
+.step.done{color:var(--teal)}
+.step-num{width:24px;height:24px;border-radius:50%;border:1.5px solid currentColor;
+  display:flex;align-items:center;justify-content:center;font-size:11px;
+  font-weight:700;flex-shrink:0}
+.step.done .step-num{background:var(--teal);border-color:var(--teal);color:var(--bg)}
+.step-label{font-weight:500}
+
+/* ── Grid ── */
+.screen-grid{display:grid;grid-template-columns:420px 1fr;gap:24px;align-items:start}
+@media(max-width:960px){.screen-grid{grid-template-columns:1fr}}
+
+/* ── Panel ── */
+.panel{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  overflow:hidden;position:sticky;top:84px}
+.panel-hdr{padding:20px 24px;border-bottom:1px solid var(--border)}
+.panel-title{font-size:15px;font-weight:600;color:var(--text)}
+.panel-sub{font-size:12px;color:var(--hint);margin-top:3px}
+.panel-body{padding:24px}
+
+/* ── Form ── */
+.field{margin-bottom:18px}
+.field label{display:block;font-size:11px;font-weight:600;text-transform:uppercase;
+  letter-spacing:1.5px;color:var(--muted);margin-bottom:7px}
+.field-hint{font-size:11px;color:var(--hint);margin-top:5px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
+input[type=text],textarea,select{width:100%;background:var(--input);
+  border:1px solid var(--border);border-radius:7px;padding:11px 14px;
+  color:var(--text);font:14px var(--ff-sans);outline:none;
+  transition:border-color .2s,box-shadow .2s}
+input[type=text]:focus,textarea:focus{border-color:var(--border-lit);
+  box-shadow:0 0 0 3px var(--gold-bg)}
+input::placeholder,textarea::placeholder{color:var(--hint)}
+textarea{min-height:140px;resize:vertical}
+.char-count{text-align:right;font-size:11px;margin-top:4px;transition:color .2s}
+.char-ok{color:var(--hint)}
+.char-good{color:var(--green)}
+.char-warn{color:var(--amber)}
+
+/* ── Drop zone ── */
+.dropzone{border:2px dashed var(--border);border-radius:10px;padding:28px 20px;
+  text-align:center;cursor:pointer;background:var(--input);transition:all .25s;
+  position:relative;overflow:hidden}
+.dropzone::before{content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,var(--gold-bg),transparent);opacity:0;transition:opacity .3s}
+.dropzone:hover,.dropzone.over{border-color:var(--gold);background:rgba(201,168,76,0.03)}
+.dropzone:hover::before,.dropzone.over::before{opacity:1}
+.dz-icon{font-size:32px;margin-bottom:10px;display:block;position:relative;z-index:1}
+.dz-title{font-size:14px;font-weight:600;color:var(--text);position:relative;z-index:1}
+.dz-sub{font-size:12px;color:var(--hint);margin-top:4px;position:relative;z-index:1}
+.dz-formats{display:flex;justify-content:center;gap:6px;margin-top:10px;position:relative;z-index:1}
+.fmt-pill{background:var(--elev);border:1px solid var(--border);border-radius:4px;
+  padding:2px 8px;font-size:10px;font-weight:600;color:var(--muted);letter-spacing:1px}
+#fileInput{display:none}
+
+/* ── File list ── */
+#fileList{margin-top:12px;display:flex;flex-direction:column;gap:6px}
+.file-item{display:flex;align-items:center;gap:10px;background:var(--elev);
+  border:1px solid var(--border);border-radius:7px;padding:8px 12px;
+  animation:slideIn .2s ease}
+@keyframes slideIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.file-ico{font-size:18px;flex-shrink:0}
+.file-info{flex:1;min-width:0}
+.file-nm{font-size:13px;font-weight:500;color:var(--text);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.file-sz{font-size:11px;color:var(--hint)}
+.file-rm{width:22px;height:22px;background:none;border:none;color:var(--hint);
+  cursor:pointer;font-size:15px;border-radius:4px;display:flex;align-items:center;
+  justify-content:center;transition:all .15s;flex-shrink:0}
+.file-rm:hover{background:rgba(248,113,113,0.15);color:var(--red)}
+
+/* ── Submit ── */
+.btn-submit{width:100%;padding:14px;margin-top:8px;
+  background:linear-gradient(135deg,var(--gold),#A07820);
+  color:#0A0B0E;font:700 13px var(--ff-sans);letter-spacing:1.5px;
+  text-transform:uppercase;border:none;border-radius:7px;cursor:pointer;
+  transition:all .25s;box-shadow:0 4px 20px rgba(201,168,76,0.25);
+  display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-submit:hover{box-shadow:0 6px 28px rgba(201,168,76,0.4);transform:translateY(-1px)}
+.btn-submit:active{transform:translateY(0)}
+.btn-submit:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+/* ── Results area ── */
+.results-area{min-height:500px}
+
+/* Empty state */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:80px 40px;text-align:center;background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);min-height:500px}
+.empty-ico{font-size:52px;margin-bottom:20px;opacity:.25}
+.empty-title{font:400 26px var(--ff-serif);color:var(--muted);margin-bottom:10px}
+.empty-sub{font-size:14px;color:var(--hint);max-width:280px;line-height:1.6;font-weight:300}
+.how-it-works{margin-top:32px;display:flex;flex-direction:column;gap:10px;width:100%;max-width:320px}
+.hiw-step{display:flex;align-items:center;gap:12px;text-align:left;
+  background:var(--elev);border:1px solid var(--border);border-radius:8px;padding:12px 14px}
+.hiw-num{width:26px;height:26px;border-radius:50%;background:var(--gold-bg);
+  border:1px solid var(--border-lit);display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:var(--gold);flex-shrink:0}
+.hiw-txt{font-size:13px;color:var(--muted)}
+
+/* Processing state */
+.proc-state{display:none;flex-direction:column;align-items:center;justify-content:center;
+  padding:60px 32px;text-align:center;background:var(--card);
+  border:1px solid var(--border-lit);border-radius:var(--radius);
+  min-height:500px;box-shadow:0 0 40px rgba(201,168,76,0.08)}
+.proc-state.on{display:flex}
+.scan-wrap{width:80px;height:80px;position:relative;margin-bottom:28px}
+.scan-ring{position:absolute;inset:0;border:2px solid var(--gold);border-radius:50%;
+  opacity:.15;animation:ringPop 2s ease-in-out infinite}
+.scan-ring:nth-child(2){animation-delay:.5s}
+.scan-ring:nth-child(3){animation-delay:1s}
+@keyframes ringPop{0%{transform:scale(.5);opacity:.5}100%{transform:scale(1.5);opacity:0}}
+.scan-core{position:absolute;inset:20px;background:linear-gradient(135deg,var(--gold),#A07820);
+  border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;
+  animation:spin 4s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.proc-title{font:400 24px var(--ff-serif);color:var(--text);margin-bottom:8px}
+.proc-msg{font-size:14px;color:var(--muted);margin-bottom:24px;
+  min-height:20px;transition:opacity .3s}
+.progress-track{width:260px;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--teal));
+  border-radius:2px;animation:progAnim 2s ease-in-out infinite}
+@keyframes progAnim{0%{width:10%;margin-left:0}50%{width:60%;margin-left:20%}100%{width:10%;margin-left:90%}}
+.proc-files{margin-top:24px;display:flex;flex-direction:column;gap:6px;width:100%;max-width:300px}
+.proc-file{display:flex;align-items:center;gap:10px;padding:8px 12px;
+  background:var(--elev);border-radius:6px;font-size:12px;color:var(--muted);text-align:left}
+.proc-file-icon{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-size:10px;flex-shrink:0}
+.pfi-wait{background:var(--border);color:var(--hint)}
+.pfi-scan{background:var(--gold-bg);border:1px solid var(--border-lit);animation:spin 1s linear infinite}
+.pfi-done{background:var(--teal-bg);color:var(--teal)}
+
+/* Results */
+.results-wrap{display:none;flex-direction:column;gap:0}
+.results-wrap.on{display:flex}
+.results-hdr{display:flex;align-items:flex-start;justify-content:space-between;
+  margin-bottom:20px;flex-wrap:wrap;gap:12px}
+.results-title{font:400 28px var(--ff-serif);color:var(--text)}
+.results-meta{font-size:13px;color:var(--hint);margin-top:4px}
+.hdr-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.sort-lbl{font-size:11px;color:var(--hint);text-transform:uppercase;letter-spacing:1px}
+.sort-btn{background:var(--elev);border:1px solid var(--border);border-radius:40px;
+  padding:5px 14px;font-size:12px;color:var(--muted);cursor:pointer;
+  transition:all .2s;font-family:var(--ff-sans)}
+.sort-btn:hover{border-color:var(--border-lit);color:var(--text)}
+.sort-btn.active{background:var(--gold-bg);border-color:var(--border-lit);color:var(--gold)}
+.btn-print{background:none;border:1px solid var(--border);border-radius:6px;
+  padding:6px 14px;font-size:12px;color:var(--muted);cursor:pointer;
+  font-family:var(--ff-sans);transition:all .2s;display:flex;align-items:center;gap:6px}
+.btn-print:hover{border-color:var(--border-lit);color:var(--text)}
+
+/* Summary bar */
+.summary-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.sum-card{background:var(--card);border:1px solid var(--border);border-radius:10px;
+  padding:14px 16px;text-align:center}
+.sum-num{font:400 28px var(--ff-serif);line-height:1;margin-bottom:4px}
+.sum-lbl{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--hint)}
+
+/* Error cards */
+.err-card{background:rgba(248,113,113,0.06);border:1px solid rgba(248,113,113,0.2);
+  border-radius:8px;padding:12px 16px;font-size:13px;color:var(--red);
+  margin-bottom:10px;display:flex;align-items:center;gap:10px}
+
+/* Candidate cards */
+.cands{display:flex;flex-direction:column;gap:16px}
+.ccard{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  overflow:hidden;transition:border-color .2s,box-shadow .2s,transform .2s;
+  animation:cardIn .4s ease forwards;opacity:0}
+.ccard:nth-child(1){animation-delay:.05s}
+.ccard:nth-child(2){animation-delay:.1s}
+.ccard:nth-child(3){animation-delay:.15s}
+.ccard:nth-child(n+4){animation-delay:.2s}
+@keyframes cardIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.ccard::before{content:'';display:block;height:2px;background:linear-gradient(90deg,var(--gold),transparent)}
+.ccard:hover{border-color:var(--border-lit);box-shadow:0 4px 32px rgba(0,0,0,.4);transform:translateY(-2px)}
+
+/* Card header */
+.card-hdr{display:flex;align-items:flex-start;gap:14px;padding:20px 22px 16px;cursor:pointer}
+.rank{width:40px;height:40px;background:var(--gold-bg);border:1px solid var(--border-lit);
+  border-radius:9px;display:flex;align-items:center;justify-content:center;
+  font:500 18px var(--ff-serif);color:var(--gold);flex-shrink:0}
+.cinfo{flex:1;min-width:0}
+.cname{font:500 20px var(--ff-serif);color:var(--text);line-height:1.2}
+.cpills{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.cpill{font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px}
+.pill-exp{background:var(--teal-bg);color:var(--teal);border:1px solid rgba(45,212,191,.2)}
+.pill-edu{background:rgba(255,255,255,.04);color:var(--muted);border:1px solid var(--border)}
+.pill-sal{background:var(--gold-bg);color:var(--gold);border:1px solid rgba(201,168,76,.2)}
+.cand-avatar{width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,var(--gold-bg),rgba(45,212,191,0.1));border:1px solid var(--border-lit);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600;color:var(--gold);flex-shrink:0;overflow:hidden}
+.cand-avatar img{width:100%;height:100%;object-fit:cover;border-radius:12px}
+.score-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:7px;flex-shrink:0}
+.ring-c{position:relative;width:70px;height:70px}
+.ring-c svg{transform:rotate(-90deg)}
+.ring-txt{position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center}
+.rv{font:400 20px var(--ff-serif);line-height:1}
+.rs{font-size:9px;color:var(--hint);letter-spacing:.5px}
+.rec-pill{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  padding:4px 10px;border-radius:4px}
+.r-sh{background:rgba(45,212,191,.12);color:var(--teal);border:1px solid rgba(45,212,191,.3)}
+.r-h{background:rgba(74,222,128,.1);color:var(--green);border:1px solid rgba(74,222,128,.25)}
+.r-m{background:rgba(251,191,36,.1);color:var(--amber);border:1px solid rgba(251,191,36,.25)}
+.r-n{background:rgba(248,113,113,.1);color:var(--red);border:1px solid rgba(248,113,113,.25)}
+
+/* Summary */
+.card-summ{padding:0 22px 16px;font-size:13.5px;color:var(--muted);
+  line-height:1.65;border-bottom:1px solid var(--border)}
+
+/* Score bars */
+.score-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border)}
+.score-cell{background:var(--card);padding:12px 14px;text-align:center}
+.sc-lbl{font-size:10px;color:var(--hint);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px}
+.sc-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin:5px 0}
+.sc-fill{height:100%;border-radius:2px;transition:width 1s cubic-bezier(.16,1,.3,1)}
+.sc-val{font-size:13px;font-weight:600;color:var(--text)}
+
+/* Expandable */
+.card-details{display:none;border-top:1px solid var(--border)}
+.card-details.open{display:block}
+.details-grid{display:grid;grid-template-columns:1fr 1fr}
+.det-sec{padding:18px 22px;border-right:1px solid var(--border);border-bottom:1px solid var(--border)}
+.det-sec:nth-child(2n){border-right:none}
+.det-sec:last-child,.det-sec:nth-last-child(2):nth-child(odd){border-bottom:none}
+.det-h{font-size:10px;text-transform:uppercase;letter-spacing:2px;
+  color:var(--hint);font-weight:600;margin-bottom:10px;
+  display:flex;align-items:center;gap:6px}
+.det-h::before{content:'';width:3px;height:3px;border-radius:50%;background:var(--gold)}
+.tag-list{display:flex;flex-wrap:wrap;gap:5px}
+.skill-tag{background:var(--elev);border:1px solid var(--border);border-radius:4px;
+  padding:3px 9px;font-size:12px;color:var(--muted);font-weight:500}
+.item-list{display:flex;flex-direction:column;gap:6px}
+.det-item{display:flex;align-items:flex-start;gap:8px;font-size:13px;
+  color:var(--muted);line-height:1.4}
+.di-s{flex-shrink:0;margin-top:1px;font-size:13px}
+.iq-item{font-size:13px;color:var(--muted);padding:8px 12px;
+  background:var(--elev);border-left:2px solid var(--gold);
+  border-radius:0 4px 4px 0;line-height:1.4}
+.achiev{font-size:13px;color:var(--muted);background:var(--teal-bg);
+  border:1px solid rgba(45,212,191,.15);border-radius:7px;padding:10px 14px;
+  line-height:1.5;font-style:italic}
+.card-toggle{padding:12px 22px;display:flex;align-items:center;justify-content:center;
+  gap:8px;cursor:pointer;font-size:12px;color:var(--hint);
+  border-top:1px solid var(--border);transition:color .2s;user-select:none}
+.card-toggle:hover{color:var(--gold)}
+.chev{width:14px;height:14px;transition:transform .3s}
+.chev.up{transform:rotate(180deg)}
+
+@media(max-width:760px){
+  .details-grid{grid-template-columns:1fr}
+  .det-sec{border-right:none}
+  .summary-bar{grid-template-columns:1fr 1fr}
+  .score-grid{grid-template-columns:1fr 1fr}
+}
+@media print{nav,#formPanel,.steps{display:none}main{padding:0}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="brand">
+    <a href="/dashboard" class="back-btn">← Dashboard</a>
+    <div class="brand-mark">A</div>
+    <div><div class="brand-name">Ap<span>tura</span> AI</div></div>
+  </div>
+  <div class="nav-right">
+    <div class="user-chip">
+      <div class="user-av">
+        {% if user.avatar_url %}
+          <img src="{{ user.avatar_url }}" alt="avatar">
+        {% else %}
+          {{ (user.name or user.email)[:2] | upper }}
+        {% endif %}
+      </div>
+      <span class="user-nm">{{ user.name or user.email.split('@')[0] }}</span>
+    </div>
+    <a href="/auth/logout" class="btn-logout">Sign out</a>
+  </div>
+</nav>
+
+<main>
+  <div class="page-header">
+    <h1 class="page-title">Screen Candidates</h1>
+    <p class="page-sub">Describe the role, upload resumes — our AI does the rest in seconds</p>
+  </div>
+
+  <!-- Steps -->
+  <div class="steps" id="steps">
+    <div class="step active" id="step1">
+      <div class="step-num">1</div>
+      <div class="step-label">Job Details</div>
+    </div>
+    <div class="step" id="step2">
+      <div class="step-num">2</div>
+      <div class="step-label">Upload Resumes</div>
+    </div>
+    <div class="step" id="step3">
+      <div class="step-num">3</div>
+      <div class="step-label">AI Results</div>
+    </div>
+  </div>
+
+  <div class="screen-grid">
+    <!-- ── Left: Form ── -->
+    <div id="formPanel">
+      <div class="panel">
+        <div class="panel-hdr">
+          <div class="panel-title">Role Configuration</div>
+          <div class="panel-sub">Tell us about the position you're hiring for</div>
+        </div>
+        <div class="panel-body">
+          <div class="frow">
+            <div>
+              <label>Job Title *</label>
+              <input type="text" id="jobTitle" placeholder="e.g. Senior Engineer" oninput="updateSteps()">
+            </div>
+            <div>
+              <label>Company <span style="color:var(--hint);font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+              <input type="text" id="company" placeholder="e.g. Acme Corp">
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Job Description *</label>
+            <textarea id="jobDesc" placeholder="Paste the full job description — requirements, responsibilities, qualifications, and any nice-to-haves. The more detail you give, the more accurate the screening." oninput="updateChars(); updateSteps()"></textarea>
+            <div class="char-count char-ok" id="charCount">0 characters</div>
+            <div class="field-hint">💡 Tip: Include required skills, years of experience, and specific tools for best results</div>
+          </div>
+
+          <div class="field">
+            <label>Candidate Resumes *</label>
+            <div class="dropzone" id="dropzone">
+              <span class="dz-icon">📂</span>
+              <div class="dz-title" id="dzTitle">Drop resume files here</div>
+              <div class="dz-sub" id="dzSub">or click anywhere to browse</div>
+              <div class="dz-formats">
+                <span class="fmt-pill">PDF</span>
+                <span class="fmt-pill">DOCX</span>
+                <span class="fmt-pill">TXT</span>
+              </div>
+            </div>
+            <input type="file" id="fileInput" multiple accept=".pdf,.docx,.doc,.txt">
+            <div id="fileList"></div>
+          </div>
+
+          <button class="btn-submit" id="submitBtn" onclick="submitForm()" disabled>
+            <span id="btnIcon">✦</span>
+            <span id="btnText">Fill in details above to continue</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Right: Results ── -->
+    <div class="results-area">
+
+      <!-- Empty state -->
+      <div class="empty-state" id="emptyState">
+        <div class="empty-ico">🎯</div>
+        <div class="empty-title">Results appear here</div>
+        <div class="empty-sub">Configure the role and upload resumes to get started</div>
+        <div class="how-it-works">
+          <div class="hiw-step">
+            <div class="hiw-num">1</div>
+            <div class="hiw-txt">Enter the job title and description on the left</div>
+          </div>
+          <div class="hiw-step">
+            <div class="hiw-num">2</div>
+            <div class="hiw-txt">Upload as many resumes as you like (PDF or DOCX)</div>
+          </div>
+          <div class="hiw-step">
+            <div class="hiw-num">3</div>
+            <div class="hiw-txt">AI ranks and scores every candidate in seconds</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Processing state -->
+      <div class="proc-state" id="procState">
+        <div class="scan-wrap">
+          <div class="scan-ring"></div><div class="scan-ring"></div><div class="scan-ring"></div>
+          <div class="scan-core">🤖</div>
+        </div>
+        <div class="proc-title">Analysing Candidates</div>
+        <div class="proc-msg" id="procMsg">Reading resumes...</div>
+        <div class="progress-track"><div class="progress-fill"></div></div>
+        <div class="proc-files" id="procFiles"></div>
+      </div>
+
+      <!-- Results -->
+      <div class="results-wrap" id="resultsWrap">
+        <div class="results-hdr">
+          <div>
+            <div class="results-title" id="resultsTitle">Results</div>
+            <div class="results-meta" id="resultsMeta"></div>
+          </div>
+          <div class="hdr-actions">
+            <span class="sort-lbl">Sort</span>
+            <button class="sort-btn active" onclick="sortBy('score',this)">Score</button>
+            <button class="sort-btn" onclick="sortBy('name',this)">Name</button>
+            <button class="sort-btn" onclick="sortBy('exp',this)">Experience</button>
+            <button class="btn-print" onclick="window.print()">🖨️ Print Report</button>
+          </div>
+        </div>
+        <div class="summary-bar" id="summaryBar"></div>
+        <div id="errorCards"></div>
+        <div class="cands" id="candsList"></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+let selectedFiles = [];
+let allResults = [];
+
+// ── File handling ──────────────────────────────────────────────────────────
+const dz = document.getElementById('dropzone');
+const fi = document.getElementById('fileInput');
+dz.addEventListener('click', () => fi.click());
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('over'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('over'));
+dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('over'); addFiles([...e.dataTransfer.files]); });
+fi.addEventListener('change', () => { addFiles([...fi.files]); fi.value = ''; });
+
+function addFiles(files) {
+  const allowed = ['.pdf','.docx','.doc','.txt'];
+  files.forEach(f => {
+    const ext = '.' + f.name.split('.').pop().toLowerCase();
+    if (!allowed.includes(ext)) return;
+    if (!selectedFiles.find(x => x.name === f.name && x.size === f.size)) selectedFiles.push(f);
+  });
+  renderFiles();
+  updateSteps();
+}
+function removeFile(i) { selectedFiles.splice(i,1); renderFiles(); updateSteps(); }
+function renderFiles() {
+  const list = document.getElementById('fileList');
+  list.innerHTML = selectedFiles.map((f,i) => {
+    const ext = f.name.split('.').pop().toUpperCase();
+    const ico = ext==='PDF'?'📕':ext==='DOCX'||ext==='DOC'?'📘':'📄';
+    const sz = f.size > 1048576 ? (f.size/1048576).toFixed(1)+'MB' : Math.round(f.size/1024)+'KB';
+    return `<div class="file-item"><span class="file-ico">${ico}</span>
+      <div class="file-info"><div class="file-nm">${f.name}</div><div class="file-sz">${ext} · ${sz}</div></div>
+      <button class="file-rm" onclick="removeFile(${i})" title="Remove">✕</button></div>`;
+  }).join('');
+  const t = document.getElementById('dzTitle');
+  const s = document.getElementById('dzSub');
+  if (selectedFiles.length > 0) {
+    t.textContent = `${selectedFiles.length} file${selectedFiles.length>1?'s':''} ready`;
+    s.textContent = 'Drop more files or click to add';
+  } else {
+    t.textContent = 'Drop resume files here';
+    s.textContent = 'or click anywhere to browse';
+  }
+}
+
+// ── Character counter ──────────────────────────────────────────────────────
+function updateChars() {
+  const n = document.getElementById('jobDesc').value.length;
+  const el = document.getElementById('charCount');
+  el.textContent = n.toLocaleString() + ' characters';
+  el.className = 'char-count ' + (n < 100 ? 'char-ok' : n < 300 ? 'char-warn' : 'char-good');
+}
+
+// ── Steps + button state ───────────────────────────────────────────────────
+function updateSteps() {
+  const hasTitle = document.getElementById('jobTitle').value.trim().length > 0;
+  const hasDesc  = document.getElementById('jobDesc').value.trim().length > 50;
+  const hasFiles = selectedFiles.length > 0;
+
+  document.getElementById('step1').className = 'step' + (hasTitle && hasDesc ? ' done' : hasTitle || hasDesc ? ' active' : '');
+  document.getElementById('step2').className = 'step' + (hasFiles ? ' done' : hasTitle && hasDesc ? ' active' : '');
+  document.getElementById('step3').className = 'step' + (hasFiles && hasTitle && hasDesc ? ' active' : '');
+
+  const btn = document.getElementById('submitBtn');
+  const ready = hasTitle && hasDesc && hasFiles;
+  btn.disabled = !ready;
+  document.getElementById('btnText').textContent = ready
+    ? `Analyse ${selectedFiles.length} Candidate${selectedFiles.length>1?'s':''}`
+    : !hasTitle ? 'Enter a job title to continue'
+    : !hasDesc ? 'Add a job description to continue'
+    : 'Upload at least one resume';
+  document.getElementById('btnIcon').textContent = ready ? '✦' : '⬤';
+}
+
+// ── Submit ─────────────────────────────────────────────────────────────────
+const msgs = ['Reading candidate experience...','Evaluating technical skills...','Comparing against job requirements...','Generating AI insights...','Ranking all candidates...'];
+let msgIdx = 0;
+
+async function submitForm() {
+  const title = document.getElementById('jobTitle').value.trim();
+  const desc  = document.getElementById('jobDesc').value.trim();
+  const comp  = document.getElementById('company').value.trim();
+  if (!title || !desc || !selectedFiles.length) return;
+
+  showProc();
+  document.getElementById('submitBtn').disabled = true;
+  document.getElementById('btnText').textContent = 'Processing...';
+
+  // Show file queue
+  const pf = document.getElementById('procFiles');
+  pf.innerHTML = selectedFiles.map((f,i) =>
+    `<div class="proc-file" id="pf-${i}">
+      <div class="proc-file-icon pfi-wait" id="pfi-${i}">○</div>
+      <span>${f.name}</span>
+    </div>`).join('');
+
+  msgIdx = 0;
+  document.getElementById('procMsg').textContent = msgs[0];
+  const iv = setInterval(() => {
+    msgIdx = (msgIdx+1) % msgs.length;
+    document.getElementById('procMsg').textContent = msgs[msgIdx];
+  }, 2500);
+
+  // Animate file icons
+  selectedFiles.forEach((_,i) => {
+    setTimeout(() => {
+      const el = document.getElementById('pfi-'+i);
+      if (el) { el.className='proc-file-icon pfi-scan'; el.textContent='◌'; }
+    }, i * 800);
+  });
+
+  const fd = new FormData();
+  fd.append('job_title', title);
+  fd.append('job_description', desc);
+  fd.append('company_name', comp);
+  selectedFiles.forEach(f => fd.append('files', f));
+
+  try {
+    const res  = await fetch('/api/screen', { method:'POST', body: fd });
+    const data = await res.json();
+    clearInterval(iv);
+
+    if (!res.ok) {
+      showError(data.detail || 'Screening failed. Please try again.');
+      return;
+    }
+
+    // Mark all files done
+    selectedFiles.forEach((_,i) => {
+      const el = document.getElementById('pfi-'+i);
+      if (el) { el.className='proc-file-icon pfi-done'; el.textContent='✓'; }
+    });
+
+    setTimeout(() => {
+      allResults = data.results || [];
+      renderResults(data);
+    }, 600);
+
+  } catch(e) {
+    clearInterval(iv);
+    showError('Network error — please check your connection and try again.');
+  } finally {
+    document.getElementById('submitBtn').disabled = false;
+    updateSteps();
+  }
+}
+
+// ── UI state helpers ───────────────────────────────────────────────────────
+function showProc() {
+  document.getElementById('emptyState').style.display  = 'none';
+  document.getElementById('procState').classList.add('on');
+  document.getElementById('resultsWrap').classList.remove('on');
+}
+function showError(msg) {
+  document.getElementById('procState').classList.remove('on');
+  document.getElementById('emptyState').style.display = 'flex';
+  document.getElementById('emptyState').innerHTML = `
+    <div class="empty-ico">⚠️</div>
+    <div class="empty-title">Something went wrong</div>
+    <div class="empty-sub">${msg}</div>`;
+}
+
+// ── Render results ─────────────────────────────────────────────────────────
+function sortBy(key, btn) {
+  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const sorted = [...allResults];
+  if (key==='score') sorted.sort((a,b) => (b.overall_score||0)-(a.overall_score||0));
+  if (key==='name')  sorted.sort((a,b) => (a.candidate_name||'').localeCompare(b.candidate_name||''));
+  if (key==='exp')   sorted.sort((a,b) => (b.experience_years||0)-(a.experience_years||0));
+  renderCards(sorted);
+}
+
+function scoreColor(s) {
+  if (s>=80) return '#2DD4BF';
+  if (s>=65) return '#4ADE80';
+  if (s>=50) return '#FBBF24';
+  return '#F87171';
+}
+function recClass(r) {
+  return {
+    'Strong Hire':'r-sh','Hire':'r-h','Maybe':'r-m','No Hire':'r-n'
+  }[r] || 'r-m';
+}
+
+function renderResults(data) {
+  document.getElementById('procState').classList.remove('on');
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('resultsWrap').classList.add('on');
+  document.getElementById('step3').className = 'step done';
+
+  const jobTitle = data.job_title || 'Results';
+  const company  = data.company_name ? ` — ${data.company_name}` : '';
+  document.getElementById('resultsTitle').textContent = jobTitle + company;
+  document.getElementById('resultsMeta').textContent =
+    `${data.total_processed} candidate${data.total_processed!==1?'s':''} analysed`;
+
+  // Summary bar
+  const res = data.results || [];
+  const avgScore = res.length ? Math.round(res.reduce((a,b)=>a+(b.overall_score||0),0)/res.length) : 0;
+  const strongHires = res.filter(r=>r.recommendation==='Strong Hire').length;
+  const topScore = res.length ? Math.max(...res.map(r=>r.overall_score||0)) : 0;
+  document.getElementById('summaryBar').innerHTML = `
+    <div class="sum-card"><div class="sum-num" style="color:var(--teal)">${data.total_processed}</div><div class="sum-lbl">Screened</div></div>
+    <div class="sum-card"><div class="sum-num" style="color:var(--gold)">${topScore}</div><div class="sum-lbl">Top Score</div></div>
+    <div class="sum-card"><div class="sum-num" style="color:var(--green)">${strongHires}</div><div class="sum-lbl">Strong Hires</div></div>
+    <div class="sum-card"><div class="sum-num" style="color:var(--amber)">${avgScore}</div><div class="sum-lbl">Avg Score</div></div>`;
+
+  // Error cards
+  document.getElementById('errorCards').innerHTML = (data.errors||[]).map(e=>
+    `<div class="err-card">⚠️ <strong>${e.file}</strong> — ${e.error}</div>`).join('');
+
+  renderCards(res);
+}
+
+function renderCards(candidates) {
+  document.getElementById('candsList').innerHTML = candidates.map((c,i) => buildCard(c,i)).join('');
+  requestAnimationFrame(() => {
+    candidates.forEach((c,i) => {
+      const circ = 2*Math.PI*28;
+      setTimeout(() => {
+        const ring = document.getElementById(`ring-${i}`);
+        if (ring) {
+          ring.style.transition = 'stroke-dashoffset 1.2s cubic-bezier(.16,1,.3,1)';
+          ring.style.strokeDashoffset = circ - ((c.overall_score||0)/100)*circ;
+          ring.style.stroke = scoreColor(c.overall_score||0);
+        }
+        const scores = c.scores || {};
+        Object.keys(scores).forEach(k => {
+          const bar = document.getElementById(`bar-${i}-${k}`);
+          if (bar) {
+            bar.style.transition = 'width 1s cubic-bezier(.16,1,.3,1)';
+            bar.style.width = (scores[k]||0)+'%';
+            bar.style.background = scoreColor(scores[k]||0);
+          }
+        });
+      }, i*80);
+    });
+  });
+}
+
+function buildCard(c, i) {
+  const score = c.overall_score||0;
+  const circ  = 2*Math.PI*28;
+  const col   = scoreColor(score);
+  const rc    = recClass(c.recommendation);
+  const scores = c.scores||{};
+  const labels = {technical_skills:'Technical',experience:'Experience',
+    education:'Education',cultural_fit:'Culture Fit',leadership:'Leadership',communication:'Communication'};
+
+  const bars = Object.entries(labels).map(([k,l]) =>
+    `<div class="score-cell">
+      <div class="sc-lbl">${l}</div>
+      <div class="sc-bar"><div class="sc-fill" id="bar-${i}-${k}" style="width:0%"></div></div>
+      <div class="sc-val">${scores[k]||0}</div>
+    </div>`).join('');
+
+  const strengths = (c.strengths||[]).slice(0,4).map(s=>
+    `<div class="det-item"><span class="di-s" style="color:var(--teal)">✓</span>${s}</div>`).join('');
+  const gaps = (c.gaps||[]).slice(0,3).map(g=>
+    `<div class="det-item"><span class="di-s" style="color:var(--amber)">△</span>${g}</div>`).join('');
+  const flags = (c.red_flags||[]).filter(Boolean).map(f=>
+    `<div class="det-item"><span class="di-s" style="color:var(--red)">⚑</span>${f}</div>`).join('');
+  const skills = (c.key_skills||[]).map(s=>
+    `<span class="skill-tag">${s}</span>`).join('');
+  const iqs = (c.interview_questions||[]).map(q=>
+    `<div class="iq-item">${q}</div>`).join('');
+
+  return `<div class="ccard">
+    <div class="card-hdr" onclick="toggleCard(${i})">
+      <div class="rank">#${i+1}</div>
+      <div class="cand-avatar">
+        ${c.avatar_url ? `<img src="${c.avatar_url}" alt="${c.candidate_name}">` : (c.candidate_name||'C').split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2)}
+      </div>
+      <div class="cinfo">
+        <div class="cname">${c.candidate_name||'Candidate'}</div>
+        <div class="cpills">
+          ${c.experience_years?`<span class="cpill pill-exp">${c.experience_years} yrs exp</span>`:''}
+          ${c.highest_education?`<span class="cpill pill-edu">${c.highest_education}</span>`:''}
+          ${c.salary_expectation?`<span class="cpill pill-sal">${c.salary_expectation}</span>`:''}
+        </div>
+      </div>
+      <div class="score-wrap">
+        <div class="ring-c">
+          <svg width="70" height="70" viewBox="0 0 70 70">
+            <circle cx="35" cy="35" r="28" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="4"/>
+            <circle id="ring-${i}" cx="35" cy="35" r="28" fill="none"
+              stroke="${col}" stroke-width="4" stroke-linecap="round"
+              stroke-dasharray="${circ}" stroke-dashoffset="${circ}"/>
+          </svg>
+          <div class="ring-txt"><div class="rv" style="color:${col}">${score}</div><div class="rs">SCORE</div></div>
+        </div>
+        <span class="rec-pill ${rc}">${c.recommendation||'N/A'}</span>
+      </div>
+    </div>
+    <div class="card-summ">${c.executive_summary||''}</div>
+    <div class="score-grid">${bars}</div>
+    <div class="card-details" id="det-${i}">
+      <div class="details-grid">
+        <div class="det-sec"><div class="det-h">Key Skills</div><div class="tag-list">${skills}</div></div>
+        <div class="det-sec"><div class="det-h">Standout Achievement</div><div class="achiev">${c.standout_achievements||'None identified.'}</div></div>
+        <div class="det-sec"><div class="det-h">Strengths</div><div class="item-list">${strengths}</div></div>
+        <div class="det-sec"><div class="det-h">Gaps & Concerns</div><div class="item-list">${gaps}</div></div>
+        <div class="det-sec"><div class="det-h">Suggested Interview Questions</div><div class="item-list" style="gap:8px">${iqs}</div></div>
+        <div class="det-sec"><div class="det-h">Additional Signals</div><div class="item-list">
+          ${flags||`<div class="det-item"><span class="di-s" style="color:var(--teal)">✓</span>No red flags detected</div>`}
+          ${c.availability_signals?`<div class="det-item" style="margin-top:4px">⏱ ${c.availability_signals}</div>`:''}
+        </div></div>
+      </div>
+    </div>
+    <div class="card-toggle" onclick="toggleCard(${i})">
+      <svg class="chev" id="chev-${i}" viewBox="0 0 16 16" fill="none">
+        <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <span id="tog-${i}">View Full Analysis</span>
+    </div>
+  </div>`;
+}
+
+function toggleCard(i) {
+  const det  = document.getElementById(`det-${i}`);
+  const chev = document.getElementById(`chev-${i}`);
+  const lbl  = document.getElementById(`tog-${i}`);
+  const open = det.classList.contains('open');
+  det.classList.toggle('open', !open);
+  chev.classList.toggle('up', !open);
+  lbl.textContent = open ? 'View Full Analysis' : 'Collapse';
+}
+
+// ── Load past result if coming from dashboard ──────────────────────────────
+{% if past_result %}
+window.addEventListener('DOMContentLoaded', () => {
+  const data = {{ past_result | tojson }};
+  allResults = data.results || [];
+  renderResults(data);
+  document.getElementById('step1').className = 'step done';
+  document.getElementById('step2').className = 'step done';
+});
+{% endif %}
+</script>
+</body>
+</html>

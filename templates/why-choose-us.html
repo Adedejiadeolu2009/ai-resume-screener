@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Why Choose Aptura — Aptura AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0A0B0E; --card: #13151C; --elev: #1A1D27; --input: #1F2330;
+  --border: rgba(255,255,255,0.07); --border-lit: rgba(201,168,76,0.35);
+  --gold: #C9A84C; --teal: #2DD4BF; --text: #F0EDE6; --muted: #9A9691; --hint: #5A5750;
+  --ff-serif: 'Cormorant Garamond', Georgia, serif; --ff-sans: 'Outfit', system-ui, sans-serif;
+}
+body { background: var(--bg); color: var(--text); font-family: var(--ff-sans); }
+body::before {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background: radial-gradient(ellipse 70% 50% at 10% 0%, rgba(201,168,76,0.05), transparent 60%);
+}
+
+nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 32px; border-bottom: 1px solid var(--border);
+  background: rgba(10,11,14,0.85); position: sticky; top: 0; z-index: 50;
+}
+.brand { display: flex; align-items: center; gap: 12px; }
+.brand-mark { width: 34px; height: 34px; background: linear-gradient(135deg, var(--gold), #8B6914); border-radius: 8px; display: flex; align-items: center; justify-content: center; font: 600 15px var(--ff-serif); color: #0A0B0E; }
+.brand-name { font: 500 18px var(--ff-serif); }
+.brand-name span { color: var(--gold); }
+
+.nav-links { display: flex; gap: 20px; align-items: center; }
+.nav-links a { color: var(--muted); text-decoration: none; font: 500 14px var(--ff-sans); transition: all 0.2s; }
+.nav-links a:hover { color: var(--gold); }
+.btn { padding: 8px 14px; border-radius: 6px; border: 1px solid var(--border); background: rgba(255,255,255,0.03); color: var(--muted); text-decoration: none; font: 700 12px var(--ff-sans); cursor: pointer; transition: all 0.2s; }
+.btn:hover { color: var(--text); border-color: rgba(255,255,255,0.15); }
+.btn-primary { background: linear-gradient(135deg, var(--gold), #A07820); border: none; color: #0A0B0E; }
+.btn-primary:hover { transform: translateY(-2px); }
+
+main { max-width: 1000px; margin: 0 auto; padding: 60px 32px; position: relative; z-index: 1; }
+h1 { font: 300 48px var(--ff-serif); margin-bottom: 16px; }
+h2 { font: 600 28px var(--ff-serif); margin-top: 40px; margin-bottom: 24px; }
+p { color: var(--muted); font-size: 15px; line-height: 1.8; margin-bottom: 16px; }
+
+.comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 32px; }
+.comparison-box { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 28px; }
+.comparison-box h3 { font: 600 20px var(--ff-serif); margin-bottom: 20px; }
+.comparison-box.aptura { border: 2px solid var(--gold); background: linear-gradient(135deg, rgba(201,168,76,0.05), transparent); }
+.comparison-box.aptura h3 { color: var(--gold); }
+
+.comparison-list { display: flex; flex-direction: column; gap: 12px; }
+.comparison-item { display: flex; gap: 10px; align-items: flex-start; }
+.comparison-item.positive { color: #4ADE80; }
+.comparison-item.negative { color: #F87171; }
+.comparison-item.positive::before { content: '✓'; font-weight: 700; }
+.comparison-item.negative::before { content: '✗'; font-weight: 700; }
+
+.benefits { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; margin-top: 32px; }
+.benefit-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
+.benefit-card-icon { font-size: 36px; margin-bottom: 12px; }
+.benefit-card h3 { font: 600 16px var(--ff-serif); margin-bottom: 8px; }
+.benefit-card p { font-size: 14px; margin: 0; }
+
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 32px; }
+.stat { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; text-align: center; }
+.stat-number { font: 700 36px var(--ff-serif); color: var(--gold); margin-bottom: 8px; }
+.stat-label { color: var(--muted); font-size: 14px; }
+
+.cta { background: linear-gradient(135deg, rgba(201,168,76,0.12), rgba(45,212,191,0.08)); border: 1px solid rgba(201,168,76,0.25); border-radius: 12px; padding: 40px 32px; text-align: center; margin-top: 40px; }
+.cta h2 { margin-top: 0; }
+.cta .btn { margin-top: 24px; display: inline-block; }
+
+@media (max-width: 768px) {
+  main { padding: 40px 20px; }
+  h1 { font-size: 36px; }
+  nav { padding: 14px 16px; }
+  .nav-links { gap: 12px; font-size: 12px; }
+  .comparison { grid-template-columns: 1fr; }
+  .stats { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="brand">
+    <div class="brand-mark">A</div>
+    <div class="brand-name">Ap<span>tura</span></div>
+  </div>
+  <div class="nav-links">
+    <a href="/">Home</a>
+    <a href="/about">About</a>
+    <a href="/why-choose-us" style="color: var(--gold); font-weight: 700;">Why Us</a>
+    <a href="/plans">Plans</a>
+    <a href="/dashboard" class="btn">Dashboard</a>
+  </div>
+</nav>
+
+<main>
+  <h1>Why Choose Aptura?</h1>
+  <p style="font-size: 16px; color: var(--text);">See what makes us different from manual screening and other tools</p>
+
+  <h2>vs Manual Resume Screening</h2>
+  <div class="comparison">
+    <div class="comparison-box">
+      <h3>Traditional Manual Approach</h3>
+      <div class="comparison-list">
+        <div class="comparison-item negative">Hours per hiring cycle wasted</div>
+        <div class="comparison-item negative">Subjective scoring varies by reviewer</div>
+        <div class="comparison-item negative">Fatigue leads to missing good candidates</div>
+        <div class="comparison-item negative">No consistent ranking system</div>
+        <div class="comparison-item negative">Limited to business hours</div>
+        <div class="comparison-item negative">Expensive recruiting staff</div>
+      </div>
+    </div>
+    <div class="comparison-box aptura">
+      <h3>Aptura AI Screening</h3>
+      <div class="comparison-list">
+        <div class="comparison-item positive">100+ resumes in seconds</div>
+        <div class="comparison-item positive">Consistent, unbiased AI scoring</div>
+        <div class="comparison-item positive">No fatigue—catches every candidate</div>
+        <div class="comparison-item positive">Objective criteria-based ranking</div>
+        <div class="comparison-item positive">Available 24/7/365</div>
+        <div class="comparison-item positive">Scales without added cost</div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Key Benefits</h2>
+  <div class="benefits">
+    <div class="benefit-card">
+      <div class="benefit-card-icon">⚡</div>
+      <h3>Lightning Fast</h3>
+      <p>Screen 100+ resumes in seconds, not hours. Get results instantly.</p>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-card-icon">🎯</div>
+      <h3>Highly Accurate</h3>
+      <p>Advanced AI matches candidates to your job requirements with precision.</p>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-card-icon">📊</div>
+      <h3>Detailed Reports</h3>
+      <p>Get structured JSON reports with scores and explanations for every candidate.</p>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-card-icon">💼</div>
+      <h3>For Teams of All Sizes</h3>
+      <p>From startups to enterprises—plans that scale with your needs.</p>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-card-icon">🔒</div>
+      <h3>Secure & Reliable</h3>
+      <p>Enterprise-grade security keeps your candidate data safe.</p>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-card-icon">🌍</div>
+      <h3>Global Reach</h3>
+      <p>Works with resumes in multiple formats and languages.</p>
+    </div>
+  </div>
+
+  <h2>Aptura by the Numbers</h2>
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-number">89%</div>
+      <div class="stat-label">Time saved on screening</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">4x</div>
+      <div class="stat-label">More candidates reviewed</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">100%</div>
+      <div class="stat-label">Uptime guarantee</div>
+    </div>
+  </div>
+
+  <h2>How It Works</h2>
+  <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 32px; margin-top: 24px;">
+    <ol style="color: var(--muted); line-height: 2; font-size: 15px;">
+      <li><strong>Upload</strong> — Drag and drop resumes or select files</li>
+      <li><strong>Specify</strong> — Enter job title, skills, and requirements</li>
+      <li><strong>Screen</strong> — AI analyzes and ranks candidates in seconds</li>
+      <li><strong>Review</strong> — Get detailed scores, recommendations, and JSON reports</li>
+      <li><strong>Hire</strong> — Focus on interviews with pre-qualified candidates</li>
+    </ol>
+  </div>
+
+  <div class="cta">
+    <h2>Start Screening Smarter Today</h2>
+    <p>Join companies using Aptura to save time and hire better talent</p>
+    <a href="/plans" class="btn btn-primary">View Plans</a>
+  </div>
+</main>
+
+</body>
+</html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Plans — Aptura AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#0A0B0E;--card:#13151C;--elev:#1A1D27;--input:#1F2330;--border:rgba(255,255,255,.07);--border-lit:rgba(201,168,76,.35);--gold:#C9A84C;--teal:#2DD4BF;--red:#F87171;--amber:#FBBF24;--green:#4ADE80;--text:#F0EDE6;--muted:#9A9691;--hint:#5A5750;--ff-serif:'Cormorant Garamond',Georgia,serif;--ff-sans:'Outfit',system-ui,sans-serif;--r:12px}
+  body{background:var(--bg);color:var(--text);font-family:var(--ff-sans);min-height:100vh}
+  nav{display:flex;align-items:center;justify-content:space-between;padding:16px 32px;border-bottom:1px solid var(--border);background:rgba(10,11,14,.85);position:sticky;top:0;z-index:50}
+  .brand{display:flex;align-items:center;gap:12px}
+  .brand-mark{width:34px;height:34px;background:linear-gradient(135deg,var(--gold),#8B6914);border-radius:8px;display:flex;align-items:center;justify-content:center;font:600 15px var(--ff-serif);color:#0A0B0E}
+  .brand-name{font:500 18px var(--ff-serif)} .brand-name span{color:var(--gold)}
+  main{max-width:1100px;margin:0 auto;padding:32px 20px 60px}
+  .hero{margin-bottom:18px}
+  .hero h1{font:300 38px var(--ff-serif);margin-bottom:6px}
+  .hero p{color:var(--muted);font-size:14px;font-weight:300}
+
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:18px}
+  @media(max-width:980px){.grid{grid-template-columns:1fr}}
+
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:22px;position:relative;overflow:hidden}
+  .card::before{content:'';position:absolute;inset:-2px;background:radial-gradient(ellipse 60% 40% at 30% 0%, rgba(201,168,76,.12), transparent 55%);pointer-events:none}
+  .card > *{position:relative}
+  .tag{display:inline-flex;align-items:center;gap:8px;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.04);border:1px solid var(--border);font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.4px}
+
+  .title{font:600 18px var(--ff-serif);margin-top:14px}
+  .price{font:700 32px var(--ff-serif);margin-top:10px}
+  .per{color:var(--muted);font-size:12px;margin-top:-4px}
+  .list{margin-top:14px;display:flex;flex-direction:column;gap:10px}
+  .li{display:flex;gap:10px;align-items:flex-start;color:var(--muted);font-size:13px;line-height:1.4}
+  .check{width:18px;height:18px;border-radius:6px;display:flex;align-items:center;justify-content:center;background:rgba(45,212,191,.12);border:1px solid rgba(45,212,191,.25);color:var(--teal);flex-shrink:0}
+
+  .btn{margin-top:18px;display:inline-flex;align-items:center;justify-content:center;width:100%;padding:12px 14px;border-radius:8px;border:1px solid var(--border);background:rgba(255,255,255,.03);color:var(--muted);text-decoration:none;font:700 13px var(--ff-sans);cursor:pointer}
+  .btn:hover{border-color:var(--border-lit);color:var(--text)}
+
+  .btn-primary{background:linear-gradient(135deg,var(--gold),#A07820);border:none;color:#0A0B0E}
+
+  .active{border-color:rgba(45,212,191,.35);box-shadow:0 0 0 1px rgba(45,212,191,.12) inset}
+  .active .tag{background:rgba(45,212,191,.12);border-color:rgba(45,212,191,.25);color:var(--teal)}
+
+  .transfer{margin-top:22px;background:var(--elev);border:1px solid var(--border);border-radius:var(--r);padding:18px}
+  .transfer h2{font:600 16px var(--ff-serif);margin-bottom:10px}
+  .transfer p{color:var(--muted);font-size:13px;line-height:1.6}
+  .kv{margin-top:12px;display:grid;grid-template-columns:1fr;gap:8px}
+  .kv .row{display:flex;gap:12px;align-items:flex-start;justify-content:space-between;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:rgba(255,255,255,.02)}
+  .k{color:var(--hint);font-size:11px;text-transform:uppercase;letter-spacing:1.2px;font-weight:800}
+  .v{color:var(--text);font-weight:700;font-size:13px}
+  .small{font-size:12px;color:var(--hint);margin-top:10px}
+
+  .notice{margin-top:16px;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.25);border-radius:12px;padding:14px;color:var(--muted);font-size:13px;line-height:1.6}
+
+  .quick-benefits{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:32px 0;background:rgba(201,168,76,.04);border:1px solid rgba(201,168,76,.15);border-radius:12px;padding:20px}
+  .qb{display:flex;gap:8px;align-items:flex-start}
+  .qb-icon{font-size:18px;flex-shrink:0}
+  .qb-text{font-size:13px;color:var(--muted);line-height:1.5}
+
+  .feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:24px 0}
+  .fcard{background:var(--elev);border:1px solid var(--border);border-radius:10px;padding:16px;font-size:13px}
+  .fcard strong{color:var(--gold);display:block;margin-bottom:6px}
+  @media(max-width:900px){.feature-grid{grid-template-columns:1fr}}
+
+</style>
+</head>
+<body>
+<nav>
+  <div class="brand">
+    <div class="brand-mark">A</div>
+    <div class="brand-name">Ap<span>tura</span> AI</div>
+  </div>
+  <div style="display:flex;gap:20px;align-items:center">
+    <a href="/about" style="color:var(--muted);text-decoration:none;font:500 13px var(--ff-sans)">About</a>
+    <a href="/why-choose-us" style="color:var(--muted);text-decoration:none;font:500 13px var(--ff-sans)">Why Us</a>
+    <a href="/contact" style="color:var(--muted);text-decoration:none;font:500 13px var(--ff-sans)">Contact</a>
+    <a href="/dashboard" class="btn" style="width:auto;padding:8px 14px">← Dashboard</a>
+  </div>
+</nav>
+
+<main>
+  <div class="hero">
+    <h1>Choose your plan</h1>
+    <p>Upgrade by bank transfer. After payment, contact admin to activate your account.</p>
+  </div>
+
+  <div class="quick-benefits">
+    <div class="qb"><div class="qb-icon">⚡</div><div class="qb-text"><strong>Lightning Speed</strong> Screen 100+ resumes in seconds</div></div>
+    <div class="qb"><div class="qb-icon">🎯</div><div class="qb-text"><strong>Accurate</strong> AI-powered candidate matching</div></div>
+    <div class="qb"><div class="qb-icon">📊</div><div class="qb-text"><strong>Detailed Reports</strong> JSON output for integration</div></div>
+    <div class="qb"><div class="qb-icon">🔒</div><div class="qb-text"><strong>Secure</strong> Your data protected</div></div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="tag">FREE</div>
+      <div class="title">Free Plan</div>
+      <div class="price">₦0</div>
+      <div class="per">/ month</div>
+      <div class="list">
+        <div class="li"><div class="check">✓</div>5 screenings / month</div>
+        <div class="li"><div class="check">✓</div>AI resume ranking</div>
+        <div class="li"><div class="check">✓</div>JSON report export</div>
+        <div class="li"><div class="check">✓</div>Basic analytics</div>
+      </div>
+      <p style="margin-top:12px;color:var(--hint);font-size:12px">Perfect for trying out Aptura or occasional hiring needs</p>
+      <a class="btn" href="/dashboard">Start Free</a>
+    </div>
+
+    <div class="card {% if tier == 'PRO' %}active{% endif %}">
+      <div class="tag">PRO</div>
+      <div class="title">Pro Plan</div>
+      <div class="price">₦{{ pro_amount }}</div>
+      <div class="per">/ month</div>
+      <div class="list">
+        <div class="li"><div class="check">✓</div>100 screenings / month</div>
+        <div class="li"><div class="check">✓</div>Advanced AI ranking</div>
+        <div class="li"><div class="check">✓</div>Detailed JSON reports</div>
+        <div class="li"><div class="check">✓</div>Advanced analytics dashboard</div>
+        <div class="li"><div class="check">✓</div>Priority support</div>
+      </div>
+      <p style="margin-top:12px;color:var(--hint);font-size:12px">Best for growing teams and frequent hiring</p>
+      <button class="btn btn-primary" onclick="requestUpgrade('PRO')" {% if tier == 'PRO' %}disabled{% endif %}>
+        {% if tier == 'PRO' %}✓ Active{% else %}Upgrade to Pro{% endif %}
+      </button>
+    </div>
+
+    <div class="card {% if tier == 'ENTERPRISE' %}active{% endif %}">
+      <div class="tag">ENTERPRISE</div>
+      <div class="title">Enterprise</div>
+      <div class="price">₦{{ enterprise_amount }}</div>
+      <div class="per">/ month</div>
+      <div class="list">
+        <div class="li"><div class="check">✓</div>Unlimited screenings</div>
+        <div class="li"><div class="check">✓</div>All Pro features</div>
+        <div class="li"><div class="check">✓</div>API access</div>
+        <div class="li"><div class="check">✓</div>Custom workflows</div>
+        <div class="li"><div class="check">✓</div>Dedicated support</div>
+      </div>
+      <p style="margin-top:12px;color:var(--hint);font-size:12px">For large teams and constant hiring</p>
+      <button class="btn btn-primary" onclick="requestUpgrade('ENTERPRISE')" {% if tier == 'ENTERPRISE' %}disabled{% endif %}>
+        {% if tier == 'ENTERPRISE' %}✓ Active{% else %}Upgrade to Enterprise{% endif %}
+      </button>
+    </div>
+  </div>
+
+  <div style="margin:40px 0;background:var(--elev);border:1px solid var(--border);border-radius:12px;padding:28px">
+    <h3 style="font:600 18px var(--ff-serif);margin-bottom:16px;margin-top:0">What's Included in Premium Plans</h3>
+    <div class="feature-grid">
+      <div class="fcard">
+        <strong>📄 Batch Screening</strong>
+        Upload multiple resumes at once and screen them all together for faster hiring cycles
+      </div>
+      <div class="fcard">
+        <strong>📊 Advanced Analytics</strong>
+        Track hiring metrics, candidate flow, and trends over time with beautiful dashboards
+      </div>
+      <div class="fcard">
+        <strong>🔄 Job Management</strong>
+        Create and manage multiple job positions with their own screening criteria
+      </div>
+      <div class="fcard">
+        <strong>📧 Automated Reports</strong>
+        Get beautiful PDF reports and summaries emailed directly to your team
+      </div>
+      <div class="fcard">
+        <strong>⚙️ Custom Scoring</strong>
+        Adjust AI weights based on your company's priorities and culture
+      </div>
+      <div class="fcard">
+        <strong>🔐 Team Collaboration</strong>
+        Add team members and share screening results securely (Enterprise only)
+      </div>
+    </div>
+  </div>
+
+  <div class="transfer">
+    <h2>Manual bank transfer details</h2>
+    <p>{{ transfer_instructions }}</p>
+
+    <div class="kv">
+      <div class="row"><div class="k">Bank name</div><div class="v">{{ bank_name }}</div></div>
+      <div class="row"><div class="k">Account name</div><div class="v">{{ account_name }}</div></div>
+      <div class="row"><div class="k">Account number</div><div class="v">{{ account_number }}</div></div>
+      <div class="row"><div class="k">Pro amount</div><div class="v">₦{{ pro_amount }}</div></div>
+      <div class="row"><div class="k">Enterprise amount</div><div class="v">₦{{ enterprise_amount }}</div></div>
+    </div>
+
+    <div class="notice">
+      After you transfer, click <strong>Request Activation</strong>. Admin will review and activate your plan.
+    </div>
+
+    <div style="margin-top:12px">
+      <form onsubmit="checkStatus(event)" style="display:flex;gap:8px;max-width:420px">
+        <input id="statusRef" placeholder="Enter reference to check status" style="flex:1;padding:10px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text)" />
+        <button type="submit" class="btn">Check Status</button>
+      </form>
+  
+  </div>
+  </div>
+</main>
+
+<script>
+  async function requestUpgrade(plan){
+    try{
+      const fd = new FormData();
+      fd.append('plan', plan);
+      fd.append('csrf_token', '{{ csrf_token }}');
+
+      const res = await fetch('/auth/request-upgrade', { method:'POST', body: fd });
+      const data = await res.json();
+
+      if(!res.ok){
+        alert(data.message || 'Request failed');
+        return;
+      }
+
+      alert(data.message + (data.request_ref ? ("\nReference: " + data.request_ref) : ""));
+    }catch(e){
+      alert('Network error');
+    }
+  }
+
+  function checkStatus(e){
+    e.preventDefault();
+    const ref = document.getElementById('statusRef').value.trim();
+    if(!ref){ alert('Enter a reference to check'); return }
+    window.location.href = '/plans/status?ref=' + encodeURIComponent(ref);
+  }
+</script>
+</body>
+</html>
+

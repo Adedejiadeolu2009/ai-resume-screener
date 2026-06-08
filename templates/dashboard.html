@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Aptura AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0A0B0E; --card: #13151C; --elev: #1A1D27; --input: #1F2330;
+  --border: rgba(255,255,255,0.07); --border-lit: rgba(201,168,76,0.35);
+  --gold: #C9A84C; --gold-light: #E8D5A3; --gold-bg: rgba(201,168,76,0.1);
+  --teal: #2DD4BF; --teal-bg: rgba(45,212,191,0.1);
+  --red: #F87171; --amber: #FBBF24; --green: #4ADE80;
+  --text: #F0EDE6; --muted: #9A9691; --hint: #5A5750;
+  --ff-serif: 'Cormorant Garamond', Georgia, serif;
+  --ff-sans: 'Outfit', system-ui, sans-serif;
+}
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--text); font-family: var(--ff-sans); overflow-x: hidden; }
+body::before {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background: radial-gradient(ellipse 70% 50% at 10% 0%, rgba(201,168,76,0.05), transparent 60%);
+}
+
+.app-wrapper { display: flex; min-height: 100vh; }
+
+/* Sidebar */
+.sidebar { 
+  width: 240px; background: linear-gradient(180deg, rgba(12,14,20,0.98), rgba(8,9,12,0.98)); 
+  padding: 24px 16px; border-right: 1px solid rgba(255,255,255,0.02); 
+  flex-shrink: 0; z-index: 1000; position: relative; 
+  display: flex; flex-direction: column;
+}
+.sidebar-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; padding: 0 8px; }
+.sidebar-brand-mark { width: 36px; height: 36px; background: linear-gradient(135deg, var(--gold), #8B6914); border-radius: 8px; display: flex; align-items: center; justify-content: center; font: 600 16px var(--ff-serif); color: #0A0B0E; }
+.sidebar-brand-name { font: 600 16px var(--ff-serif); }
+.sidebar-brand-name span { color: var(--gold); }
+
+.sidebar-nav { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.sidebar-nav a { 
+  display: flex; align-items: center; gap: 12px; 
+  padding: 12px 14px; border-radius: 10px; 
+  color: var(--muted); text-decoration: none; 
+  font: 500 13px var(--ff-sans); transition: all 0.2s;
+}
+.sidebar-nav a:hover, .sidebar-nav a.active { 
+  background: linear-gradient(90deg, rgba(201,168,76,0.08), rgba(45,212,191,0.03));
+  color: var(--text);
+}
+
+.sidebar-footer { 
+  background: linear-gradient(135deg, rgba(201,168,76,0.06), rgba(45,212,191,0.03)); 
+  border: 1px solid rgba(255,255,255,0.03); border-radius: 10px; 
+  padding: 12px 14px; margin-top: auto;
+}
+.sidebar-footer-title { font: 700 12px var(--ff-sans); color: var(--gold); margin-bottom: 6px; }
+.sidebar-footer-desc { font: 400 11px var(--ff-sans); color: var(--hint); margin-bottom: 8px; }
+.sidebar-footer-link { display: inline-block; font: 700 11px var(--ff-sans); color: var(--gold); text-decoration: none; }
+
+/* Content Area */
+.content { flex: 1; display: flex; flex-direction: column; position: relative; z-index: 1; }
+
+/* Top Nav */
+nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 28px; border-bottom: 1px solid var(--border);
+  background: rgba(10,11,14,0.7); backdrop-filter: blur(8px);
+  position: sticky; top: 0; z-index: 100;
+}
+
+.nav-left { display: flex; align-items: center; gap: 16px; }
+.hamburger-btn { 
+  display: none; width: 40px; height: 40px; border: 1px solid var(--border); 
+  background: rgba(255,255,255,0.03); border-radius: 8px; 
+  color: var(--text); cursor: pointer; font-size: 20px; align-items: center; justify-content: center;
+}
+
+.nav-right { display: flex; align-items: center; gap: 16px; }
+.btn-new { 
+  background: linear-gradient(135deg, var(--gold), #A07820); color: #0A0B0E; 
+  font: 700 12px var(--ff-sans); padding: 10px 18px; border: none; border-radius: 8px; 
+  cursor: pointer; text-decoration: none; display: flex; align-items: center; gap: 6px; 
+  transition: all 0.2s; box-shadow: 0 2px 12px rgba(201,168,76,0.2);
+}
+.btn-new:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(201,168,76,0.35); }
+
+.user-profile { display: flex; align-items: center; gap: 12px; }
+.user-avatar { 
+  width: 36px; height: 36px; border-radius: 50%; 
+  background: var(--gold-bg); border: 1px solid var(--border-lit); 
+  display: flex; align-items: center; justify-content: center; 
+  font-size: 13px; font-weight: 700; color: var(--gold); overflow: hidden; flex-shrink: 0;
+}
+.user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.user-name { font: 500 13px var(--ff-sans); color: var(--text); }
+.btn-logout { 
+  background: none; border: 1px solid var(--border); border-radius: 6px; 
+  color: var(--muted); font: 600 12px var(--ff-sans); padding: 6px 12px; 
+  cursor: pointer; transition: all 0.2s; text-decoration: none;
+}
+.btn-logout:hover { border-color: var(--red); color: var(--red); }
+
+/* Main Content */
+main { flex: 1; max-width: 1280px; width: 100%; margin: 0 auto; padding: 32px 28px 60px; position: relative; z-index: 1; }
+
+.welcome { margin-bottom: 28px; }
+.welcome h1 { font: 300 36px var(--ff-serif); margin-bottom: 4px; }
+.welcome p { font: 300 14px var(--ff-sans); color: var(--muted); }
+
+/* Premium Banner */
+.premium-banner { 
+  background: linear-gradient(135deg, rgba(201,168,76,0.12), rgba(45,212,191,0.08)); 
+  border: 1px solid rgba(201,168,76,0.25); border-radius: 12px; 
+  padding: 20px 24px; margin-bottom: 32px; 
+  display: flex; align-items: center; justify-content: space-between; 
+  flex-wrap: wrap; gap: 20px;
+}
+.premium-info { display: flex; align-items: center; gap: 16px; }
+.premium-icon { font-size: 32px; }
+.premium-text h3 { font: 600 14px var(--ff-sans); margin-bottom: 3px; }
+.premium-text p { font: 400 12px var(--ff-sans); color: var(--hint); }
+
+.premium-usage { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+.usage-bar { width: 140px; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; }
+.usage-fill { height: 100%; background: linear-gradient(90deg, var(--gold), var(--teal)); border-radius: 3px; }
+.usage-text { font: 600 12px var(--ff-sans); color: var(--muted); min-width: 50px; text-align: right; }
+
+.premium-btn { 
+  background: linear-gradient(135deg, var(--gold), #A07820); color: #0A0B0E; 
+  font: 700 12px var(--ff-sans); padding: 9px 18px; border: none; border-radius: 6px; 
+  cursor: pointer; text-decoration: none; transition: all 0.2s;
+}
+.premium-btn:hover { transform: translateY(-2px); }
+.premium-badge { background: var(--teal-bg); color: var(--teal); font: 700 11px var(--ff-sans); padding: 5px 12px; border-radius: 20px; text-transform: uppercase; }
+
+/* Stats Grid */
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+.stat-card { 
+  background: var(--card); border: 1px solid var(--border); border-radius: 12px; 
+  padding: 20px 22px; transition: all 0.2s; cursor: default;
+}
+.stat-card:hover { border-color: var(--border-lit); }
+.stat-card:first-child { border-top: 3px solid var(--gold); }
+.stat-card:nth-child(2) { border-top: 3px solid var(--teal); }
+.stat-card:nth-child(3) { border-top: 3px solid var(--amber); }
+.stat-card:last-child { border-top: 3px solid var(--green); }
+
+.stat-label { font: 700 10px var(--ff-sans); text-transform: uppercase; letter-spacing: 1px; color: var(--hint); margin-bottom: 10px; }
+.stat-number { font: 400 40px var(--ff-serif); line-height: 1; margin-bottom: 4px; }
+.stat-card:first-child .stat-number { color: var(--gold); }
+.stat-card:nth-child(2) .stat-number { color: var(--teal); }
+.stat-card:nth-child(3) .stat-number { color: var(--amber); }
+.stat-card:last-child .stat-number { color: var(--green); }
+.stat-sub { font: 400 11px var(--ff-sans); color: var(--hint); }
+
+/* Section Header */
+.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+.section-title { font: 600 18px var(--ff-serif); }
+.section-count { font: 500 12px var(--ff-sans); color: var(--hint); }
+
+/* Table */
+.table-container { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+table { width: 100%; border-collapse: collapse; }
+thead th { padding: 14px 18px; text-align: left; font: 700 10px var(--ff-sans); text-transform: uppercase; letter-spacing: 1px; color: var(--hint); border-bottom: 1px solid var(--border); }
+tbody td { padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,0.03); font: 500 13px var(--ff-sans); vertical-align: middle; }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: rgba(255,255,255,0.02); }
+
+.td-main { font: 700 13px var(--ff-sans); color: var(--text); }
+.td-muted { color: var(--muted); font-size: 12px; }
+
+.score-badge { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 28px; border-radius: 6px; font: 700 12px var(--ff-sans); }
+.rec-pill { font: 700 10px var(--ff-sans); text-transform: uppercase; letter-spacing: 0.5px; padding: 4px 10px; border-radius: 5px; white-space: nowrap; display: inline-block; }
+
+.r-sh { background: rgba(45,212,191,0.12); color: var(--teal); border: 1px solid rgba(45,212,191,0.25); }
+.r-h { background: rgba(74,222,128,0.1); color: var(--green); border: 1px solid rgba(74,222,128,0.2); }
+.r-m { background: rgba(251,191,36,0.1); color: var(--amber); border: 1px solid rgba(251,191,36,0.2); }
+.r-n { background: rgba(248,113,113,0.1); color: var(--red); border: 1px solid rgba(248,113,113,0.2); }
+
+.action-btns { display: flex; gap: 8px; }
+.btn-view, .btn-again { 
+  border-radius: 6px; font: 700 11px var(--ff-sans); padding: 6px 12px; 
+  cursor: pointer; text-decoration: none; transition: all 0.2s; border: 1px solid;
+}
+.btn-view { background: var(--gold-bg); border-color: var(--border-lit); color: var(--gold); }
+.btn-view:hover { background: rgba(201,168,76,0.2); }
+.btn-again { background: transparent; border-color: var(--border); color: var(--muted); }
+.btn-again:hover { color: var(--text); border-color: rgba(255,255,255,0.15); }
+
+/* Empty State */
+.empty-state { text-align: center; padding: 80px 40px; }
+.empty-icon { font-size: 56px; margin-bottom: 16px; opacity: 0.3; }
+.empty-title { font: 400 24px var(--ff-serif); color: var(--muted); margin-bottom: 10px; }
+.empty-sub { font: 400 13px var(--ff-sans); color: var(--hint); margin-bottom: 28px; max-width: 340px; margin-left: auto; margin-right: auto; }
+
+/* Backdrop */
+.backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 500; }
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .sidebar { width: 220px; padding: 20px 12px; }
+  .app-wrapper { flex-direction: column; }
+  .sidebar { position: fixed; left: 0; top: 0; bottom: 0; height: 100vh; transform: translateX(-100%); transition: transform 0.3s ease; border-right: none; border-bottom: none; z-index: 1001; width: 240px; }
+  .sidebar.open { transform: translateX(0); }
+  .content { margin-left: 0; }
+  .hamburger-btn { display: flex; }
+  .nav-right .btn-new { display: none; }
+  main { padding: 24px 16px 60px; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 24px; }
+  .welcome h1 { font-size: 28px; }
+  nav { padding: 14px 16px; }
+}
+
+@media (max-width: 768px) {
+  main { padding: 20px 14px 60px; }
+  .premium-banner { flex-direction: column; align-items: flex-start; }
+  .premium-usage { width: 100%; }
+  .usage-bar { width: 100%; }
+  .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .stat-card { padding: 16px 14px; }
+  .stat-number { font-size: 32px; }
+  .table-container { overflow-x: auto; }
+  thead th, tbody td { padding: 12px 14px; font-size: 12px; }
+  .action-btns { flex-wrap: wrap; }
+  .welcome h1 { font-size: 24px; }
+}
+
+@media (max-width: 480px) {
+  main { padding: 16px 12px 50px; }
+  .premium-banner { padding: 14px 12px; }
+  .welcome h1 { font-size: 20px; }
+  .stats-grid { grid-template-columns: 1fr; gap: 10px; }
+  .section-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+  thead th:nth-child(n+4), tbody td:nth-child(n+4) { display: none; }
+  .action-btns { flex-direction: column; }
+  .btn-view, .btn-again { width: 100%; justify-content: center; }
+  .user-name { display: none; }
+  nav { padding: 12px 12px; }
+  .nav-right { gap: 10px; }
+  .btn-new { padding: 8px 12px; font-size: 11px; }
+}
+
+</style>
+</head>
+<body>
+
+<div class="app-wrapper">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-mark">A</div>
+      <div class="sidebar-brand-name">Ap<span>tura</span></div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="/dashboard" class="active">🏠 Dashboard</a>
+      <a href="/screen">📄 Screenings</a>
+      <a href="/plans">💎 Plans & Upgrade</a>
+      <a href="/analytics">📊 Analytics</a>
+      {% if is_admin %}
+      <a href="/admin">🛡️ Admin</a>
+      {% endif %}
+      <a href="/contact">📧 Support</a>
+      <a href="/settings">⚙️ Settings</a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-footer-title">{{ tier or 'FREE' }} Plan</div>
+      <div class="sidebar-footer-desc">{% if tier == 'PRO' or tier == 'ENTERPRISE' %}Premium active{% else %}5 free screenings/month{% endif %}</div>
+      <a href="/plans" class="sidebar-footer-link">Upgrade →</a>
+    </div>
+  </aside>
+
+  <!-- Content -->
+  <div class="content">
+    <!-- Top Nav -->
+    <nav>
+      <div class="nav-left">
+        <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle menu">☰</button>
+      </div>
+      <div class="nav-right">
+        <a href="/screen" class="btn-new">+ New Screening</a>
+        <div class="user-profile">
+          <div class="user-avatar">
+            {% if user.avatar_url %}
+              <img src="{{ user.avatar_url }}" alt="{{ user.name }}">
+            {% else %}
+              {{ (user.name or user.email)[:2] | upper }}
+            {% endif %}
+          </div>
+          <span class="user-name">{{ user.name or user.email.split('@')[0] }}</span>
+        </div>
+        <a href="/auth/logout" class="btn-logout">Sign out</a>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+      <div class="welcome">
+        <h1>Good to see you, {{ (user.name or 'there').split(' ')[0] }} 👋</h1>
+        <p>Here is your recruitment overview</p>
+      </div>
+
+      <!-- Premium Banner -->
+      <div class="premium-banner">
+        <div class="premium-info">
+          <div class="premium-icon">{% if tier == 'PRO' or tier == 'ENTERPRISE' %}👑{% else %}⚡{% endif %}</div>
+          <div class="premium-text">
+            <h3>{% if tier == 'PRO' or tier == 'ENTERPRISE' %}Premium Account{% else %}Free Plan{% endif %}</h3>
+            <p>{% if tier == 'PRO' or tier == 'ENTERPRISE' %}{% if premium_until %}Expires {{ premium_until.strftime('%b %d, %Y') }}{% else %}Active{% endif %}{% else %}5 free screenings per month{% endif %}</p>
+          </div>
+        </div>
+
+        <div class="premium-usage">
+          <div class="usage-bar">
+            <div class="usage-fill" id="usageFill" style="width: 0%;"></div>
+          </div>
+          <div class="usage-text">{{ screenings_used }}/{% if tier == 'PRO' or tier == 'ENTERPRISE' %}100{% else %}5{% endif %}</div>
+        </div>
+
+        {% if tier == 'PRO' or tier == 'ENTERPRISE' %}
+          <span class="premium-badge">✓ Active</span>
+        {% else %}
+          <a href="/plans" class="premium-btn">Upgrade Now</a>
+        {% endif %}
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Total Screenings</div>
+          <div class="stat-number">{{ total_screenings }}</div>
+          <div class="stat-sub">All time</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Candidates Reviewed</div>
+          <div class="stat-number">{{ total_candidates }}</div>
+          <div class="stat-sub">Across all positions</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Average Top Score</div>
+          <div class="stat-number">{{ avg_score }}</div>
+          <div class="stat-sub">Out of 100</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Strong Hires Found</div>
+          <div class="stat-number">{{ strong_hires }}</div>
+          <div class="stat-sub">Highly recommended</div>
+        </div>
+      </div>
+
+      <!-- Screening History -->
+      <div class="section-header">
+        <div class="section-title">Screening History</div>
+        <div class="section-count">{{ screenings | length }} sessions</div>
+      </div>
+
+      {% if screenings %}
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Position</th>
+                <th>Company</th>
+                <th>Date</th>
+                <th>Candidates</th>
+                <th>Top Score</th>
+                <th>Recommendation</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for s in screenings %}
+              <tr>
+                <td class="td-main">{{ s.job_title }}</td>
+                <td class="td-muted">{{ s.company }}</td>
+                <td class="td-muted">{{ s.created_at }}</td>
+                <td class="td-muted">{{ s.total_candidates }}</td>
+                <td>
+                  {% if s.top_score is not none %}
+                    {% if s.top_score >= 80 %}
+                      <span class="score-badge" style="background:rgba(45,212,191,0.12);color:#2DD4BF">{{ s.top_score }}</span>
+                    {% elif s.top_score >= 65 %}
+                      <span class="score-badge" style="background:rgba(74,222,128,0.1);color:#4ADE80">{{ s.top_score }}</span>
+                    {% elif s.top_score >= 50 %}
+                      <span class="score-badge" style="background:rgba(251,191,36,0.1);color:#FBBF24">{{ s.top_score }}</span>
+                    {% else %}
+                      <span class="score-badge" style="background:rgba(248,113,113,0.1);color:#F87171">{{ s.top_score }}</span>
+                    {% endif %}
+                  {% else %}—{% endif %}
+                </td>
+                <td>
+                  {% if s.top_rec == 'Strong Hire' %}<span class="rec-pill r-sh">Strong Hire</span>
+                  {% elif s.top_rec == 'Hire' %}<span class="rec-pill r-h">Hire</span>
+                  {% elif s.top_rec == 'Maybe' %}<span class="rec-pill r-m">Maybe</span>
+                  {% elif s.top_rec == 'No Hire' %}<span class="rec-pill r-n">No Hire</span>
+                  {% else %}—{% endif %}
+                </td>
+                <td>
+                  <div class="action-btns">
+                    <a href="/screen?session={{ s.id }}" class="btn-view">View</a>
+                    <a href="/screen" class="btn-again">Screen Again</a>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="table-container">
+          <div class="empty-state">
+            <div class="empty-icon">🎯</div>
+            <div class="empty-title">No screenings yet</div>
+            <p class="empty-sub">Run your first resume screening to see your results here.</p>
+            <a href="/screen" class="btn-new" style="display:inline-flex">+ Start Screening</a>
+          </div>
+        </div>
+      {% endif %}
+    </main>
+  </div>
+</div>
+
+<div class="backdrop" id="backdrop"></div>
+
+<script>
+  const hamburgerBtn = document.getElementById('hamburgerBtn');
+  const sidebar = document.getElementById('sidebar');
+  const backdrop = document.getElementById('backdrop');
+
+  hamburgerBtn.addEventListener('click', function() {
+    sidebar.classList.toggle('open');
+    backdrop.style.display = sidebar.classList.contains('open') ? 'block' : 'none';
+  });
+
+  backdrop.addEventListener('click', function() {
+    sidebar.classList.remove('open');
+    backdrop.style.display = 'none';
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && sidebar.classList.contains('open')) {
+      sidebar.classList.remove('open');
+      backdrop.style.display = 'none';
+    }
+  });
+
+  // Close sidebar when a link is clicked
+  document.querySelectorAll('.sidebar-nav a').forEach(link => {
+    link.addEventListener('click', function() {
+      sidebar.classList.remove('open');
+      backdrop.style.display = 'none';
+    });
+  });
+
+  // Highlight active nav link
+  const currentPath = window.location.pathname;
+  document.querySelectorAll('.sidebar-nav a').forEach(link => {
+    if (link.getAttribute('href') === currentPath) {
+      link.classList.add('active');
+    }
+  });
+
+  // Calculate usage bar width
+  const usageFill = document.getElementById('usageFill');
+  if (usageFill) {
+    const screeningsUsed = parseInt(document.querySelector('.usage-text').textContent.split('/')[0]) || 0;
+    const maxScreenings = parseInt(document.querySelector('.usage-text').textContent.split('/')[1]) || 5;
+    const percentage = Math.min((screeningsUsed / maxScreenings) * 100, 100);
+    usageFill.style.width = percentage + '%';
+  }
+</script>
+
+</body>
+</html>

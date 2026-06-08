@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign In — Aptura AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0A0B0E; --card: #13151C; --elev: #1A1D27; --input: #1F2330;
+  --border: rgba(255,255,255,0.07); --border-lit: rgba(201,168,76,0.35);
+  --gold: #C9A84C; --gold-light: #E8D5A3; --gold-bg: rgba(201,168,76,0.1);
+  --teal: #2DD4BF; --red: #F87171;
+  --text: #F0EDE6; --muted: #9A9691; --hint: #5A5750;
+  --ff-serif: 'Cormorant Garamond', Georgia, serif;
+  --ff-sans: 'Outfit', system-ui, sans-serif;
+}
+body { background: var(--bg); color: var(--text); font-family: var(--ff-sans); min-height: 100vh; display: flex; }
+body::before {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background: radial-gradient(ellipse 80% 60% at 15% 0%, rgba(201,168,76,0.06), transparent 60%),
+              radial-gradient(ellipse 60% 40% at 85% 100%, rgba(45,212,191,0.04), transparent 50%);
+}
+body::after {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image: linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* ── Layout ── */
+.login-wrap { display: grid; grid-template-columns: 1fr 1fr; width: 100%; min-height: 100vh; position: relative; z-index: 1; }
+
+/* ── Left Panel ── */
+.left-panel {
+  background: linear-gradient(160deg, rgba(201,168,76,0.04), transparent);
+  border-right: 1px solid var(--border);
+  padding: 56px 52px;
+  display: flex; flex-direction: column; justify-content: space-between;
+}
+.brand { display: flex; align-items: center; gap: 12px; }
+.brand-mark {
+  width: 38px; height: 38px;
+  background: linear-gradient(135deg, var(--gold), #8B6914);
+  border-radius: 9px; display: flex; align-items: center; justify-content: center;
+  font: 600 17px var(--ff-serif); color: #0A0B0E;
+  box-shadow: 0 2px 16px rgba(201,168,76,0.25);
+}
+.brand-name { font: 500 20px var(--ff-serif); }
+.brand-name span { color: var(--gold); }
+.brand-tag { font-size: 10px; color: var(--hint); letter-spacing: 2px; text-transform: uppercase; margin-top: 2px; }
+
+.left-content { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 40px 0; }
+.left-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold);
+  font-weight: 500; margin-bottom: 20px;
+}
+.left-eyebrow::before, .left-eyebrow::after { content: ''; width: 24px; height: 1px; background: var(--gold); opacity: 0.5; }
+.left-h1 { font: 300 52px/1.1 var(--ff-serif); color: var(--text); margin-bottom: 20px; letter-spacing: -0.5px; }
+.left-h1 em { font-style: italic; color: var(--gold-light); }
+.left-sub { font-size: 15px; color: var(--muted); line-height: 1.7; font-weight: 300; max-width: 380px; margin-bottom: 40px; }
+.features { display: flex; flex-direction: column; gap: 12px; }
+.feature { display: flex; align-items: center; gap: 12px; font-size: 13px; color: var(--muted); }
+.feat-icon {
+  width: 30px; height: 30px; border-radius: 7px;
+  background: var(--gold-bg); border: 1px solid var(--border-lit);
+  display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0;
+}
+.left-footer { font-size: 11px; color: var(--hint); }
+
+/* ── Right Panel ── */
+.right-panel { padding: 56px 52px; display: flex; flex-direction: column; justify-content: center; }
+.form-box { max-width: 380px; width: 100%; }
+.form-heading { font: 400 34px var(--ff-serif); color: var(--text); margin-bottom: 6px; }
+.form-sub { font-size: 14px; color: var(--muted); margin-bottom: 32px; font-weight: 300; }
+
+/* Error banner */
+.error-banner {
+  background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.25);
+  border-radius: 8px; padding: 12px 16px; font-size: 13px; color: var(--red);
+  margin-bottom: 20px; display: flex; align-items: center; gap: 8px;
+}
+
+/* ── OAuth Buttons ── */
+.oauth-btn {
+  width: 100%; padding: 12px 16px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  font: 500 14px var(--ff-sans); cursor: pointer; transition: all 0.2s;
+  margin-bottom: 10px; text-decoration: none;
+}
+.google-btn {
+  background: #ffffff; border: 1px solid #dadce0; color: #3c4043;
+}
+.google-btn:hover { background: #f8f9fa; box-shadow: 0 2px 12px rgba(0,0,0,0.18); }
+.apple-btn {
+  background: #000000; border: 1px solid #333; color: #ffffff;
+}
+.apple-btn:hover { background: #1a1a1a; }
+.github-btn {
+  background: #24292e; border: 1px solid #444; color: #ffffff;
+}
+.github-btn:hover { background: #2f363d; }
+
+.oauth-loading { opacity: 0.6; pointer-events: none; }
+
+/* ── Divider ── */
+.divider { display: flex; align-items: center; gap: 14px; margin: 22px 0; color: var(--hint); font-size: 12px; }
+.divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* ── Form Inputs ── */
+.field { margin-bottom: 16px; }
+.field label { display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-bottom: 7px; }
+.field input {
+  width: 100%; background: var(--input); border: 1px solid var(--border);
+  border-radius: 7px; padding: 12px 14px; color: var(--text);
+  font: 14px var(--ff-sans); outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+}
+.field input:focus { border-color: var(--border-lit); box-shadow: 0 0 0 3px rgba(201,168,76,0.1); }
+.field input::placeholder { color: var(--hint); }
+
+/* ── Submit Button ── */
+.btn-submit {
+  width: 100%; padding: 14px; margin-top: 4px;
+  background: linear-gradient(135deg, var(--gold), #A07820);
+  color: #0A0B0E; font: 700 13px var(--ff-sans);
+  letter-spacing: 1.5px; text-transform: uppercase;
+  border: none; border-radius: 7px; cursor: pointer;
+  transition: all 0.2s; box-shadow: 0 4px 20px rgba(201,168,76,0.25);
+}
+.btn-submit:hover { box-shadow: 0 6px 28px rgba(201,168,76,0.4); transform: translateY(-1px); }
+.btn-submit:active { transform: translateY(0); }
+
+/* ── Toggle ── */
+.toggle-text { text-align: center; font-size: 13px; color: var(--muted); margin-top: 20px; font-weight: 300; }
+.toggle-link { color: var(--gold); cursor: pointer; font-weight: 500; }
+.toggle-link:hover { text-decoration: underline; }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .login-wrap { grid-template-columns: 1fr; }
+  .left-panel { display: none; }
+  .right-panel { padding: 40px 28px; }
+}
+
+/* ── Fade panels ── */
+.auth-panel { transition: opacity 0.2s; }
+</style>
+</head>
+<body>
+<div class="login-wrap">
+
+  <!-- Left: Branding -->
+  <div class="left-panel">
+    <div class="brand">
+      <div class="brand-mark">A</div>
+      <div>
+        <div class="brand-name">Ap<span>tura</span> AI</div>
+        <div class="brand-tag">Intelligent Recruitment</div>
+      </div>
+    </div>
+
+    <div class="left-content">
+      <div class="left-eyebrow">Resume Intelligence Platform</div>
+      <h1 class="left-h1">Screen smarter,<br>hire <em>better</em></h1>
+      <p class="left-sub">Upload any number of resumes and let our AI instantly rank, score, and surface your ideal candidates — saving you hours every hire.</p>
+      <div class="features">
+        <div class="feature"><div class="feat-icon">📊</div>6-dimension AI scoring per candidate</div>
+        <div class="feature"><div class="feat-icon">⚡</div>Screen unlimited resumes in under 30s</div>
+        <div class="feature"><div class="feat-icon">💾</div>Full history saved to your dashboard</div>
+        <div class="feature"><div class="feat-icon">🎯</div>Interview questions auto-generated</div>
+      </div>
+    </div>
+
+    <div class="left-footer">© 2025 Aptura AI · All rights reserved</div>
+  </div>
+
+  <!-- Right: Auth Forms -->
+  <div class="right-panel">
+    <div class="form-box">
+
+      {% if error %}
+      <div class="error-banner">⚠️ {{ error }}</div>
+      {% endif %}
+
+      <!-- ── SIGN IN PANEL ── -->
+      <div id="panel-signin" class="auth-panel">
+        <h2 class="form-heading">Welcome back</h2>
+        <p class="form-sub">Sign in to your Aptura account</p>
+
+        <!-- Google -->
+        <a href="/auth/google" class="oauth-btn google-btn" id="google-btn" onclick="setBtnLoading(this, 'Signing in with Google...')">
+          <svg width="18" height="18" viewBox="0 0 24 24" aria-label="Google logo">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+          </svg>
+          Continue with Google
+        </a>
+
+        <!-- Apple -->
+        <a href="/auth/github" class="oauth-btn github-btn" onclick="setBtnLoading(this, 'Signing in with GitHub...')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-label="GitHub logo">
+            <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+          </svg>
+          Continue with GitHub
+        </a>
+
+        <div class="divider">or continue with email</div>
+
+        <div class="field"><label>Email address</label><input type="email" id="si-email" placeholder="you@example.com" autocomplete="email"></div>
+        <div class="field"><label>Password</label><input type="password" id="si-pass" placeholder="••••••••" autocomplete="current-password"></div>
+        <div id="si-error" style="color:var(--red);font-size:13px;margin-bottom:10px;display:none"></div>
+        <button class="btn-submit" onclick="doLogin()">Sign In</button>
+        <div class="toggle-text">No account? <span class="toggle-link" onclick="showRegister()">Create one free</span></div>
+      </div>
+
+      <!-- ── REGISTER PANEL ── -->
+      <div id="panel-register" class="auth-panel" style="display:none">
+        <h2 class="form-heading">Create account</h2>
+        <p class="form-sub">Free to start — no credit card needed</p>
+
+        <a href="/auth/google" class="oauth-btn google-btn" onclick="setBtnLoading(this, 'Signing up with Google...')">
+          <svg width="18" height="18" viewBox="0 0 24 24" aria-label="Google logo">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+          </svg>
+          Sign up with Google
+        </a>
+        <a href="/auth/github" class="oauth-btn github-btn" onclick="setBtnLoading(this, 'Signing in with GitHub...')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-label="GitHub logo">
+            <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+          </svg>
+          Continue with GitHub
+        </a>
+
+        <div class="divider">or use email</div>
+
+        <div class="field"><label>Full name</label><input type="text" id="rg-name" placeholder="Your full name" autocomplete="name"></div>
+        <div class="field"><label>Email address</label><input type="email" id="rg-email" placeholder="you@example.com" autocomplete="email"></div>
+        <div class="field"><label>Password</label><input type="password" id="rg-pass" placeholder="At least 8 characters" autocomplete="new-password"></div>
+        <div id="rg-error" style="color:var(--red);font-size:13px;margin-bottom:10px;display:none"></div>
+        <button class="btn-submit" onclick="doRegister()">Create Account</button>
+        <div class="toggle-text">Already have an account? <span class="toggle-link" onclick="showSignin()">Sign in</span></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+function showRegister() {
+  document.getElementById('panel-signin').style.display = 'none';
+  document.getElementById('panel-register').style.display = 'block';
+}
+function showSignin() {
+  document.getElementById('panel-register').style.display = 'none';
+  document.getElementById('panel-signin').style.display = 'block';
+}
+function setBtnLoading(btn, text) {
+  btn.classList.add('oauth-loading');
+  btn.querySelector('svg').style.display = 'none';
+  const span = document.createElement('span');
+  span.textContent = text;
+  btn.insertBefore(span, btn.firstChild);
+}
+  async function doLogin() {
+  const email = document.getElementById('si-email').value.trim();
+  const pass  = document.getElementById('si-pass').value;
+  const errEl = document.getElementById('si-error');
+  errEl.style.display = 'none';
+  if (!email || !pass) { errEl.textContent = 'Please fill in all fields.'; errEl.style.display = 'block'; return; }
+  const form = new FormData();
+  form.append('email', email); form.append('password', pass);
+  form.append('csrf_token', '{{ csrf_token }}');
+  try {
+    const res  = await fetch('/auth/login', { method: 'POST', body: form });
+    const data = await res.json();
+    if (data.success) { window.location.href = data.redirect; }
+    else { errEl.textContent = data.error || 'Login failed.'; errEl.style.display = 'block'; }
+  } catch(e) { errEl.textContent = 'Network error. Please try again.'; errEl.style.display = 'block'; }
+}
+async function doRegister() {
+  const name  = document.getElementById('rg-name').value.trim();
+  const email = document.getElementById('rg-email').value.trim();
+  const pass  = document.getElementById('rg-pass').value;
+  const errEl = document.getElementById('rg-error');
+  errEl.style.display = 'none';
+  if (!name || !email || !pass) { errEl.textContent = 'Please fill in all fields.'; errEl.style.display = 'block'; return; }
+  const form = new FormData();
+  form.append('name', name); form.append('email', email); form.append('password', pass);
+  form.append('csrf_token', '{{ csrf_token }}');
+  try {
+    const res  = await fetch('/auth/register', { method: 'POST', body: form });
+    const data = await res.json();
+    if (data.success) { window.location.href = data.redirect; }
+    else { errEl.textContent = data.error || 'Registration failed.'; errEl.style.display = 'block'; }
+  } catch(e) { errEl.textContent = 'Network error. Please try again.'; errEl.style.display = 'block'; }
+}
+// Allow Enter key to submit
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  if (document.getElementById('panel-register').style.display !== 'none') doRegister();
+  else doLogin();
+});
+</script>
+</body>
+</html>

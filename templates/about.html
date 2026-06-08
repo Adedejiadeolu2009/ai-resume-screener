@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About - Aptura AI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#0A0B0E;--panel:#13151C;--elev:#1A1D27;--border:rgba(255,255,255,.08);--border-lit:rgba(201,168,76,.35);--gold:#C9A84C;--teal:#2DD4BF;--green:#4ADE80;--text:#F0EDE6;--muted:#9A9691;--hint:#5A5750;--serif:'Cormorant Garamond',Georgia,serif;--sans:'Outfit',system-ui,sans-serif}
+    body{min-height:100vh;background:var(--bg);color:var(--text);font-family:var(--sans)}
+    nav{display:flex;align-items:center;justify-content:space-between;padding:16px 32px;border-bottom:1px solid var(--border);background:rgba(10,11,14,.9);position:sticky;top:0;z-index:20}
+    .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--text)}
+    .mark{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,var(--gold),#A07820);display:grid;place-items:center;color:#0A0B0E;font:700 16px var(--serif)}
+    .brand-name{font:500 18px var(--serif)} .brand-name span{color:var(--gold)}
+    .nav-links{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+    a{color:var(--gold);text-decoration:none}
+    .nav-links a{color:var(--muted);font-size:13px;font-weight:600}
+    .btn{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:8px;padding:10px 14px;background:rgba(255,255,255,.03);color:var(--text)!important;font-weight:700}
+    .btn-primary{background:linear-gradient(135deg,var(--gold),#A07820);border:none;color:#0A0B0E!important}
+    main{max-width:1120px;margin:0 auto;padding:38px 20px 70px}
+    .hero{display:grid;grid-template-columns:1.1fr .9fr;gap:22px;align-items:stretch}
+    @media(max-width:860px){nav{padding:14px 18px}.hero{grid-template-columns:1fr}.nav-links{gap:9px}.nav-links a:not(.btn){display:none}}
+    .hero-copy{padding:30px 0}
+    .eyebrow{color:var(--gold);font-size:12px;text-transform:uppercase;letter-spacing:1.2px;font-weight:800;margin-bottom:12px}
+    h1{font:500 54px/1 var(--serif);max-width:720px}
+    .lead{color:var(--muted);font-size:16px;line-height:1.7;margin-top:16px;max-width:680px}
+    .hero-panel{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:24px;position:relative;overflow:hidden}
+    .hero-panel::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 45% at 25% 0%,rgba(201,168,76,.14),transparent 62%);pointer-events:none}
+    .hero-panel>*{position:relative}
+    .metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
+    .metric{padding:16px;border-radius:10px;background:rgba(255,255,255,.025);border:1px solid var(--border)}
+    .metric strong{display:block;font:600 30px var(--serif);color:var(--text)}
+    .metric span{display:block;color:var(--muted);font-size:12px;margin-top:4px;line-height:1.5}
+    .section{margin-top:34px}
+    .section h2{font:600 28px var(--serif);margin-bottom:12px}
+    .section p{color:var(--muted);font-size:15px;line-height:1.75}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px}
+    @media(max-width:900px){.grid{grid-template-columns:1fr}}
+    .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:20px}
+    .card h3{font-size:16px;margin-bottom:8px;color:var(--text)}
+    .card p,.card li{color:var(--muted);font-size:14px;line-height:1.65}
+    ul{list-style:none;display:grid;gap:9px;margin-top:12px}
+    li{display:grid;grid-template-columns:20px 1fr;gap:9px}
+    li::before{content:'✓';display:grid;place-items:center;width:20px;height:20px;border-radius:6px;background:rgba(45,212,191,.12);border:1px solid rgba(45,212,191,.25);color:var(--teal);font-size:12px;font-weight:800}
+    .plans{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px}
+    @media(max-width:920px){.plans{grid-template-columns:1fr}}
+    .plan{background:var(--elev);border:1px solid var(--border);border-radius:12px;padding:20px}
+    .plan.featured{border-color:var(--border-lit);box-shadow:0 0 0 1px rgba(201,168,76,.1) inset}
+    .tag{display:inline-flex;padding:4px 9px;border-radius:999px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted);font-size:11px;font-weight:800;letter-spacing:.8px}
+    .plan h3{font:600 22px var(--serif);margin:12px 0 6px}
+    .cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}
+    .band{background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.2);border-radius:12px;padding:22px;margin-top:34px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+    @media(max-width:760px){.band{display:block}.band .btn{margin-top:14px}}
+  </style>
+</head>
+<body>
+  <nav>
+    <a class="brand" href="/">
+      <div class="mark">A</div>
+      <div class="brand-name">Ap<span>tura</span> AI</div>
+    </a>
+    <div class="nav-links">
+      <a href="/why-choose-us">Why Us</a>
+      <a href="/contact">Contact</a>
+      <a href="/plans">Plans</a>
+      <a class="btn btn-primary" href="/dashboard">Dashboard</a>
+    </div>
+  </nav>
+
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow">About Aptura AI</div>
+        <h1>Resume screening built for faster, clearer hiring decisions.</h1>
+        <p class="lead">Aptura AI helps recruiters, founders, HR teams, and growing businesses move from resume overload to a ranked shortlist. It reads resumes against a role description, highlights fit signals, flags gaps, and keeps previous screening sessions available in your dashboard.</p>
+        <div class="cta">
+          <a class="btn btn-primary" href="/screen">Start screening</a>
+          <a class="btn" href="/plans">View packages</a>
+        </div>
+      </div>
+      <aside class="hero-panel">
+        <div class="eyebrow">What the product focuses on</div>
+        <p class="lead" style="margin-top:0">The goal is not to replace human hiring judgement. The goal is to reduce first-pass review time and make every candidate comparison more consistent.</p>
+        <div class="metric-grid">
+          <div class="metric"><strong>5</strong><span>Free monthly screenings for small tests</span></div>
+          <div class="metric"><strong>100</strong><span>Pro monthly screenings for active hiring</span></div>
+          <div class="metric"><strong>24/7</strong><span>Dashboard access to previous results</span></div>
+          <div class="metric"><strong>AI</strong><span>Structured scoring and recommendations</span></div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="section">
+      <h2>Why we built it</h2>
+      <p>Hiring teams often receive more resumes than they can review properly. Strong candidates can be missed because formatting is different, keywords are buried, or reviewers are under time pressure. Aptura AI creates a structured first pass so teams can compare candidates with clearer evidence before deciding who to interview.</p>
+    </section>
+
+    <section class="section">
+      <h2>What Aptura AI does</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>Ranks candidates</h3>
+          <p>Upload resumes with a job description and receive a ranked list based on experience, technical fit, education, communication signals, leadership, and role alignment.</p>
+        </div>
+        <div class="card">
+          <h3>Explains the score</h3>
+          <p>Each result includes strengths, gaps, interview questions, red flags, key skills, and a short executive summary so your team can review quickly.</p>
+        </div>
+        <div class="card">
+          <h3>Keeps hiring history</h3>
+          <p>Your dashboard tracks previous screenings, total candidates processed, top candidates, recommendations, and analytics across your hiring activity.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Packages</h2>
+      <p>Start free, then upgrade by bank transfer when your hiring volume increases. After admin confirms payment, the selected package is activated and a confirmation email is sent to the email address on the user's account.</p>
+      <div class="plans">
+        <div class="plan">
+          <span class="tag">FREE</span>
+          <h3>Free</h3>
+          <p>Best for testing Aptura AI or screening a few candidates each month.</p>
+          <ul>
+            <li>5 screenings per month</li>
+            <li>AI ranking and recommendations</li>
+            <li>Basic dashboard access</li>
+          </ul>
+        </div>
+        <div class="plan featured">
+          <span class="tag">PRO</span>
+          <h3>Pro</h3>
+          <p>Built for recruiters, founders, and HR teams actively hiring for multiple roles.</p>
+          <ul>
+            <li>100 screenings per month</li>
+            <li>Advanced candidate reports</li>
+            <li>Analytics and priority support</li>
+          </ul>
+        </div>
+        <div class="plan">
+          <span class="tag">ENTERPRISE</span>
+          <h3>Enterprise</h3>
+          <p>For teams with heavy hiring volume, ongoing recruitment, or custom workflow needs.</p>
+          <ul>
+            <li>Unlimited screenings</li>
+            <li>All Pro features</li>
+            <li>Dedicated support and custom workflows</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Data and security posture</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>Private account access</h3>
+          <p>Users only see their own dashboard, screening history, and payment status references.</p>
+        </div>
+        <div class="card">
+          <h3>Secure deployment ready</h3>
+          <p>Production mode requires a strong secret key, HTTPS base URL, secure cookies, and host configuration before launch.</p>
+        </div>
+        <div class="card">
+          <h3>Human approval for payments</h3>
+          <p>Manual bank-transfer payments are confirmed by admin before package activation, keeping early operations controlled.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="band">
+      <div>
+        <h2 style="margin-bottom:6px">Ready to screen your next batch?</h2>
+        <p>Open the screening workspace, paste the job description, and upload candidate resumes.</p>
+      </div>
+      <a class="btn btn-primary" href="/screen">Open screener</a>
+    </section>
+  </main>
+</body>
+</html>

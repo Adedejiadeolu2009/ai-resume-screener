@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — Plan Requests</title>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif; background:#0A0B0E; color:#F0EDE6; margin:0; padding:0;}
+    .wrap{max-width:1100px; margin:0 auto; padding:24px 20px 60px;}
+    nav{display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid rgba(255,255,255,.08); background:rgba(10,11,14,.85); position:sticky; top:0; z-index:50;}
+    nav .brand{display:flex; gap:10px; align-items:center; font-weight:700;}
+    a{color:#C9A84C; text-decoration:none;}
+    table{width:100%; border-collapse:collapse; margin-top:18px; background:#13151C; border:1px solid rgba(255,255,255,.08); border-radius:12px; overflow:hidden;}
+    th,td{padding:12px 12px; border-bottom:1px solid rgba(255,255,255,.06); font-size:14px;}
+    th{background:rgba(255,255,255,.03); text-align:left; color:#9A9691; font-weight:700;}
+    tr:last-child td{border-bottom:none;}
+    .btn{display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:8px 12px; border-radius:10px; border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.03); color:#F0EDE6; cursor:pointer; font-weight:700; font-size:13px;}
+    .btn-primary{background:linear-gradient(135deg,#C9A84C,#A07820); border:none; color:#0A0B0E;}
+    .btn-danger{background:rgba(248,113,113,.12); border:1px solid rgba(248,113,113,.35);}
+    .pill{display:inline-block; padding:4px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.03); color:#9A9691; font-weight:700; font-size:12px;}
+    .muted{color:#9A9691;}
+    .grid{display:grid; grid-template-columns:1fr; gap:12px; margin-top:14px;}
+    .notice{padding:14px 14px; background:rgba(201,168,76,.08); border:1px solid rgba(201,168,76,.25); border-radius:12px; color:#9A9691; line-height:1.6; font-size:13px;}
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="brand">Aptura AI — Admin</div>
+    <div>
+      <a class="btn" href="/admin/payments">Payments</a>
+      <a class="btn" href="/dashboard">Back to dashboard</a>
+    </div>
+  </nav>
+
+  <div class="wrap">
+    {% if request.query_params.get('confirmed') %}
+      <div class="notice" style="margin-bottom:10px;background:rgba(74,222,128,.08);border-color:rgba(74,222,128,.25);color:#F0EDE6">
+        Payment confirmed for <strong>{{ request.query_params.get('confirmed') }}</strong>.
+        Confirmation email: <strong>{{ request.query_params.get('email') or 'unknown' }}</strong>.
+      </div>
+    {% endif %}
+
+    <div class="notice">
+      Activate requests below. This will set the user tier immediately and mark the request as <strong>success</strong>.
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Plan</th>
+          <th>Status</th>
+          <th>Reference</th>
+          <th>Requested</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in requests %}
+        <tr>
+          <td>
+            <div style="font-weight:700">{{ r.user_email }}</div>
+            <div class="muted" style="font-size:12px">User ID: {{ r.user_id }}</div>
+          </td>
+          <td>
+            <span class="pill">{{ r.plan }}</span>
+          </td>
+          <td>
+            <span class="pill">{{ r.status }}</span>
+          </td>
+          <td style="word-break:break-word">{{ r.request_ref }}</td>
+          <td>{{ r.created_at }}</td>
+          <td>
+            <div style="display:flex; gap:10px; align-items:center">
+              <form method="post" action="/admin/confirm-upgrade" style="margin:0">
+                <input type="hidden" name="request_ref" value="{{ r.request_ref }}" />
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+                <button class="btn btn-primary" type="submit">Confirm</button>
+              </form>
+              <form method="post" action="/admin/decline-upgrade" style="margin:0">
+                <input type="hidden" name="request_ref" value="{{ r.request_ref }}" />
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+                <button class="btn btn-danger" type="submit">Decline</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="grid">
+      {% if requests|length == 0 %}
+        <div class="notice">No pending requests.</div>
+      {% endif %}
+    </div>
+  </div>
+</body>
+</html>
+

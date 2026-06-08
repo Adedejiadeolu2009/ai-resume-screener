@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settings — Aptura AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0A0B0E; --card: #13151C; --elev: #1A1D27; --input: #1F2330;
+  --border: rgba(255,255,255,0.07); --border-lit: rgba(201,168,76,0.35);
+  --gold: #C9A84C; --gold-light: #E8D5A3; --gold-bg: rgba(201,168,76,0.1);
+  --teal: #2DD4BF; --teal-bg: rgba(45,212,191,0.1);
+  --red: #F87171; --amber: #FBBF24; --green: #4ADE80;
+  --text: #F0EDE6; --muted: #9A9691; --hint: #5A5750;
+  --ff-serif: 'Cormorant Garamond', Georgia, serif;
+  --ff-sans: 'Outfit', system-ui, sans-serif;
+}
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--text); font-family: var(--ff-sans); overflow-x: hidden; }
+body::before {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background: radial-gradient(ellipse 70% 50% at 10% 0%, rgba(201,168,76,0.05), transparent 60%);
+}
+
+.app-wrapper { display: flex; min-height: 100vh; }
+
+/* Sidebar */
+.sidebar { 
+  width: 240px; background: linear-gradient(180deg, rgba(12,14,20,0.98), rgba(8,9,12,0.98)); 
+  padding: 24px 16px; border-right: 1px solid rgba(255,255,255,0.02); 
+  flex-shrink: 0; z-index: 1000; position: relative; 
+  display: flex; flex-direction: column;
+}
+.sidebar-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; padding: 0 8px; }
+.sidebar-brand-mark { width: 36px; height: 36px; background: linear-gradient(135deg, var(--gold), #8B6914); border-radius: 8px; display: flex; align-items: center; justify-content: center; font: 600 16px var(--ff-serif); color: #0A0B0E; }
+.sidebar-brand-name { font: 600 16px var(--ff-serif); }
+.sidebar-brand-name span { color: var(--gold); }
+
+.sidebar-nav { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.sidebar-nav a { 
+  display: flex; align-items: center; gap: 12px; 
+  padding: 12px 14px; border-radius: 10px; 
+  color: var(--muted); text-decoration: none; 
+  font: 500 13px var(--ff-sans); transition: all 0.2s;
+}
+.sidebar-nav a:hover, .sidebar-nav a.active { 
+  background: linear-gradient(90deg, rgba(201,168,76,0.08), rgba(45,212,191,0.03));
+  color: var(--text);
+}
+
+.sidebar-footer { 
+  background: linear-gradient(135deg, rgba(201,168,76,0.06), rgba(45,212,191,0.03)); 
+  border: 1px solid rgba(255,255,255,0.03); border-radius: 10px; 
+  padding: 12px 14px; margin-top: auto;
+}
+.sidebar-footer-title { font: 700 12px var(--ff-sans); color: var(--gold); margin-bottom: 6px; }
+.sidebar-footer-desc { font: 400 11px var(--ff-sans); color: var(--hint); margin-bottom: 8px; }
+.sidebar-footer-link { display: inline-block; font: 700 11px var(--ff-sans); color: var(--gold); text-decoration: none; }
+
+/* Content Area */
+.content { flex: 1; display: flex; flex-direction: column; position: relative; z-index: 1; }
+
+/* Top Nav */
+nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 28px; border-bottom: 1px solid var(--border);
+  background: rgba(10,11,14,0.7); backdrop-filter: blur(8px);
+  position: sticky; top: 0; z-index: 100;
+}
+
+.nav-left { display: flex; align-items: center; gap: 16px; }
+.hamburger-btn { 
+  display: none; width: 40px; height: 40px; border: 1px solid var(--border); 
+  background: rgba(255,255,255,0.03); border-radius: 8px; 
+  color: var(--text); cursor: pointer; font-size: 20px; align-items: center; justify-content: center;
+}
+
+.nav-right { display: flex; align-items: center; gap: 16px; }
+.user-profile { display: flex; align-items: center; gap: 12px; }
+.user-avatar { 
+  width: 36px; height: 36px; border-radius: 50%; 
+  background: var(--gold-bg); border: 1px solid var(--border-lit); 
+  display: flex; align-items: center; justify-content: center; 
+  font-size: 13px; font-weight: 700; color: var(--gold); overflow: hidden; flex-shrink: 0;
+}
+.user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.user-name { font: 500 13px var(--ff-sans); color: var(--text); }
+.btn-logout { 
+  background: none; border: 1px solid var(--border); border-radius: 6px; 
+  color: var(--muted); font: 600 12px var(--ff-sans); padding: 6px 12px; 
+  cursor: pointer; transition: all 0.2s; text-decoration: none;
+}
+.btn-logout:hover { border-color: var(--red); color: var(--red); }
+
+/* Main Content */
+main { flex: 1; max-width: 1280px; width: 100%; margin: 0 auto; padding: 32px 28px 60px; position: relative; z-index: 1; }
+
+.welcome { margin-bottom: 28px; }
+.welcome h1 { font: 300 36px var(--ff-serif); margin-bottom: 4px; }
+
+/* Settings Sections */
+.settings-container { max-width: 600px; }
+.settings-section { 
+  background: var(--card); border: 1px solid var(--border); border-radius: 12px; 
+  padding: 24px; margin-bottom: 20px;
+}
+.settings-section h3 { font: 600 16px var(--ff-serif); margin-bottom: 16px; color: var(--text); }
+.setting-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
+.setting-row:last-child { border-bottom: none; }
+.setting-label { display: flex; flex-direction: column; }
+.setting-label span { font: 500 14px var(--ff-sans); color: var(--text); }
+.setting-label small { font: 400 12px var(--ff-sans); color: var(--hint); margin-top: 4px; }
+.btn { padding: 8px 16px; border: 1px solid var(--border); background: transparent; border-radius: 6px; color: var(--muted); font: 600 12px var(--ff-sans); cursor: pointer; transition: all 0.2s; }
+.btn:hover { color: var(--text); border-color: rgba(255,255,255,0.15); }
+.btn-primary { background: var(--gold-bg); border-color: var(--border-lit); color: var(--gold); }
+.btn-primary:hover { background: rgba(201,168,76,0.2); }
+.btn-danger { color: var(--red); border-color: rgba(248,113,113,0.3); }
+.btn-danger:hover { background: rgba(248,113,113,0.1); }
+
+/* Backdrop */
+.backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 500; }
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .sidebar { width: 220px; padding: 20px 12px; }
+  .app-wrapper { flex-direction: column; }
+  .sidebar { position: fixed; left: 0; top: 0; bottom: 0; height: 100vh; transform: translateX(-100%); transition: transform 0.3s ease; border-right: none; border-bottom: none; z-index: 1001; width: 240px; }
+  .sidebar.open { transform: translateX(0); }
+  .content { margin-left: 0; }
+  .hamburger-btn { display: flex; }
+  main { padding: 24px 16px 60px; }
+  .welcome h1 { font-size: 28px; }
+  nav { padding: 14px 16px; }
+}
+
+@media (max-width: 768px) {
+  main { padding: 20px 14px 60px; }
+  .welcome h1 { font-size: 24px; }
+  .settings-container { max-width: 100%; }
+}
+
+@media (max-width: 480px) {
+  main { padding: 16px 12px 50px; }
+  .welcome h1 { font-size: 20px; }
+  .user-name { display: none; }
+  nav { padding: 12px 12px; }
+}
+
+</style>
+</head>
+<body>
+
+<div class="app-wrapper">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-mark">A</div>
+      <div class="sidebar-brand-name">Ap<span>tura</span></div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="/dashboard">🏠 Dashboard</a>
+      <a href="/screen">📄 Screenings</a>
+      <a href="/plans">💎 Plans & Upgrade</a>
+      <a href="/analytics">📊 Analytics</a>
+      {% if is_admin %}
+      <a href="/admin">🛡️ Admin</a>
+      {% endif %}
+      <a href="/contact">📧 Support</a>
+      <a href="/settings" class="active">⚙️ Settings</a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-footer-title">{{ tier or 'FREE' }} Plan</div>
+      <div class="sidebar-footer-desc">Premium account active</div>
+      <a href="/plans" class="sidebar-footer-link">Manage →</a>
+    </div>
+  </aside>
+
+  <!-- Content -->
+  <div class="content">
+    <!-- Top Nav -->
+    <nav>
+      <div class="nav-left">
+        <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle menu">☰</button>
+      </div>
+      <div class="nav-right">
+        <div class="user-profile">
+          <div class="user-avatar">
+            {% if user.avatar_url %}
+              <img src="{{ user.avatar_url }}" alt="{{ user.name }}">
+            {% else %}
+              {{ (user.name or user.email)[:2] | upper }}
+            {% endif %}
+          </div>
+          <span class="user-name">{{ user.name or user.email.split('@')[0] }}</span>
+        </div>
+        <a href="/auth/logout" class="btn-logout">Sign out</a>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+      <div class="welcome">
+        <h1>⚙️ Settings</h1>
+      </div>
+
+      <div class="settings-container">
+        <!-- Account Settings -->
+        <div class="settings-section">
+          <h3>Account</h3>
+          <div class="setting-row">
+            <div class="setting-label">
+              <span>{{ user.name or user.email }}</span>
+              <small>{{ user.email }}</small>
+            </div>
+            <button class="btn btn-primary">Edit</button>
+          </div>
+          <div class="setting-row">
+            <div class="setting-label">
+              <span>Provider</span>
+              <small>{{ user.provider }}</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Subscription Settings -->
+        <div class="settings-section">
+          <h3>Subscription</h3>
+          <div class="setting-row">
+            <div class="setting-label">
+              <span>Plan Type</span>
+              <small>{{ tier }}</small>
+            </div>
+            <a href="/plans" class="btn btn-primary">Change Plan</a>
+          </div>
+          {% if premium_until %}
+          <div class="setting-row">
+            <div class="setting-label">
+              <span>Expires</span>
+              <small>{{ premium_until.strftime('%B %d, %Y') }}</small>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Session Settings -->
+        <div class="settings-section">
+          <h3>Session</h3>
+          <div class="setting-row">
+            <div class="setting-label">
+              <span>Sign Out</span>
+              <small>End your current session</small>
+            </div>
+            <a href="/auth/logout" class="btn btn-danger">Sign out</a>
+          </div>
+        </div>
+
+        <!-- Support -->
+        <div class="settings-section">
+          <h3>Support</h3>
+          <div class="setting-row">
+            <div class="setting-label">
+              <span>Need Help?</span>
+              <small>Contact our support team</small>
+            </div>
+            <a href="/contact" class="btn btn-primary">Contact Us</a>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<div class="backdrop" id="backdrop"></div>
+
+<script>
+  const hamburgerBtn = document.getElementById('hamburgerBtn');
+  const sidebar = document.getElementById('sidebar');
+  const backdrop = document.getElementById('backdrop');
+
+  hamburgerBtn.addEventListener('click', function() {
+    sidebar.classList.toggle('open');
+    backdrop.style.display = sidebar.classList.contains('open') ? 'block' : 'none';
+  });
+
+  backdrop.addEventListener('click', function() {
+    sidebar.classList.remove('open');
+    backdrop.style.display = 'none';
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && sidebar.classList.contains('open')) {
+      sidebar.classList.remove('open');
+      backdrop.style.display = 'none';
+    }
+  });
+
+  document.querySelectorAll('.sidebar-nav a').forEach(link => {
+    link.addEventListener('click', function() {
+      sidebar.classList.remove('open');
+      backdrop.style.display = 'none';
+    });
+  });
+
+  const currentPath = window.location.pathname;
+  document.querySelectorAll('.sidebar-nav a').forEach(link => {
+    if (link.getAttribute('href') === currentPath) {
+      link.classList.add('active');
+    }
+  });
+</script>
+
+</body>
+</html>
