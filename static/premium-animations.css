@@ -1,0 +1,69 @@
+@media (prefers-reduced-motion: no-preference) {
+  :where(body)::before {
+    animation: ambient-drift 18s ease-in-out infinite alternate;
+  }
+
+  :where(nav, main, .login-wrap, .app-wrapper) {
+    animation: page-rise .75s cubic-bezier(.16, 1, .3, 1) both;
+  }
+
+  :where(.card, .plan, .stat-card, .premium-banner, .table-container, .hero-panel, .panel, .empty-state, .quick-benefits, .feature-grid .fcard, .transfer, .notice, .landing-card, .workflow-step, .proof-card, .visual-panel, .command-bar) {
+    transition: transform .35s cubic-bezier(.16, 1, .3, 1), border-color .35s ease, box-shadow .35s ease, background .35s ease;
+  }
+
+  :where(.card, .plan, .stat-card, .premium-banner, .table-container, .hero-panel, .panel, .empty-state, .quick-benefits, .feature-grid .fcard, .transfer, .notice, .landing-card, .workflow-step, .proof-card, .visual-panel, .command-bar):hover {
+    transform: translateY(-3px);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, .28);
+  }
+
+  :where(.btn, .btn-primary, .btn-submit, .btn-new, .premium-btn, .oauth-btn, button, .back-btn) {
+    transition: transform .25s cubic-bezier(.16, 1, .3, 1), box-shadow .25s ease, border-color .25s ease, background .25s ease, color .25s ease;
+  }
+
+  :where(.btn, .btn-primary, .btn-submit, .btn-new, .premium-btn, .oauth-btn, button, .back-btn):hover {
+    transform: translateY(-2px);
+  }
+
+  :where(.brand-mark, .sidebar-brand-mark, .mark) {
+    position: relative;
+    overflow: hidden;
+  }
+
+  :where(.brand-mark, .sidebar-brand-mark, .mark)::after {
+    content: "";
+    position: absolute;
+    inset: -45%;
+    background: linear-gradient(120deg, transparent 35%, rgba(255, 255, 255, .45), transparent 65%);
+    transform: translateX(-120%) rotate(8deg);
+    animation: mark-sheen 5.5s ease-in-out infinite;
+  }
+
+  :where(tbody tr, .file-item, .ccard, .sum-card, .metric, .fcard, .li, .qb) {
+    animation: item-reveal .55s cubic-bezier(.16, 1, .3, 1) both;
+  }
+
+  :where(tbody tr, .file-item, .ccard, .sum-card, .metric, .fcard, .li, .qb):nth-child(2) { animation-delay: .05s; }
+  :where(tbody tr, .file-item, .ccard, .sum-card, .metric, .fcard, .li, .qb):nth-child(3) { animation-delay: .1s; }
+  :where(tbody tr, .file-item, .ccard, .sum-card, .metric, .fcard, .li, .qb):nth-child(4) { animation-delay: .15s; }
+  :where(tbody tr, .file-item, .ccard, .sum-card, .metric, .fcard, .li, .qb):nth-child(n+5) { animation-delay: .2s; }
+}
+
+@keyframes page-rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes item-reveal {
+  from { opacity: 0; transform: translateY(12px) scale(.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes ambient-drift {
+  from { transform: translate3d(0, 0, 0) scale(1); filter: saturate(1); }
+  to { transform: translate3d(1.5%, -1%, 0) scale(1.03); filter: saturate(1.15); }
+}
+
+@keyframes mark-sheen {
+  0%, 55% { transform: translateX(-120%) rotate(8deg); }
+  78%, 100% { transform: translateX(120%) rotate(8deg); }
+}

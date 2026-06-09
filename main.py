@@ -207,10 +207,14 @@ async def terms_page(request: Request):
 
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request):
-    """Homepage → redirect to dashboard if logged in, else login."""
+    """Homepage -> landing page for visitors, dashboard for signed-in users."""
     if request.cookies.get("access_token"):
         return RedirectResponse("/dashboard")
-    return RedirectResponse("/login")
+    return templates.TemplateResponse(
+        request=request,
+        name="landing.html",
+        context={},
+    )
 
 
 @app.get("/login", response_class=HTMLResponse)
