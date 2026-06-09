@@ -8,7 +8,8 @@ We just read directly from os.environ using os.getenv().
 
 import os
 import logging
-from datetime import datetime
+import secrets
+from datetime import datetime, timedelta
 
 from authlib.integrations.starlette_client import OAuth, OAuthError
 from fastapi import APIRouter, Depends, Form, Request
@@ -18,6 +19,7 @@ from sqlalchemy.orm import Session
 import security as auth
 import models
 from database import get_db
+from email_utils import send_email
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 logger = logging.getLogger(__name__)
@@ -37,6 +39,22 @@ def get_github_creds():
 
 def get_app_base_url() -> str:
     return os.getenv("APP_BASE_URL", "http://localhost:8000").rstrip("/")
+
+
+async def read_request_data(request: Request) -> dict:
+    content_type = request.headers.get("content-type", "")
+    if "application/json" in content_type:
+        try:
+            payload = await request.json()
+            return payload if isinstance(payload, dict) else {}
+        except Exception:
+            return {}
+
+    try:
+        form = await request.form()
+        return dict(form)
+    except Exception:
+        return {}
 
 
 # ── OAuth client ──────────────────────────────────────────────────────────────
@@ -162,12 +180,15 @@ async def register(
 # ── Email Login ───────────────────────────────────────────────────────────────
 @router.post("/login")
 async def login(
-    email: str = Form(...),
-    password: str = Form(...),
-    csrf_token: str = Form(...),
+    request: Request,
     db: Session = Depends(get_db),
-    request: Request = None,
 ):
+    data = await read_request_data(request)
+    email = (data.get("email") or "").strip()
+    password = data.get("password") or ""
+    if not email or not password:
+        return JSONResponse({"error": "Email and password are required."}, status_code=400)
+
     user = db.query(models.User).filter(
         models.User.email == email.lower().strip()
     ).first()
@@ -184,6 +205,93 @@ async def login(
 
     response = JSONResponse({"success": True, "redirect": "/dashboard"})
     return set_auth_cookie(response, user)
+
+
+@router.post("/forgot-password")
+async def forgot_password(request: Request, db: Session = Depends(get_db)):
+    data = await read_request_data(request)
+    email = (data.get("email") or "").lower().strip()
+    if not email:
+        return JSONResponse({"error": "Email address is required."}, status_code=400)
+
+    user = db.query(models.User).filter(models.User.email == email).first()
+    if user and user.hashed_password:
+        otp = f"{secrets.randbelow(1_000_000):06d}"
+        reset = models.PasswordResetOTP(
+            user_id=user.id,
+            email=user.email,
+            otp_hash=auth.hash_password(otp),
+            expires_at=datetime.utcnow() + timedelta(minutes=15),
+        )
+        db.add(reset)
+        db.commit()
+
+        base_url = get_app_base_url()
+        subject = "Aptura AI password reset code"
+        plain = (
+            f"Hi {user.name or user.email},\n\n"
+            f"Your Aptura AI password reset code is {otp}. "
+            "It expires in 15 minutes.\n\n"
+            f"Return to {base_url}/login to set a new password.\n\n"
+            "If you did not request this, you can ignore this email."
+        )
+        html = f"""
+        <div style="font-family:Arial,Helvetica,sans-serif;background:#0A0B0E;color:#F0EDE6;padding:24px">
+          <div style="max-width:560px;margin:auto;background:#13151C;border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:24px">
+            <h1 style="margin:0 0 10px;color:#F0EDE6">Reset your Aptura AI password</h1>
+            <p style="color:#C9C5BE;line-height:1.6">Use this one-time code to choose a new password. It expires in 15 minutes.</p>
+            <div style="font-size:34px;letter-spacing:8px;font-weight:800;color:#C9A84C;margin:22px 0">{otp}</div>
+            <p style="color:#9A9691;font-size:13px">If you did not request this, ignore this email.</p>
+          </div>
+        </div>
+        """
+        send_email(user.email, subject, plain, html_body=html)
+
+    return JSONResponse({
+        "success": True,
+        "message": "If that email has an Aptura account, a reset code has been sent.",
+    })
+
+
+@router.post("/reset-password")
+async def reset_password(request: Request, db: Session = Depends(get_db)):
+    data = await read_request_data(request)
+    email = (data.get("email") or "").lower().strip()
+    otp = (data.get("otp") or "").strip()
+    password = data.get("password") or ""
+
+    if not email or not otp or not password:
+        return JSONResponse({"error": "Email, OTP, and new password are required."}, status_code=400)
+    if len(password) < 8:
+        return JSONResponse({"error": "Password must be at least 8 characters."}, status_code=400)
+    if len(password.encode("utf-8")) > 72:
+        return JSONResponse({"error": "Password is too long. Use a password under 72 bytes."}, status_code=400)
+
+    user = db.query(models.User).filter(models.User.email == email).first()
+    reset = (
+        db.query(models.PasswordResetOTP)
+        .filter(
+            models.PasswordResetOTP.email == email,
+            models.PasswordResetOTP.used_at.is_(None),
+            models.PasswordResetOTP.expires_at > datetime.utcnow(),
+        )
+        .order_by(models.PasswordResetOTP.created_at.desc())
+        .first()
+    )
+    if not user or not reset or reset.attempts >= 5:
+        return JSONResponse({"error": "Invalid or expired reset code."}, status_code=400)
+
+    reset.attempts = (reset.attempts or 0) + 1
+    if not auth.verify_password(otp, reset.otp_hash):
+        db.commit()
+        return JSONResponse({"error": "Invalid or expired reset code."}, status_code=400)
+
+    user.hashed_password = auth.hash_password(password)
+    user.provider = user.provider or "email"
+    reset.used_at = datetime.utcnow()
+    db.commit()
+
+    return JSONResponse({"success": True, "message": "Password reset successfully. You can sign in now."})
 
 
 # ── Google OAuth ──────────────────────────────────────────────────────────────

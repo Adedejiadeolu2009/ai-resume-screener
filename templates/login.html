@@ -137,6 +137,9 @@ body::after {
 .toggle-text { text-align: center; font-size: 13px; color: var(--muted); margin-top: 20px; font-weight: 300; }
 .toggle-link { color: var(--gold); cursor: pointer; font-weight: 500; }
 .toggle-link:hover { text-decoration: underline; }
+.row-link { display:flex; justify-content:flex-end; margin:-6px 0 14px; }
+.helper-text { font-size:12px; color:var(--muted); line-height:1.55; margin:-18px 0 20px; }
+.success-text { color:var(--teal); font-size:13px; margin-bottom:10px; display:none; line-height:1.5; }
 
 /* ── Responsive ── */
 @media (max-width: 768px) {
@@ -213,6 +216,7 @@ body::after {
 
         <div class="field"><label>Email address</label><input type="email" id="si-email" placeholder="you@example.com" autocomplete="email"></div>
         <div class="field"><label>Password</label><input type="password" id="si-pass" placeholder="••••••••" autocomplete="current-password"></div>
+        <div class="row-link"><span class="toggle-link" onclick="showResetRequest()">Forgot password?</span></div>
         <div id="si-error" style="color:var(--red);font-size:13px;margin-bottom:10px;display:none"></div>
         <button class="btn-submit" onclick="doLogin()">Sign In</button>
         <div class="toggle-text">No account? <span class="toggle-link" onclick="showRegister()">Create one free</span></div>
@@ -249,18 +253,60 @@ body::after {
         <div class="toggle-text">Already have an account? <span class="toggle-link" onclick="showSignin()">Sign in</span></div>
       </div>
 
+      <div id="panel-reset-request" class="auth-panel" style="display:none">
+        <h2 class="form-heading">Reset password</h2>
+        <p class="form-sub">Enter your email and we will send a one-time code.</p>
+        <div class="field"><label>Email address</label><input type="email" id="fp-email" placeholder="you@example.com" autocomplete="email"></div>
+        <div id="fp-success" class="success-text"></div>
+        <div id="fp-error" style="color:var(--red);font-size:13px;margin-bottom:10px;display:none"></div>
+        <button class="btn-submit" onclick="requestPasswordReset()">Send Code</button>
+        <div class="toggle-text">Have a code? <span class="toggle-link" onclick="showResetVerify()">Enter OTP</span></div>
+        <div class="toggle-text"><span class="toggle-link" onclick="showSignin()">Back to sign in</span></div>
+      </div>
+
+      <div id="panel-reset-verify" class="auth-panel" style="display:none">
+        <h2 class="form-heading">Enter OTP</h2>
+        <p class="form-sub">Use the code sent to your email to set a new password.</p>
+        <p class="helper-text">The code expires after 15 minutes.</p>
+        <div class="field"><label>Email address</label><input type="email" id="rp-email" placeholder="you@example.com" autocomplete="email"></div>
+        <div class="field"><label>OTP code</label><input type="text" id="rp-otp" placeholder="6-digit code" inputmode="numeric" autocomplete="one-time-code"></div>
+        <div class="field"><label>New password</label><input type="password" id="rp-pass" placeholder="At least 8 characters" autocomplete="new-password"></div>
+        <div id="rp-success" class="success-text"></div>
+        <div id="rp-error" style="color:var(--red);font-size:13px;margin-bottom:10px;display:none"></div>
+        <button class="btn-submit" onclick="resetPassword()">Reset Password</button>
+        <div class="toggle-text"><span class="toggle-link" onclick="showResetRequest()">Send another code</span></div>
+        <div class="toggle-text"><span class="toggle-link" onclick="showSignin()">Back to sign in</span></div>
+      </div>
+
     </div>
   </div>
 </div>
 
 <script>
+function hidePanels() {
+  ['panel-signin','panel-register','panel-reset-request','panel-reset-verify'].forEach(id => {
+    document.getElementById(id).style.display = 'none';
+  });
+}
 function showRegister() {
-  document.getElementById('panel-signin').style.display = 'none';
+  hidePanels();
   document.getElementById('panel-register').style.display = 'block';
 }
 function showSignin() {
-  document.getElementById('panel-register').style.display = 'none';
+  hidePanels();
   document.getElementById('panel-signin').style.display = 'block';
+}
+function showResetRequest() {
+  hidePanels();
+  const email = document.getElementById('si-email').value.trim();
+  if (email) document.getElementById('fp-email').value = email;
+  document.getElementById('panel-reset-request').style.display = 'block';
+}
+function showResetVerify() {
+  hidePanels();
+  const email = document.getElementById('fp-email').value.trim() || document.getElementById('si-email').value.trim();
+  if (email) document.getElementById('rp-email').value = email;
+  document.getElementById('panel-reset-verify').style.display = 'block';
 }
 function setBtnLoading(btn, text) {
   btn.classList.add('oauth-loading');
@@ -302,10 +348,59 @@ async function doRegister() {
     else { errEl.textContent = data.error || 'Registration failed.'; errEl.style.display = 'block'; }
   } catch(e) { errEl.textContent = 'Network error. Please try again.'; errEl.style.display = 'block'; }
 }
+async function requestPasswordReset() {
+  const email = document.getElementById('fp-email').value.trim();
+  const errEl = document.getElementById('fp-error');
+  const okEl = document.getElementById('fp-success');
+  errEl.style.display = 'none'; okEl.style.display = 'none';
+  if (!email) { errEl.textContent = 'Please enter your email address.'; errEl.style.display = 'block'; return; }
+  const form = new FormData();
+  form.append('email', email);
+  try {
+    const res = await fetch('/auth/forgot-password', { method: 'POST', body: form });
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      errEl.textContent = data.error || 'Could not send reset code.';
+      errEl.style.display = 'block';
+      return;
+    }
+    okEl.textContent = data.message || 'Reset code sent.';
+    okEl.style.display = 'block';
+    document.getElementById('rp-email').value = email;
+    setTimeout(showResetVerify, 700);
+  } catch(e) { errEl.textContent = 'Network error. Please try again.'; errEl.style.display = 'block'; }
+}
+async function resetPassword() {
+  const email = document.getElementById('rp-email').value.trim();
+  const otp = document.getElementById('rp-otp').value.trim();
+  const pass = document.getElementById('rp-pass').value;
+  const errEl = document.getElementById('rp-error');
+  const okEl = document.getElementById('rp-success');
+  errEl.style.display = 'none'; okEl.style.display = 'none';
+  if (!email || !otp || !pass) { errEl.textContent = 'Please fill in all fields.'; errEl.style.display = 'block'; return; }
+  const form = new FormData();
+  form.append('email', email); form.append('otp', otp); form.append('password', pass);
+  try {
+    const res = await fetch('/auth/reset-password', { method: 'POST', body: form });
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      errEl.textContent = data.error || 'Could not reset password.';
+      errEl.style.display = 'block';
+      return;
+    }
+    okEl.textContent = data.message || 'Password reset successfully.';
+    okEl.style.display = 'block';
+    document.getElementById('si-email').value = email;
+    document.getElementById('si-pass').value = '';
+    setTimeout(showSignin, 1000);
+  } catch(e) { errEl.textContent = 'Network error. Please try again.'; errEl.style.display = 'block'; }
+}
 // Allow Enter key to submit
 document.addEventListener('keydown', e => {
   if (e.key !== 'Enter') return;
   if (document.getElementById('panel-register').style.display !== 'none') doRegister();
+  else if (document.getElementById('panel-reset-request').style.display !== 'none') requestPasswordReset();
+  else if (document.getElementById('panel-reset-verify').style.display !== 'none') resetPassword();
   else doLogin();
 });
 </script>

@@ -1,7 +1,5 @@
 import os
-import smtplib
 from datetime import datetime, timedelta
-from email.message import EmailMessage
 
 from fastapi import APIRouter, Depends, Form, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -11,6 +9,7 @@ from sqlalchemy.orm import Session
 import models
 from database import get_db
 from security import get_current_user
+from email_utils import send_email
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -38,55 +37,6 @@ async def admin_home(current_user: models.User = Depends(get_current_user)):
     except PermissionError:
         return RedirectResponse("/dashboard")
     return RedirectResponse("/admin/requests")
-
-
-def send_email(to_email: str, subject: str, body: str, html_body: str = None) -> bool:
-    """Send an email using SMTP configured via env vars.
-
-    Required env vars: SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD, SMTP_FROM
-    html_body: optional HTML string to send as alternative content
-    """
-    host = os.getenv("SMTP_HOST")
-    port = int(os.getenv("SMTP_PORT", "0") or 0)
-    user = os.getenv("SMTP_USER")
-    password = os.getenv("SMTP_PASSWORD")
-    sender = os.getenv("SMTP_FROM") or user
-
-    if not host or not port or not sender:
-        return False
-
-    msg = EmailMessage()
-    msg["From"] = sender
-    msg["To"] = to_email
-    msg["Subject"] = subject
-    msg.set_content(body or "")
-    if html_body:
-        try:
-            msg.add_alternative(html_body, subtype="html")
-        except Exception:
-            # fallback: ignore html if adding fails
-            pass
-
-    try:
-        use_ssl = os.getenv("SMTP_USE_SSL", "false").lower() in (
-            "1", "true", "yes")
-        if use_ssl:
-            with smtplib.SMTP_SSL(host, port) as s:
-                if user and password:
-                    s.login(user, password)
-                s.send_message(msg)
-        else:
-            with smtplib.SMTP(host, port) as s:
-                s.ehlo()
-                if os.getenv("SMTP_STARTTLS", "true").lower() in ("1", "true", "yes"):
-                    s.starttls()
-                    s.ehlo()
-                if user and password:
-                    s.login(user, password)
-                s.send_message(msg)
-        return True
-    except Exception:
-        return False
 
 
 def app_base_url() -> str:

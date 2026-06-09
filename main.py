@@ -227,7 +227,7 @@ async def login_page(request: Request):
     return templates.TemplateResponse(
         request=request,
         name="login.html",
-        context={"error": error}
+        context={"error": error, "csrf_token": get_csrf_token(request)}
     )
 
 
@@ -425,8 +425,8 @@ if __name__ == "__main__":
     reload_enabled = _is_truthy(
         os.getenv("UVICORN_RELOAD", "true" if not IS_PRODUCTION else "false")
     )
-    logger.info("Aptura AI starting on http://0.0.0.0:8000")
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=reload_enabled)
+    logger.info("Aptura AI starting on http://localhost:8000")
+    uvicorn.run("main:app", host="localhost", port=8000, reload=reload_enabled)
 
 
 # ── Custom 404 Handler ────────────────────────────────────────────────────────
