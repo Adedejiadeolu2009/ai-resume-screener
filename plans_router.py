@@ -1,4 +1,5 @@
 import os
+import secrets
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
@@ -14,6 +15,21 @@ from security import get_current_user
 router = APIRouter(prefix="", tags=["plans"])
 
 templates = Jinja2Templates(directory="templates")
+
+
+def get_csrf_token(request: Request) -> str:
+    token = request.session.get("csrf_token")
+    if not token:
+        token = secrets.token_urlsafe(32)
+        request.session["csrf_token"] = token
+    return token
+
+
+def require_csrf(request: Request, csrf_token: str | None) -> None:
+    expected = request.session.get("csrf_token")
+    if not expected or not csrf_token or csrf_token != expected:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=403, detail="CSRF validation failed")
 
 
 @router.get("/plans", response_class=HTMLResponse)
@@ -41,17 +57,23 @@ async def plans_page(
             "account_name": os.getenv("MANUAL_TRANSFER_ACCOUNT_NAME", ""),
             # NOTE: do not hardcode account number in code; keep it in env.
             "account_number": os.getenv("MANUAL_TRANSFER_ACCOUNT_NUMBER", ""),
+            "csrf_token": get_csrf_token(request),
         },
     )
 
 
 @router.get("/create-request", response_class=HTMLResponse)
 async def create_request_get(request: Request, current_user: models.User = Depends(get_current_user)):
-    return templates.TemplateResponse(request=request, name="create_request.html", context={"created": False})
+    return templates.TemplateResponse(
+        request=request,
+        name="create_request.html",
+        context={"created": False, "csrf_token": get_csrf_token(request)},
+    )
 
 
 @router.post("/create-request", response_class=HTMLResponse)
-async def create_request_post(request: Request, plan: str = Form(...), amount: int = Form(...), db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+async def create_request_post(request: Request, plan: str = Form(...), amount: int = Form(...), csrf_token: str = Form(...), db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    require_csrf(request, csrf_token)
     # generate a unique reference
     ref = f"manual_{current_user.id}_{int(datetime.utcnow().timestamp())}_{uuid.uuid4().hex[:6]}"
     p = models.Payment(
@@ -63,7 +85,11 @@ async def create_request_post(request: Request, plan: str = Form(...), amount: i
     )
     db.add(p)
     db.commit()
-    return templates.TemplateResponse(request=request, name="create_request.html", context={"created": True, "ref": ref, "plan": p.plan, "amount": amount})
+    return templates.TemplateResponse(
+        request=request,
+        name="create_request.html",
+        context={"created": True, "ref": ref, "plan": p.plan, "amount": amount, "csrf_token": get_csrf_token(request)},
+    )
 
 
 @router.get('/plans/status', response_class=HTMLResponse)

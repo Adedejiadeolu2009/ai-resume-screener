@@ -32,12 +32,9 @@ from pathlib import Path
 from sqlalchemy import inspect, text
 
 # ── Fix Python path for uvicorn reload workers ────────────────────────────────
-# Uvicorn's --reload spawns new processes that don't know your project folder.
-# This ensures 'routers', 'security', 'models' etc. are always findable.
 PROJECT_DIR = Path(__file__).parent
 if str(PROJECT_DIR) not in sys.path:
     sys.path.insert(0, str(PROJECT_DIR))
-
 
 # ── Load .env using the exact location of this script ────────────────────────
 ENV_PATH = PROJECT_DIR / ".env"
@@ -67,35 +64,30 @@ def ensure_db_columns():
         return
     existing = [c['name'] for c in insp.get_columns('users')]
     with engine.connect() as conn:
-        # Add `tier` column
         if 'tier' not in existing:
             try:
                 conn.execute(
                     text("ALTER TABLE users ADD COLUMN tier VARCHAR(20) DEFAULT 'FREE'"))
             except Exception:
                 pass
-        # Add `premium_until` column
         if 'premium_until' not in existing:
             try:
                 conn.execute(
                     text("ALTER TABLE users ADD COLUMN premium_until DATETIME"))
             except Exception:
                 pass
-        # Add `screenings_used_this_month` column
         if 'screenings_used_this_month' not in existing:
             try:
                 conn.execute(text(
                     "ALTER TABLE users ADD COLUMN screenings_used_this_month INTEGER DEFAULT 0"))
             except Exception:
                 pass
-        # Add `usage_reset_date` column
         if 'usage_reset_date' not in existing:
             try:
                 conn.execute(
                     text("ALTER TABLE users ADD COLUMN usage_reset_date DATETIME"))
             except Exception:
                 pass
-        # Add `is_admin` column
         if 'is_admin' not in existing:
             try:
                 conn.execute(
@@ -104,7 +96,6 @@ def ensure_db_columns():
                 pass
 
 
-# Run migrations now
 ensure_db_columns()
 
 # ── App ──────────────────────────────────────────────────────────────────────
@@ -118,6 +109,7 @@ APP_ENV = os.getenv("APP_ENV", "development").lower()
 APP_BASE_URL = os.getenv("APP_BASE_URL", "http://localhost:8000").rstrip("/")
 IS_PRODUCTION = APP_ENV == "production" or APP_BASE_URL.startswith("https://")
 SECRET_KEY = os.getenv("SECRET_KEY", "")
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./aptura.db")
 
 if IS_PRODUCTION:
     if not SECRET_KEY or SECRET_KEY in {
@@ -130,6 +122,9 @@ if IS_PRODUCTION:
     if APP_BASE_URL.startswith("http://localhost"):
         raise RuntimeError(
             "Production requires APP_BASE_URL to be your HTTPS domain.")
+    if DATABASE_URL.startswith("sqlite"):
+        raise RuntimeError(
+            "Production requires DATABASE_URL to point to a managed database, not local SQLite.")
 
 app = FastAPI(title="Aptura AI", version="2.0.0")
 
@@ -151,9 +146,22 @@ app.add_middleware(
 )
 
 
-# CSRF utilities for cookie-auth
-# We store a per-session token in Starlette's session (server-side)
-# and require it on all state-changing POST requests.
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
+    response.headers.setdefault("X-Frame-Options", "DENY")
+    response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+    response.headers.setdefault(
+        "Permissions-Policy", "camera=(), microphone=(), geolocation=()"
+    )
+    if IS_PRODUCTION:
+        response.headers.setdefault(
+            "Strict-Transport-Security",
+            "max-age=31536000; includeSubDomains",
+        )
+    return response
+
 
 def get_csrf_token(request: Request) -> str:
     token = request.session.get("csrf_token")
@@ -183,6 +191,8 @@ app.include_router(plans_router.router)
 app.include_router(admin_router.router)
 
 
+# ── Page Routes ───────────────────────────────────────────────────────────────
+
 @app.get("/contact", response_class=HTMLResponse)
 async def contact_page(request: Request):
     return templates.TemplateResponse(request=request, name="admin_contact.html", context={})
@@ -203,11 +213,8 @@ async def terms_page(request: Request):
     return templates.TemplateResponse(request=request, name="terms.html", context={})
 
 
-# ── Page Routes ───────────────────────────────────────────────────────────────
-
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request):
-    """Homepage -> landing page for visitors, dashboard for signed-in users."""
     if request.cookies.get("access_token"):
         return RedirectResponse("/dashboard")
     return templates.TemplateResponse(
@@ -219,11 +226,9 @@ async def root(request: Request):
 
 @app.get("/login", response_class=HTMLResponse)
 async def login_page(request: Request):
-    """Login / Register page."""
     if request.cookies.get("access_token"):
         return RedirectResponse("/dashboard")
     error = request.query_params.get("error", "")
-    # ✅ New Starlette 0.41+ syntax — request is passed separately, NOT in context
     return templates.TemplateResponse(
         request=request,
         name="login.html",
@@ -233,14 +238,11 @@ async def login_page(request: Request):
 
 @app.get("/dashboard", response_class=HTMLResponse)
 async def dashboard_page(request: Request, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
-    # CSRF token (available in templates)
     csrf_token = get_csrf_token(request)
 
-    """Dashboard — requires login."""
     if not request.cookies.get("access_token"):
         return RedirectResponse("/login")
 
-    # ── Gather stats ──────────────────────────────────────────────────────────
     total_screenings = db.query(models.Screening).filter(
         models.Screening.user_id == current_user.id
     ).count()
@@ -287,7 +289,6 @@ async def dashboard_page(request: Request, db: Session = Depends(get_db), curren
         request=request,
         name="dashboard.html",
         context={
-
             "user": current_user,
             "tier": current_user.tier or "FREE",
             "premium_until": current_user.premium_until,
@@ -305,11 +306,9 @@ async def dashboard_page(request: Request, db: Session = Depends(get_db), curren
 
 @app.get("/screen", response_class=HTMLResponse)
 async def screen_page(request: Request, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
-    """Resume screening tool — requires login."""
     if not request.cookies.get("access_token"):
         return RedirectResponse("/login")
 
-    # Load previous screening if ?session=ID is in the URL
     session_id = request.query_params.get("session")
     past_result = None
     if session_id:
@@ -337,17 +336,16 @@ async def screen_page(request: Request, db: Session = Depends(get_db), current_u
         context={
             "user": current_user,
             "past_result": past_result,
+            "csrf_token": get_csrf_token(request),
         }
     )
 
 
 @app.get("/analytics", response_class=HTMLResponse)
 async def analytics_page(request: Request, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
-    """Analytics dashboard — requires login."""
     if not request.cookies.get("access_token"):
         return RedirectResponse("/login")
 
-    # Get screening statistics
     total_screenings = db.query(models.Screening).filter(
         models.Screening.user_id == current_user.id
     ).count()
@@ -399,7 +397,6 @@ async def analytics_page(request: Request, db: Session = Depends(get_db), curren
 
 @app.get("/settings", response_class=HTMLResponse)
 async def settings_page(request: Request, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
-    """Settings page — requires login."""
     if not request.cookies.get("access_token"):
         return RedirectResponse("/login")
 
@@ -429,19 +426,10 @@ if __name__ == "__main__":
     uvicorn.run("main:app", host="localhost", port=8000, reload=reload_enabled)
 
 
-# ── Custom 404 Handler ────────────────────────────────────────────────────────
-# Without this, FastAPI returns raw JSON like {"detail":"Not Found"} for
-# unknown URLs. This replaces that with a friendly redirect.
-
+# ── Custom Error Handlers ─────────────────────────────────────────────────────
 
 @app.exception_handler(404)
 async def not_found_handler(request: _Request, exc: _HTTPException):
-    """
-    When any URL doesn't exist:
-    - If the user is logged in  → send to dashboard
-    - If the user is not logged in → send to login page
-    Instead of showing ugly {"detail":"Not Found"} JSON.
-    """
     if request.cookies.get("access_token"):
         return RedirectResponse("/dashboard")
     return RedirectResponse("/login")
@@ -449,7 +437,6 @@ async def not_found_handler(request: _Request, exc: _HTTPException):
 
 @app.exception_handler(405)
 async def method_not_allowed_handler(request: _Request, exc: _HTTPException):
-    """When someone visits an API URL directly in their browser (GET on a POST route)."""
     if request.cookies.get("access_token"):
         return RedirectResponse("/dashboard")
     return RedirectResponse("/login")
@@ -457,7 +444,6 @@ async def method_not_allowed_handler(request: _Request, exc: _HTTPException):
 
 @app.exception_handler(401)
 async def unauthorized_handler(request: _Request, exc: _HTTPException):
-    """Send unauthenticated browser page requests to login instead of raw JSON."""
     accept = request.headers.get("accept", "")
     if "text/html" in accept:
         return RedirectResponse("/login")

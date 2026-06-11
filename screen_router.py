@@ -234,10 +234,14 @@ async def screen_resumes(
     job_description: str = Form(...),
     job_title: str = Form(default="Open Position"),
     company_name: str = Form(default=""),
+    csrf_token: str = Form(...),
     files: list[UploadFile] = File(...),
     db: Session = Depends(get_db),
     current_user: models.User = Depends(auth.get_current_user),
 ):
+    import main as _main
+    _main.require_csrf(request, csrf_token)
+
     # ── PRODUCTION: Input validation & security checks ────────────────────────
     MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB per file
     MAX_FILES = 50

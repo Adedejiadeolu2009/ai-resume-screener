@@ -593,6 +593,7 @@ async function submitForm() {
   fd.append('job_title', title);
   fd.append('job_description', desc);
   fd.append('company_name', comp);
+  fd.append('csrf_token', '{{ csrf_token }}');
   selectedFiles.forEach(f => fd.append('files', f));
 
   try {
