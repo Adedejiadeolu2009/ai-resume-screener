@@ -21,7 +21,9 @@ load_dotenv()
 # ── Database URL ──────────────────────────────────────────────────────────────
 # Reads DATABASE_URL from .env. Falls back to SQLite so it works immediately
 # with zero setup — great for your first time developing locally!
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./aptura.db")
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./aptura.db").strip()
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
 # SQLite needs an extra argument so it works with FastAPI's threading model.
 # PostgreSQL doesn't need this, so we only add it for SQLite.
