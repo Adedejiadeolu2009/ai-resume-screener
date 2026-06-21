@@ -30,15 +30,15 @@ logger = logging.getLogger(__name__)
 
 
 def get_google_creds():
-    return os.getenv("GOOGLE_CLIENT_ID", ""), os.getenv("GOOGLE_CLIENT_SECRET", "")
+    return os.getenv("GOOGLE_CLIENT_ID", "").strip(), os.getenv("GOOGLE_CLIENT_SECRET", "").strip()
 
 
 def get_github_creds():
-    return os.getenv("GITHUB_CLIENT_ID", ""), os.getenv("GITHUB_CLIENT_SECRET", "")
+    return os.getenv("GITHUB_CLIENT_ID", "").strip(), os.getenv("GITHUB_CLIENT_SECRET", "").strip()
 
 
 def get_app_base_url() -> str:
-    return os.getenv("APP_BASE_URL", "http://localhost:8000").rstrip("/")
+    return os.getenv("APP_BASE_URL", "http://localhost:8000").strip().rstrip("/")
 
 
 async def read_request_data(request: Request) -> dict:

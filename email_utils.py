@@ -3,17 +3,38 @@ import os
 import smtplib
 from email.message import EmailMessage
 
+import resend
+
 
 logger = logging.getLogger(__name__)
 
 
 def send_email(to_email: str, subject: str, body: str, html_body: str | None = None) -> bool:
-    """Send email with SMTP settings from environment variables."""
-    host = os.getenv("SMTP_HOST")
+    """Send email using Resend if configured, otherwise SMTP."""
+    resend_api_key = (os.getenv("RESEND_API_KEY") or "").strip()
+    resend_sender = (os.getenv("EMAIL_FROM") or "").strip()
+    if resend_api_key and resend_sender:
+        try:
+            resend.api_key = resend_api_key
+            params = {
+                "from": resend_sender,
+                "to": [to_email],
+                "subject": subject,
+                "text": body or "",
+            }
+            if html_body:
+                params["html"] = html_body
+            resend.Emails.send(params)
+            return True
+        except Exception:
+            logger.exception("Resend email send failed for %s", to_email)
+            return False
+
+    host = (os.getenv("SMTP_HOST") or "").strip()
     port = int(os.getenv("SMTP_PORT", "0") or 0)
-    user = os.getenv("SMTP_USER")
+    user = (os.getenv("SMTP_USER") or "").strip()
     password = os.getenv("SMTP_PASSWORD")
-    sender = os.getenv("SMTP_FROM") or user
+    sender = (os.getenv("SMTP_FROM") or "").strip() or user
 
     if not host or not port or not sender:
         logger.warning("Email not sent: SMTP_HOST, SMTP_PORT, or SMTP_FROM/SMTP_USER is missing")
