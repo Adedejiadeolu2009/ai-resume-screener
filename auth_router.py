@@ -245,7 +245,14 @@ async def forgot_password(request: Request, db: Session = Depends(get_db)):
           </div>
         </div>
         """
-        send_email(user.email, subject, plain, html_body=html)
+        email_sent = send_email(user.email, subject, plain, html_body=html)
+        if not email_sent:
+            logger.warning("Password reset email failed for %s", user.email)
+            if os.getenv("APP_ENV", "development").lower() != "production":
+                return JSONResponse(
+                    {"error": "Could not send reset code. Check RESEND_API_KEY, EMAIL_FROM, and the Resend package installation."},
+                    status_code=500,
+                )
 
     return JSONResponse({
         "success": True,
