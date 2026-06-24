@@ -12,6 +12,7 @@ import screen_router
 import auth_router
 import plans_router
 import admin_router
+import resume_builder_router
 from security import get_current_user
 
 from database import engine, get_db, Base
@@ -189,6 +190,7 @@ app.include_router(auth_router.router)
 app.include_router(screen_router.router)
 app.include_router(plans_router.router)
 app.include_router(admin_router.router)
+app.include_router(resume_builder_router.router)
 
 
 # ── Page Routes ───────────────────────────────────────────────────────────────
@@ -338,6 +340,21 @@ async def screen_page(request: Request, db: Session = Depends(get_db), current_u
             "past_result": past_result,
             "csrf_token": get_csrf_token(request),
         }
+    )
+
+
+@app.get("/resume-builder", response_class=HTMLResponse)
+async def resume_builder_page(request: Request, current_user: models.User = Depends(get_current_user)):
+    if not request.cookies.get("access_token"):
+        return RedirectResponse("/login")
+
+    return templates.TemplateResponse(
+        request=request,
+        name="resume_builder.html",
+        context={
+            "user": current_user,
+            "csrf_token": get_csrf_token(request),
+        },
     )
 
 

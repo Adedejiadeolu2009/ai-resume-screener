@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resume Builder - Aptura AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/premium-animations.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0A0B0E;--card:#13151C;--elev:#1A1D27;--input:#1F2330;
+  --border:rgba(255,255,255,0.07);--border-lit:rgba(201,168,76,0.35);
+  --gold:#C9A84C;--gold-light:#E8D5A3;--gold-bg:rgba(201,168,76,0.1);
+  --teal:#2DD4BF;--teal-bg:rgba(45,212,191,0.1);
+  --red:#F87171;--amber:#FBBF24;--green:#4ADE80;
+  --text:#F0EDE6;--muted:#9A9691;--hint:#5A5750;
+  --ff-serif:'Cormorant Garamond',Georgia,serif;--ff-sans:'Outfit',system-ui,sans-serif;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--ff-sans);min-height:100vh}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 70% 50% at 12% 0%,rgba(201,168,76,0.05),transparent 60%),
+             radial-gradient(ellipse 50% 40% at 90% 100%,rgba(45,212,191,0.04),transparent 55%)}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(255,255,255,0.012) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(255,255,255,0.012) 1px,transparent 1px);background-size:48px 48px}
+nav{display:flex;align-items:center;justify-content:space-between;padding:16px 32px;
+  border-bottom:1px solid var(--border);background:rgba(10,11,14,0.86);
+  backdrop-filter:blur(12px);position:sticky;top:0;z-index:100}
+.brand{display:flex;align-items:center;gap:12px}.back-btn{display:flex;align-items:center;gap:6px;color:var(--muted);text-decoration:none;font:600 13px var(--ff-sans)}
+.back-btn:hover{color:var(--gold)}.brand-mark{width:32px;height:32px;background:linear-gradient(135deg,var(--gold),#8B6914);
+  border-radius:8px;display:flex;align-items:center;justify-content:center;font:600 14px var(--ff-serif);color:#0A0B0E}
+.brand-name{font:500 17px var(--ff-serif)}.brand-name span{color:var(--gold)}
+.nav-right{display:flex;align-items:center;gap:12px}.nav-link{color:var(--muted);text-decoration:none;font:600 13px var(--ff-sans)}
+.nav-link:hover{color:var(--gold)}
+.user-chip{display:flex;align-items:center;gap:8px;padding:5px 12px 5px 5px;background:var(--card);border:1px solid var(--border);border-radius:40px}
+.user-av{width:26px;height:26px;border-radius:50%;background:var(--gold-bg);border:1px solid var(--border-lit);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--gold);font-weight:700;overflow:hidden}
+.user-av img{width:100%;height:100%;object-fit:cover}.user-name{font:500 12px var(--ff-sans);color:var(--text)}
+.btn-logout{color:var(--muted);text-decoration:none;font:600 12px var(--ff-sans);padding:8px 12px;border:1px solid var(--border);border-radius:7px}
+.btn-logout:hover{color:var(--red);border-color:rgba(248,113,113,0.3)}
+main{position:relative;z-index:1;max-width:1320px;margin:0 auto;padding:34px 28px 70px}
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:24px}
+.page-title{font:300 40px var(--ff-serif);letter-spacing:0}.page-sub{color:var(--muted);font:300 14px/1.7 var(--ff-sans);max-width:620px;margin-top:6px}
+.layout{display:grid;grid-template-columns:390px 1fr;gap:22px;align-items:start}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.panel-head{padding:18px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.panel-title{font:600 17px var(--ff-serif)}.panel-body{padding:20px}
+.field{margin-bottom:16px}.field label{display:block;font:700 10px var(--ff-sans);letter-spacing:1.4px;text-transform:uppercase;color:var(--hint);margin-bottom:8px}
+input,select,textarea{width:100%;background:var(--input);border:1px solid var(--border);border-radius:8px;color:var(--text);font:14px var(--ff-sans);outline:none}
+input,select{height:44px;padding:0 13px}textarea{min-height:230px;resize:vertical;padding:13px;line-height:1.55}
+input:focus,select:focus,textarea:focus{border-color:var(--border-lit);box-shadow:0 0 0 3px rgba(201,168,76,0.08)}
+.btn{height:44px;border:0;border-radius:8px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;font:700 12px var(--ff-sans);letter-spacing:.8px;text-transform:uppercase}
+.btn-primary{width:100%;background:linear-gradient(135deg,var(--gold),#A07820);color:#0A0B0E;box-shadow:0 4px 18px rgba(201,168,76,0.22)}
+.btn-primary:hover{box-shadow:0 6px 28px rgba(201,168,76,0.34);transform:translateY(-1px)}
+.btn-ghost{height:34px;padding:0 12px;background:transparent;border:1px solid var(--border);color:var(--muted);font-size:11px}
+.btn-ghost:hover{color:var(--text);border-color:rgba(255,255,255,0.18)}
+.btn:disabled{opacity:.55;cursor:not-allowed;transform:none}.status{display:none;margin-top:14px;font:500 13px/1.5 var(--ff-sans);border-radius:8px;padding:12px 13px}
+.status.err{display:block;color:var(--red);background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.22)}
+.status.ok{display:block;color:var(--teal);background:rgba(45,212,191,0.08);border:1px solid rgba(45,212,191,0.2)}
+.result-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.result-col{display:flex;flex-direction:column;gap:18px}
+.empty{min-height:520px;display:flex;align-items:center;justify-content:center;text-align:center;padding:40px;color:var(--hint)}
+.empty h2{font:300 30px var(--ff-serif);color:var(--muted);margin-bottom:10px}.empty p{font:300 14px/1.7 var(--ff-sans);max-width:420px}
+.section{background:rgba(255,255,255,0.025);border:1px solid var(--border);border-radius:10px;padding:16px}
+.section h3{font:600 16px var(--ff-serif);margin-bottom:12px;color:var(--gold-light)}
+.copy-row{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px}.copy-row h3{margin:0}
+.text-block{color:var(--muted);font:400 13px/1.65 var(--ff-sans);white-space:pre-wrap}
+.tag-list{display:flex;flex-wrap:wrap;gap:8px}.tag{border:1px solid var(--border-lit);background:var(--gold-bg);color:var(--gold-light);border-radius:6px;padding:6px 9px;font:600 12px var(--ff-sans)}
+.list{display:flex;flex-direction:column;gap:9px}.list-item{position:relative;padding-left:18px;color:var(--muted);font:400 13px/1.55 var(--ff-sans)}
+.list-item::before{content:'';position:absolute;left:0;top:.65em;width:6px;height:6px;border-radius:50%;background:var(--teal)}
+.resume-output{background:#F7F4ED;color:#161616;border-radius:8px;padding:22px;font-family:Arial,Helvetica,sans-serif}
+.resume-output h2{font:700 22px Arial,Helvetica,sans-serif;margin-bottom:4px;color:#111}.resume-output h3{font:700 12px Arial,Helvetica,sans-serif;margin:18px 0 8px;color:#111;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid #cfc8ba;padding-bottom:5px}
+.resume-output p,.resume-output li{font-size:13px;line-height:1.55;color:#202020}.resume-output ul{margin-left:18px}.resume-output .skills-line{font-weight:600;color:#222}
+.loading{display:none;align-items:center;gap:10px;color:var(--muted);font:600 13px var(--ff-sans)}
+.loading.show{display:flex}.spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.12);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:980px){.layout{grid-template-columns:1fr}.result-grid{grid-template-columns:1fr}.page-head{align-items:flex-start;flex-direction:column}.nav-link{display:none}}
+@media(max-width:620px){nav{padding:13px 14px}.user-chip{display:none}main{padding:24px 14px 50px}.page-title{font-size:32px}.panel-body{padding:16px}.brand-name{display:none}}
+@media print{nav,.form-panel,.btn-ghost,.page-head{display:none}body{background:#fff}main{padding:0}.layout,.result-grid{display:block}.panel{border:0}.panel-head{display:none}.resume-output{padding:0}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="brand">
+    <a href="/dashboard" class="back-btn">Back</a>
+    <div class="brand-mark">A</div>
+    <div class="brand-name">Ap<span>tura</span> AI</div>
+  </div>
+  <div class="nav-right">
+    <a href="/screen" class="nav-link">Screen Candidates</a>
+    <div class="user-chip">
+      <div class="user-av">
+        {% if user.avatar_url %}<img src="{{ user.avatar_url }}" alt="avatar">{% else %}{{ (user.name or user.email or 'U')[:1].upper() }}{% endif %}
+      </div>
+      <div class="user-name">{{ user.name or user.email }}</div>
+    </div>
+    <a href="/auth/logout" class="btn-logout">Sign out</a>
+  </div>
+</nav>
+
+<main>
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">Resume Builder</h1>
+      <p class="page-sub">Generate role requirements, ATS keywords, and tailored resume sections for a target job.</p>
+    </div>
+    <div class="loading" id="loading"><span class="spinner"></span><span>Generating</span></div>
+  </div>
+
+  <div class="layout">
+    <section class="panel form-panel">
+      <div class="panel-head"><div class="panel-title">Target Role</div></div>
+      <div class="panel-body">
+        <form id="builderForm">
+          <div class="field">
+            <label for="job_title">Job Title</label>
+            <input id="job_title" name="job_title" placeholder="Product Manager" required maxlength="120">
+          </div>
+          <div class="field">
+            <label for="seniority">Seniority</label>
+            <select id="seniority" name="seniority">
+              <option>Entry-level</option>
+              <option selected>Mid-level</option>
+              <option>Senior</option>
+              <option>Lead</option>
+              <option>Manager</option>
+              <option>Director</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="industry">Industry</label>
+            <input id="industry" name="industry" placeholder="Fintech, healthcare, SaaS">
+          </div>
+          <div class="field">
+            <label for="target_company">Company Context</label>
+            <input id="target_company" name="target_company" placeholder="Startup, enterprise, remote team">
+          </div>
+          <div class="field">
+            <label for="resume_text">Current Resume or Background</label>
+            <textarea id="resume_text" name="resume_text" placeholder="Paste resume text, work history, skills, education, or project notes."></textarea>
+          </div>
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button class="btn btn-primary" id="submitBtn" type="submit">Generate Resume</button>
+          <div id="status" class="status"></div>
+        </form>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <div class="panel-title">Output</div>
+        <button class="btn btn-ghost" type="button" onclick="copyAll()">Copy All</button>
+      </div>
+      <div class="panel-body" id="output">
+        <div class="empty">
+          <div>
+            <h2>No draft yet</h2>
+            <p>Enter a target role and generate a requirements profile with resume-ready sections.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script>
+const form = document.getElementById('builderForm');
+const statusEl = document.getElementById('status');
+const output = document.getElementById('output');
+const submitBtn = document.getElementById('submitBtn');
+const loading = document.getElementById('loading');
+let latestText = '';
+let copyValues = [];
+
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, ch => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+  }[ch]));
+}
+function asArray(value) {
+  return Array.isArray(value) ? value.filter(Boolean) : [];
+}
+function list(items) {
+  return `<div class="list">${asArray(items).map(item => `<div class="list-item">${escapeHtml(item)}</div>`).join('')}</div>`;
+}
+function tags(items) {
+  return `<div class="tag-list">${asArray(items).map(item => `<span class="tag">${escapeHtml(item)}</span>`).join('')}</div>`;
+}
+function copyText(text) {
+  navigator.clipboard.writeText(text).then(() => showStatus('Copied.', 'ok')).catch(() => showStatus('Could not copy.', 'err'));
+}
+function copyAll() {
+  if (!latestText) return showStatus('Generate a draft first.', 'err');
+  copyText(latestText);
+}
+function storeCopy(value) {
+  copyValues.push(value || '');
+  return copyValues.length - 1;
+}
+function showStatus(message, type) {
+  statusEl.className = `status ${type}`;
+  statusEl.textContent = message;
+}
+function setBusy(isBusy) {
+  submitBtn.disabled = isBusy;
+  submitBtn.textContent = isBusy ? 'Generating...' : 'Generate Resume';
+  loading.classList.toggle('show', isBusy);
+}
+function section(title, body, copyValue = '') {
+  return `<div class="section">
+    <div class="copy-row"><h3>${escapeHtml(title)}</h3>${copyValue ? `<button class="btn btn-ghost copy-btn" type="button" data-copy-id="${storeCopy(copyValue)}">Copy</button>` : ''}</div>
+    ${body}
+  </div>`;
+}
+function formatPlain(result) {
+  const req = result.job_requirements || {};
+  const resume = result.resume || {};
+  return [
+    'JOB REQUIREMENTS',
+    req.role_summary || '',
+    '',
+    'Must-have skills:',
+    ...asArray(req.must_have_skills).map(x => `- ${x}`),
+    '',
+    'Preferred skills:',
+    ...asArray(req.preferred_skills).map(x => `- ${x}`),
+    '',
+    'Core responsibilities:',
+    ...asArray(req.core_responsibilities).map(x => `- ${x}`),
+    '',
+    'Tools and keywords:',
+    asArray(req.tools_and_keywords).join(', '),
+    '',
+    'RESUME DRAFT',
+    resume.headline || '',
+    resume.professional_summary || '',
+    '',
+    'Skills:',
+    asArray(resume.skills).join(', '),
+    '',
+    'Experience bullets:',
+    ...asArray(resume.experience_bullets).map(x => `- ${x}`),
+    '',
+    'Project ideas:',
+    ...asArray(resume.project_ideas).map(x => `- ${x}`),
+    '',
+    'Keyword gaps:',
+    ...asArray(resume.keyword_gaps).map(x => `- ${x}`),
+    '',
+    'Rewrite advice:',
+    ...asArray(resume.rewrite_advice).map(x => `- ${x}`)
+  ].join('\n');
+}
+function render(result) {
+  const req = result.job_requirements || {};
+  const resume = result.resume || {};
+  copyValues = [];
+  latestText = formatPlain(result);
+  const resumeBlock = `${resume.headline || ''}\n\n${resume.professional_summary || ''}\n\nSkills: ${asArray(resume.skills).join(', ')}\n\n${asArray(resume.experience_bullets).map(x => `- ${x}`).join('\n')}`;
+  output.innerHTML = `
+    <div class="result-grid">
+      <div class="result-col">
+        ${section('Role Summary', `<div class="text-block">${escapeHtml(req.role_summary || '')}</div>`, req.role_summary || '')}
+        ${section('Must-Have Skills', tags(req.must_have_skills), asArray(req.must_have_skills).join(', '))}
+        ${section('Preferred Skills', tags(req.preferred_skills), asArray(req.preferred_skills).join(', '))}
+        ${section('Core Responsibilities', list(req.core_responsibilities), asArray(req.core_responsibilities).map(x => `- ${x}`).join('\n'))}
+        ${section('Tools & Keywords', tags(req.tools_and_keywords), asArray(req.tools_and_keywords).join(', '))}
+        ${section('Experience & Education', `<div class="text-block">${escapeHtml(req.experience_expectations || '')}</div><div style="height:12px"></div>${list(req.education_or_certifications)}`)}
+      </div>
+      <div class="result-col">
+        <div class="section">
+          <div class="copy-row"><h3>Resume Draft</h3><button class="btn btn-ghost copy-btn" type="button" data-copy-id="${storeCopy(resumeBlock)}">Copy</button></div>
+          <div class="resume-output">
+            <h2>${escapeHtml(resume.headline || 'Targeted Resume')}</h2>
+            <p>${escapeHtml(resume.professional_summary || '')}</p>
+            <h3>Skills</h3>
+            <p class="skills-line">${escapeHtml(asArray(resume.skills).join(' | '))}</p>
+            <h3>Experience</h3>
+            <ul>${asArray(resume.experience_bullets).map(x => `<li>${escapeHtml(x)}</li>`).join('')}</ul>
+          </div>
+        </div>
+        ${section('Project Ideas', list(resume.project_ideas), asArray(resume.project_ideas).map(x => `- ${x}`).join('\n'))}
+        ${section('Keyword Gaps', list(resume.keyword_gaps), asArray(resume.keyword_gaps).map(x => `- ${x}`).join('\n'))}
+        ${section('Rewrite Advice', list(resume.rewrite_advice), asArray(resume.rewrite_advice).map(x => `- ${x}`).join('\n'))}
+      </div>
+    </div>`;
+}
+output.addEventListener('click', (event) => {
+  const button = event.target.closest('.copy-btn');
+  if (!button) return;
+  copyText(copyValues[Number(button.dataset.copyId)] || '');
+});
+form.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  statusEl.className = 'status';
+  statusEl.textContent = '';
+  setBusy(true);
+  try {
+    const response = await fetch('/api/resume-builder/generate', {
+      method: 'POST',
+      body: new FormData(form)
+    });
+    const data = await response.json();
+    if (!response.ok || !data.success) {
+      throw new Error(data.detail || data.error || 'Could not generate resume.');
+    }
+    render(data.result);
+    showStatus('Draft generated.', 'ok');
+  } catch (error) {
+    showStatus(error.message || 'Could not generate resume.', 'err');
+  } finally {
+    setBusy(false);
+  }
+});
+</script>
+</body>
+</html>
