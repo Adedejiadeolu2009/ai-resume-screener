@@ -193,6 +193,15 @@ app.include_router(admin_router.router)
 app.include_router(resume_builder_router.router)
 
 
+@app.get("/sitemap.xml")
+async def sitemap_xml():
+    sitemap_path = BASE_DIR / "templates" / "sitemap.xml"
+    return _Response(
+        content=sitemap_path.read_text(encoding="utf-8"),
+        media_type="application/xml",
+    )
+
+
 # ── Page Routes ───────────────────────────────────────────────────────────────
 
 @app.get("/contact", response_class=HTMLResponse)

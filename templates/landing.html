@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Aptura AI - Premium Resume Screening</title>
+<title>Aptura AI - Hire Smarter. Build Better Resumes.</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/static/premium-animations.css">
 <style>
@@ -28,7 +28,7 @@ h1{font:400 clamp(46px,7vw,86px)/.92 var(--serif);letter-spacing:0;max-width:820
 .workflow-step{position:relative;min-height:210px;padding:20px;border:1px solid var(--line);border-radius:8px;background:var(--panel);overflow:hidden}.workflow-step::before{content:attr(data-step);position:absolute;right:18px;top:10px;color:rgba(255,255,255,.06);font:600 62px var(--serif)}.workflow-step h3{position:relative;margin-top:44px;font-size:16px}.workflow-step p{position:relative;margin-top:10px;color:var(--muted);font-size:13px;line-height:1.6}.step-icon{position:relative;width:38px;height:38px;border-radius:8px;display:grid;place-items:center;background:rgba(201,168,76,.1);border:1px solid var(--line-lit);color:var(--gold);font-weight:800}
 .features{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:54px clamp(18px,5vw,64px)}.landing-card{border:1px solid var(--line);border-radius:8px;background:var(--panel);padding:24px}.landing-card h3{font:600 24px var(--serif);margin-bottom:10px}.landing-card p{color:var(--muted);line-height:1.7}.feature-list{display:grid;gap:10px;margin-top:18px}.feature-list div{display:flex;gap:10px;align-items:flex-start;color:var(--muted);font-size:14px}.feature-list span{display:grid;place-items:center;width:20px;height:20px;border-radius:6px;background:rgba(45,212,191,.12);border:1px solid rgba(45,212,191,.25);color:var(--teal);font-size:12px;font-weight:800;flex-shrink:0}
 .cta-band{margin:0 clamp(18px,5vw,64px) 54px;padding:34px;border:1px solid rgba(201,168,76,.22);border-radius:8px;background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(45,212,191,.05));display:flex;align-items:center;justify-content:space-between;gap:20px}.cta-band h2{font:500 34px var(--serif);margin-bottom:6px}.cta-band p{color:var(--muted)}footer{padding:24px clamp(18px,5vw,64px);border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;color:var(--hint);font-size:12px}
-@keyframes bar-fill{from{width:0}to{width:var(--w)}}@media(prefers-reduced-motion:no-preference){.candidate{animation:float-card 7s ease-in-out infinite}.candidate:nth-child(2){animation-delay:.6s}.candidate:nth-child(3){animation-delay:1.2s}.candidate:nth-child(4){animation-delay:1.8s}@keyframes float-card{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}}@media(max-width:980px){.hero{grid-template-columns:1fr;min-height:auto}.visual-panel{min-height:500px}.workflow-grid,.features{grid-template-columns:1fr 1fr}.nav-links a:not(.btn){display:none}}@media(max-width:680px){nav{align-items:flex-start}.nav-links{justify-content:flex-end}.hero{padding-top:28px}.trust-row,.workflow-grid,.features{grid-template-columns:1fr}.visual-panel{min-height:470px}.candidate{grid-template-columns:38px 1fr 58px;padding:12px}.score{width:48px;height:48px}.cta-band{display:block}.cta-band .btn{margin-top:18px}.section-head{display:block}.section-head p{margin-top:12px}}
+@keyframes bar-fill{from{width:0}to{width:var(--w)}}@media(prefers-reduced-motion:no-preference){.candidate{animation:float-card 7s ease-in-out infinite}.candidate:nth-child(2){animation-delay:.6s}.candidate:nth-child(3){animation-delay:1.2s}.candidate:nth-child(4){animation-delay:1.8s}@keyframes float-card{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}}@media(max-width:980px){.hero{grid-template-columns:1fr;min-height:auto}.visual-panel{min-height:500px}.workflow-grid,.features{grid-template-columns:1fr 1fr}.nav-links a:not(.btn){display:none}}@media(max-width:680px){nav{align-items:flex-start;padding:14px 16px}.nav-links{justify-content:flex-end;gap:8px}.nav-links .btn{min-height:36px;padding:9px 11px;font-size:12px}.hero{padding-top:28px}.trust-row,.workflow-grid,.features{grid-template-columns:1fr}.visual-panel{min-height:470px}.candidate{grid-template-columns:38px 1fr 58px;padding:12px}.score{width:48px;height:48px}.cta-band{display:block;padding:24px}.cta-band .btn{margin-top:18px;width:100%}.section-head{display:block}.section-head p{margin-top:12px}}@media(max-width:420px){h1{font-size:42px}.hero-actions .btn{width:100%}.command-bar{left:14px;right:14px}.rank-stack{inset:86px 14px 18px}.candidate{gap:10px}.candidate h3{font-size:13px}}
 </style>
 </head>
 <body>
@@ -40,22 +40,23 @@ h1{font:400 clamp(46px,7vw,86px)/.92 var(--serif);letter-spacing:0;max-width:820
     </a>
     <div class="nav-links">
       <a href="#workflow">Workflow</a>
+      <a href="/resume-builder">Resume Builder</a>
       <a href="/about">About</a>
       <a href="/plans">Plans</a>
       <a class="btn" href="/login">Sign in</a>
-      <a class="btn btn-primary" href="/login">Start screening</a>
+      <a class="btn btn-primary" href="/login">Get started</a>
     </div>
   </nav>
 
   <section class="hero">
     <div class="hero-copy">
       <div class="eyebrow">AI resume intelligence</div>
-      <h1>Screen resumes with a <em>premium hiring workflow</em>.</h1>
-      <p class="lead">Aptura AI turns a pile of resumes into ranked shortlists, evidence-backed scores, interview prompts, and reusable hiring history without slowing your team down.</p>
-      <div class="hero-actions"><a class="btn btn-primary" href="/login">Launch workspace</a><a class="btn" href="#workflow">See workflow</a></div>
+      <h1>Hire smarter. <em>Build better resumes.</em></h1>
+      <p class="lead">Aptura AI helps teams screen candidates faster and helps people shape targeted resumes with role requirements, ATS keywords, and practical rewrite guidance.</p>
+      <div class="hero-actions"><a class="btn btn-primary" href="/login">Launch workspace</a><a class="btn" href="/resume-builder">Build a resume</a><a class="btn" href="#workflow">See workflow</a></div>
       <div class="trust-row">
         <div class="proof-card"><strong>6</strong><span>Scoring dimensions per candidate</span></div>
-        <div class="proof-card"><strong>30s</strong><span>Designed for fast first-pass reviews</span></div>
+        <div class="proof-card"><strong>ATS</strong><span>Keyword guidance for targeted resumes</span></div>
         <div class="proof-card"><strong>24/7</strong><span>Saved dashboards and hiring history</span></div>
       </div>
     </div>
@@ -72,22 +73,22 @@ h1{font:400 clamp(46px,7vw,86px)/.92 var(--serif);letter-spacing:0;max-width:820
   </section>
 
   <section class="workflow" id="workflow">
-    <div class="section-head"><h2>A cleaner screening flow</h2><p>Each step has a clear output, so recruiters can move from job criteria to interview shortlist without re-reading every resume from scratch.</p></div>
+    <div class="section-head"><h2>One workflow for both sides of hiring</h2><p>Recruiters can shortlist faster, and candidates can turn the same role signals into stronger, more targeted resume drafts.</p></div>
     <div class="workflow-grid">
-      <div class="workflow-step" data-step="01"><div class="step-icon">JD</div><h3>Define the role</h3><p>Paste the job description and core hiring criteria for consistent evaluation.</p></div>
-      <div class="workflow-step" data-step="02"><div class="step-icon">CV</div><h3>Upload resumes</h3><p>Batch resumes into one screening session and keep every result connected.</p></div>
-      <div class="workflow-step" data-step="03"><div class="step-icon">AI</div><h3>Rank and explain</h3><p>Receive scores, strengths, gaps, red flags, and suggested interview questions.</p></div>
-      <div class="workflow-step" data-step="04"><div class="step-icon">OK</div><h3>Shortlist faster</h3><p>Use the dashboard history to revisit decisions and compare hiring sessions.</p></div>
+      <div class="workflow-step" data-step="01"><div class="step-icon">JD</div><h3>Define the role</h3><p>Paste the job description or target role so the AI understands the hiring context.</p></div>
+      <div class="workflow-step" data-step="02"><div class="step-icon">CV</div><h3>Screen or build</h3><p>Upload candidate resumes for ranking or paste a background to create a targeted resume draft.</p></div>
+      <div class="workflow-step" data-step="03"><div class="step-icon">AI</div><h3>Get evidence</h3><p>Review scores, gaps, keywords, responsibilities, rewrite advice, and interview prompts.</p></div>
+      <div class="workflow-step" data-step="04"><div class="step-icon">OK</div><h3>Move forward</h3><p>Shortlist candidates faster or copy resume-ready sections into your next application.</p></div>
     </div>
   </section>
 
   <section class="features">
-    <div class="landing-card"><h3>Premium motion, practical interface</h3><p>The site now uses restrained entrance motion, hover depth, animated scoring previews, and reduced-motion support so the product feels sharper without making the workflow noisy.</p><div class="feature-list"><div><span>✓</span> Smooth page reveals and staged content loading</div><div><span>✓</span> Animated candidate ranking preview</div><div><span>✓</span> Motion disabled automatically for reduced-motion users</div></div></div>
-    <div class="landing-card"><h3>Built for recruiters and growing teams</h3><p>The product stays focused on the actual task: role setup, resume upload, AI screening, shortlist review, and plan upgrades when hiring volume grows.</p><div class="feature-list"><div><span>✓</span> Free plan for light screening</div><div><span>✓</span> Pro and Enterprise workflows for active hiring</div><div><span>✓</span> Admin-confirmed upgrade requests</div></div></div>
+    <div class="landing-card"><h3>Smarter hiring decisions</h3><p>Move from job criteria to ranked shortlists with candidate scores, strengths, gaps, red flags, and interview questions in one workspace.</p><div class="feature-list"><div><span>✓</span> Evidence-backed candidate ranking</div><div><span>✓</span> Saved screening sessions and analytics</div><div><span>✓</span> Plans for individuals and growing teams</div></div></div>
+    <div class="landing-card"><h3>Better resume drafts</h3><p>The resume builder turns a target role and background notes into requirements, keywords, resume sections, project ideas, and rewrite advice.</p><div class="feature-list"><div><span>✓</span> Role-specific ATS keywords</div><div><span>✓</span> Resume-ready summaries and bullets</div><div><span>✓</span> Clear gaps without inventing experience</div></div></div>
   </section>
 
-  <section class="cta-band"><div><h2>Start with your next role.</h2><p>Sign in, add the job description, upload resumes, and let Aptura AI build the first shortlist.</p></div><a class="btn btn-primary" href="/login">Open Aptura AI</a></section>
-  <footer><span>© 2026 Aptura AI</span><span>Resume screening, ranking, analytics, and hiring workflow intelligence.</span></footer>
+  <section class="cta-band"><div><h2>Start with your next role.</h2><p>Sign in to screen candidates, build targeted resumes, and keep your hiring workflow in one place.</p></div><a class="btn btn-primary" href="/login">Open Aptura AI</a></section>
+  <footer><span>© 2026 Aptura AI</span><span>Resume screening, resume building, analytics, and hiring workflow intelligence.</span></footer>
 </div>
 </body>
 </html>

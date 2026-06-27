@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Resume Builder - Aptura AI</title>
+<title>Build Better Resumes - Aptura AI</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/static/premium-animations.css">
 <style>
@@ -24,14 +24,14 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   background-image:linear-gradient(rgba(255,255,255,0.012) 1px,transparent 1px),
   linear-gradient(90deg,rgba(255,255,255,0.012) 1px,transparent 1px);background-size:48px 48px}
-nav{display:flex;align-items:center;justify-content:space-between;padding:16px 32px;
+nav{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:16px 32px;
   border-bottom:1px solid var(--border);background:rgba(10,11,14,0.86);
   backdrop-filter:blur(12px);position:sticky;top:0;z-index:100}
-.brand{display:flex;align-items:center;gap:12px}.back-btn{display:flex;align-items:center;gap:6px;color:var(--muted);text-decoration:none;font:600 13px var(--ff-sans)}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}.back-btn{display:flex;align-items:center;gap:6px;color:var(--muted);text-decoration:none;font:600 13px var(--ff-sans);white-space:nowrap}
 .back-btn:hover{color:var(--gold)}.brand-mark{width:32px;height:32px;background:linear-gradient(135deg,var(--gold),#8B6914);
   border-radius:8px;display:flex;align-items:center;justify-content:center;font:600 14px var(--ff-serif);color:#0A0B0E}
 .brand-name{font:500 17px var(--ff-serif)}.brand-name span{color:var(--gold)}
-.nav-right{display:flex;align-items:center;gap:12px}.nav-link{color:var(--muted);text-decoration:none;font:600 13px var(--ff-sans)}
+.nav-right{display:flex;align-items:center;justify-content:flex-end;gap:12px;min-width:0}.nav-link{color:var(--muted);text-decoration:none;font:600 13px var(--ff-sans);white-space:nowrap}
 .nav-link:hover{color:var(--gold)}
 .user-chip{display:flex;align-items:center;gap:8px;padding:5px 12px 5px 5px;background:var(--card);border:1px solid var(--border);border-radius:40px}
 .user-av{width:26px;height:26px;border-radius:50%;background:var(--gold-bg);border:1px solid var(--border-lit);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--gold);font-weight:700;overflow:hidden}
@@ -41,7 +41,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:16px 3
 main{position:relative;z-index:1;max-width:1320px;margin:0 auto;padding:34px 28px 70px}
 .page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:24px}
 .page-title{font:300 40px var(--ff-serif);letter-spacing:0}.page-sub{color:var(--muted);font:300 14px/1.7 var(--ff-sans);max-width:620px;margin-top:6px}
-.layout{display:grid;grid-template-columns:390px 1fr;gap:22px;align-items:start}
+.layout{display:grid;grid-template-columns:minmax(320px,390px) minmax(0,1fr);gap:22px;align-items:start}
 .panel{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
 .panel-head{padding:18px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px}
 .panel-title{font:600 17px var(--ff-serif)}.panel-body{padding:20px}
@@ -74,18 +74,20 @@ input:focus,select:focus,textarea:focus{border-color:var(--border-lit);box-shado
 .loading.show{display:flex}.spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.12);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 @media(max-width:980px){.layout{grid-template-columns:1fr}.result-grid{grid-template-columns:1fr}.page-head{align-items:flex-start;flex-direction:column}.nav-link{display:none}}
-@media(max-width:620px){nav{padding:13px 14px}.user-chip{display:none}main{padding:24px 14px 50px}.page-title{font-size:32px}.panel-body{padding:16px}.brand-name{display:none}}
+@media(max-width:720px){nav{align-items:flex-start;padding:13px 14px}.nav-right{gap:8px}.user-chip{display:none}.btn-logout{padding:8px 10px}.brand-name{display:none}main{padding:24px 14px 50px}.page-title{font-size:32px}.panel-body{padding:16px}.panel-head{padding:15px 16px}textarea{min-height:190px}.empty{min-height:360px;padding:28px 18px}.btn-ghost{padding:0 10px}.resume-output{padding:16px}}
+@media(max-width:430px){nav{gap:10px}.back-btn{font-size:12px}.nav-right{flex-shrink:0}.page-title{font-size:30px}.page-sub{font-size:13px}.panel-title{font-size:16px}.copy-row{align-items:flex-start}.copy-row .btn-ghost{height:32px}.tag{max-width:100%;overflow-wrap:anywhere}.resume-output h2{font-size:19px}}
 @media print{nav,.form-panel,.btn-ghost,.page-head{display:none}body{background:#fff}main{padding:0}.layout,.result-grid{display:block}.panel{border:0}.panel-head{display:none}.resume-output{padding:0}}
 </style>
 </head>
 <body>
 <nav>
   <div class="brand">
-    <a href="/dashboard" class="back-btn">Back</a>
+    <a href="/dashboard" class="back-btn">Dashboard</a>
     <div class="brand-mark">A</div>
     <div class="brand-name">Ap<span>tura</span> AI</div>
   </div>
   <div class="nav-right">
+    <a href="/" class="nav-link">Website</a>
     <a href="/screen" class="nav-link">Screen Candidates</a>
     <div class="user-chip">
       <div class="user-av">
@@ -100,8 +102,8 @@ input:focus,select:focus,textarea:focus{border-color:var(--border-lit);box-shado
 <main>
   <div class="page-head">
     <div>
-      <h1 class="page-title">Resume Builder</h1>
-      <p class="page-sub">Generate role requirements, ATS keywords, and tailored resume sections for a target job.</p>
+      <h1 class="page-title">Build Better Resumes</h1>
+      <p class="page-sub">Turn a target role and your background into requirements, ATS keywords, tailored resume sections, project ideas, and rewrite advice.</p>
     </div>
     <div class="loading" id="loading"><span class="spinner"></span><span>Generating</span></div>
   </div>
@@ -139,7 +141,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--border-lit);box-shado
             <textarea id="resume_text" name="resume_text" placeholder="Paste resume text, work history, skills, education, or project notes."></textarea>
           </div>
           <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-          <button class="btn btn-primary" id="submitBtn" type="submit">Generate Resume</button>
+          <button class="btn btn-primary" id="submitBtn" type="submit">Build Resume</button>
           <div id="status" class="status"></div>
         </form>
       </div>
@@ -154,7 +156,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--border-lit);box-shado
         <div class="empty">
           <div>
             <h2>No draft yet</h2>
-            <p>Enter a target role and generate a requirements profile with resume-ready sections.</p>
+            <p>Enter a target role to generate a requirements profile with resume-ready sections.</p>
           </div>
         </div>
       </div>
@@ -202,7 +204,7 @@ function showStatus(message, type) {
 }
 function setBusy(isBusy) {
   submitBtn.disabled = isBusy;
-  submitBtn.textContent = isBusy ? 'Generating...' : 'Generate Resume';
+  submitBtn.textContent = isBusy ? 'Generating...' : 'Build Resume';
   loading.classList.toggle('show', isBusy);
 }
 function section(title, body, copyValue = '') {
