@@ -19,7 +19,7 @@ from database import engine, get_db, Base
 from starlette.middleware.sessions import SessionMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from sqlalchemy.orm import Session, joinedload
-from sqlalchemy import func
+from sqlalchemy import func, inspect, text
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -30,7 +30,6 @@ import os
 import sys
 import logging
 from pathlib import Path
-from sqlalchemy import inspect, text
 
 # ── Fix Python path for uvicorn reload workers ────────────────────────────────
 PROJECT_DIR = Path(__file__).parent
@@ -52,52 +51,43 @@ else:
 import models  # noqa: F401
 
 # Create all DB tables on startup (safe to run every time — never deletes data)
+# With Supabase PostgreSQL, schema management is handled cleanly by SQLAlchemy.
 Base.metadata.create_all(bind=engine)
 logger.info("Database tables ready")
-
-# ── Lightweight DB migrations for local SQLite (adds new columns if missing)
 
 
 def ensure_db_columns():
     insp = inspect(engine)
-    tables = insp.get_table_names()
-    if 'users' not in tables:
-        return
-    existing = [c['name'] for c in insp.get_columns('users')]
-    with engine.connect() as conn:
-        if 'tier' not in existing:
-            try:
-                conn.execute(
-                    text("ALTER TABLE users ADD COLUMN tier VARCHAR(20) DEFAULT 'FREE'"))
-            except Exception:
-                pass
-        if 'premium_until' not in existing:
-            try:
-                conn.execute(
-                    text("ALTER TABLE users ADD COLUMN premium_until DATETIME"))
-            except Exception:
-                pass
-        if 'screenings_used_this_month' not in existing:
-            try:
-                conn.execute(text(
-                    "ALTER TABLE users ADD COLUMN screenings_used_this_month INTEGER DEFAULT 0"))
-            except Exception:
-                pass
-        if 'usage_reset_date' not in existing:
-            try:
-                conn.execute(
-                    text("ALTER TABLE users ADD COLUMN usage_reset_date DATETIME"))
-            except Exception:
-                pass
-        if 'is_admin' not in existing:
-            try:
-                conn.execute(
-                    text("ALTER TABLE users ADD COLUMN is_admin BOOLEAN DEFAULT 0"))
-            except Exception:
-                pass
+    tables = set(insp.get_table_names())
+
+    column_specs = {
+        "screenings": {
+            "total_files": "INTEGER DEFAULT 0",
+            "processed_candidates": "INTEGER DEFAULT 0",
+            "status": "VARCHAR(50) DEFAULT 'QUEUED' NOT NULL",
+            "error_message": "TEXT",
+        },
+        "candidates": {
+            "status": "VARCHAR(50) DEFAULT 'QUEUED' NOT NULL",
+            "error_message": "TEXT",
+            "file_content_b64": "TEXT",
+        },
+    }
+
+    with engine.begin() as conn:
+        for table_name, columns in column_specs.items():
+            if table_name not in tables:
+                continue
+            existing = {column["name"] for column in insp.get_columns(table_name)}
+            for column_name, ddl in columns.items():
+                if column_name not in existing:
+                    conn.execute(
+                        text(f"ALTER TABLE {table_name} ADD COLUMN {column_name} {ddl}")
+                    )
 
 
 ensure_db_columns()
+logger.info("Database columns ready")
 
 # ── App ──────────────────────────────────────────────────────────────────────
 
@@ -152,7 +142,8 @@ async def add_security_headers(request: Request, call_next):
     response = await call_next(request)
     response.headers.setdefault("X-Content-Type-Options", "nosniff")
     response.headers.setdefault("X-Frame-Options", "DENY")
-    response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+    response.headers.setdefault(
+        "Referrer-Policy", "strict-origin-when-cross-origin")
     response.headers.setdefault(
         "Permissions-Policy", "camera=(), microphone=(), geolocation=()"
     )

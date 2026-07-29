@@ -98,6 +98,10 @@ class Screening(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     job_id = Column(Integer, ForeignKey("jobs.id"), nullable=False)
     total_candidates = Column(Integer, default=0)
+    total_files = Column(Integer, default=0)
+    processed_candidates = Column(Integer, default=0)
+    status = Column(String(50), default="QUEUED", nullable=False)
+    error_message = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
     # Relationships
@@ -121,6 +125,9 @@ class Candidate(Base):
     overall_score = Column(Integer, nullable=True)            # 0–100
     # "Strong Hire", "Hire", etc.
     recommendation = Column(String(50), nullable=True)
+    status = Column(String(50), default="QUEUED", nullable=False)
+    error_message = Column(Text, nullable=True)
+    file_content_b64 = Column(Text, nullable=True)
     # The complete AI analysis
     result_json = Column(JSON, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)

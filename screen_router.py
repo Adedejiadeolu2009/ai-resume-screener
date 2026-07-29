@@ -5,6 +5,7 @@ Uses Google Gemini API — completely free tier, no dollar payment needed.
 Free limit: 1,500 requests/day which is plenty for a growing business.
 """
 
+import base64
 import io
 import json
 import logging
@@ -242,10 +243,9 @@ async def screen_resumes(
     import main as _main
     _main.require_csrf(request, csrf_token)
 
-    # ── PRODUCTION: Input validation & security checks ────────────────────────
-    MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB per file
+    MAX_FILE_SIZE = 10 * 1024 * 1024
     MAX_FILES = 50
-    ALLOWED_EXTENSIONS = {'.pdf', '.docx', '.txt'}
+    ALLOWED_EXTENSIONS = {".pdf", ".docx", ".txt"}
 
     if not job_description.strip():
         raise HTTPException(400, "Job description is required.")
@@ -254,45 +254,40 @@ async def screen_resumes(
     if not files or all(f.filename == "" for f in files):
         raise HTTPException(400, "At least one resume file is required.")
     if len(files) > MAX_FILES:
-        raise HTTPException(
-            400, f"Maximum {MAX_FILES} files allowed per screening.")
+        raise HTTPException(400, f"Maximum {MAX_FILES} files allowed per screening.")
 
-    # Validate each file
     for upload in files:
         if not upload.filename:
             continue
-        # Check file extension
         ext = Path(upload.filename).suffix.lower()
         if ext not in ALLOWED_EXTENSIONS:
             raise HTTPException(
-                400, f"File '{upload.filename}' has unsupported format. Allowed: PDF, DOCX, TXT")
-        # Check file size (validate early before reading into memory)
+                400,
+                f"File '{upload.filename}' has unsupported format. Allowed: PDF, DOCX, TXT",
+            )
         if upload.size and upload.size > MAX_FILE_SIZE:
             size_mb = upload.size / (1024 * 1024)
             raise HTTPException(
-                400, f"File '{upload.filename}' is too large ({size_mb:.1f}MB). Maximum: 10MB")
+                400,
+                f"File '{upload.filename}' is too large ({size_mb:.1f}MB). Maximum: 10MB",
+            )
 
-    # ── RATE LIMITING: Check monthly limits based on tier ─────────────────────
     from datetime import datetime, timedelta
-    from sqlalchemy import func
 
-    # Reset monthly counter if reset date has passed
     if current_user.usage_reset_date is None or current_user.usage_reset_date <= datetime.utcnow():
         current_user.screenings_used_this_month = 0
         current_user.usage_reset_date = datetime.utcnow() + timedelta(days=30)
         db.commit()
 
-    # Check limits based on tier
     FREE_LIMIT = 5
     PRO_LIMIT = 100
-    ENTERPRISE_LIMIT = None  # None => unlimited
+    ENTERPRISE_LIMIT = None
 
     now = datetime.utcnow()
-
     tier = (current_user.tier or "FREE").upper()
-
     is_pro = tier == "PRO" and (
-        current_user.premium_until is None or current_user.premium_until > now)
+        current_user.premium_until is None or current_user.premium_until > now
+    )
     is_enterprise = tier == "ENTERPRISE" and (
         current_user.premium_until is None or current_user.premium_until > now
     )
@@ -309,37 +304,20 @@ async def screen_resumes(
         raise HTTPException(
             403,
             f"You've reached your {monthly_limit} screenings/month limit for {tier_name} tier. "
-            f"Upgrade by bank transfer from your dashboard > Plans."
+            f"Upgrade by bank transfer from your dashboard > Plans.",
         )
 
-    # API key lives on the server only — users never touch it
-    # Prefer OpenAI/Deepseek/Groq key, fall back to GEMINI if present
     resolved_key = os.environ.get("OPENAI_API_KEY", "").strip() \
         or os.environ.get("DEEPSEEK_API_KEY", "").strip() \
         or os.environ.get("GROQ_API_KEY", "").strip() \
         or os.environ.get("GEMINI_API_KEY", "").strip()
     if not resolved_key:
-        raise HTTPException(
-            500, "AI service is not configured. Please contact support.")
+        raise HTTPException(500, "AI service is not configured. Please contact support.")
 
-    # Preflight: validate AI provider credentials before processing files.
-    # If auth fails, abort early with 502 so users/deployments see a clear error.
-    try:
-        # minimal connectivity prompt to verify authentication
-        screen_with_openai(
-            resolved_key, job_description[:200] or "Test", "Connectivity test", "TestCandidate")
-    except RuntimeError as e:
-        msg = str(e)
-        if "Authentication with the AI provider failed" in msg or "401" in msg:
-            raise HTTPException(status_code=502, detail=msg)
-        # non-auth failures are non-fatal here; log and continue
-        logger.warning("AI preflight check failed (non-auth): %s", msg)
-
-    # ── Save job to DB ────────────────────────────────────────────────────────
     job = db.query(models.Job).filter(
         models.Job.user_id == current_user.id,
         models.Job.title == job_title,
-        models.Job.company == company_name
+        models.Job.company == company_name,
     ).first()
 
     if not job:
@@ -347,97 +325,99 @@ async def screen_resumes(
             user_id=current_user.id,
             title=job_title,
             company=company_name,
-            description=job_description
+            description=job_description,
         )
         db.add(job)
         db.commit()
         db.refresh(job)
 
-    screening = models.Screening(user_id=current_user.id, job_id=job.id)
+    valid_uploads = [upload for upload in files if upload.filename]
+    screening = models.Screening(
+        user_id=current_user.id,
+        job_id=job.id,
+        total_files=len(valid_uploads),
+        processed_candidates=0,
+        total_candidates=0,
+        status="QUEUED",
+    )
     db.add(screening)
     db.commit()
     db.refresh(screening)
 
-    # ── Process each resume ───────────────────────────────────────────────────
-    results, errors = [], []
+    queued_files, rejected_files = [], []
 
-    for upload in files:
-        if not upload.filename:
-            continue
+    for upload in valid_uploads:
         try:
             file_bytes = await upload.read()
             if len(file_bytes) > MAX_FILE_SIZE:
                 size_mb = len(file_bytes) / (1024 * 1024)
-                errors.append({
+                rejected_files.append({
                     "file": upload.filename,
-                    "error": f"File is too large ({size_mb:.1f}MB). Maximum: 10MB"
+                    "error": f"File is too large ({size_mb:.1f}MB). Maximum: 10MB",
                 })
                 continue
+
             candidate_name = (
                 Path(upload.filename).stem
-                .replace("_", " ").replace("-", " ").title()
+                .replace("_", " ")
+                .replace("-", " ")
+                .title()
             )
-
-            resume_text = extract_text(upload.filename, file_bytes)
-            if len(resume_text.strip()) < 50:
-                errors.append({
-                    "file": upload.filename,
-                    "error": "Could not extract enough text from this file."
-                })
-                continue
-
-            result = screen_with_openai(
-                resolved_key, job_description, resume_text, candidate_name
-            )
-            result["filename"] = upload.filename
-            result["file_size_kb"] = round(len(file_bytes) / 1024, 1)
-
-            # Save to DB
             candidate_row = models.Candidate(
                 screening_id=screening.id,
                 filename=upload.filename,
-                candidate_name=result.get("candidate_name", candidate_name),
-                overall_score=result.get("overall_score", 0),
-                recommendation=result.get("recommendation", ""),
-                result_json=result
+                candidate_name=candidate_name,
+                status="QUEUED",
+                file_content_b64=base64.b64encode(file_bytes).decode("ascii"),
             )
             db.add(candidate_row)
-            results.append(result)
+            db.commit()
+            db.refresh(candidate_row)
 
-        except json.JSONDecodeError:
-            errors.append({
-                "file": upload.filename,
-                "error": "AI returned an unexpected response. Please try again."
+            queued_files.append({
+                "candidate_id": candidate_row.id,
+                "filename": upload.filename,
             })
-        except ValueError as e:
-            errors.append({"file": upload.filename, "error": str(e)})
         except Exception as e:
-            logger.error(
-                f"Error processing {upload.filename}: {traceback.format_exc()}")
-            errors.append({
+            logger.error("Error queueing %s: %s", upload.filename, traceback.format_exc())
+            rejected_files.append({
                 "file": upload.filename,
-                "error": f"Processing failed: {str(e)}"
+                "error": f"Queueing failed: {str(e)}",
             })
 
-    screening.total_candidates = len(results)
+    if not queued_files:
+        screening.status = "FAILED"
+        screening.error_message = "No resume files could be queued."
+        db.commit()
+        return JSONResponse(
+            status_code=400,
+            content={
+                "detail": "No resume files could be queued.",
+                "screening_id": screening.id,
+                "errors": rejected_files,
+            },
+        )
 
-    # ── Increment user's monthly screening count ───────────────────────────────
+    screening.total_files = len(queued_files)
     current_user.screenings_used_this_month += 1
     db.commit()
 
-    results.sort(key=lambda x: x.get("overall_score", 0), reverse=True)
+    from screening_tasks import process_screening_task
+    task = process_screening_task.delay(screening.id, queued_files)
 
-    return JSONResponse({
+    return JSONResponse(status_code=202, content={
         "job_title": job_title,
         "company_name": company_name,
         "screening_id": screening.id,
-        "total_processed": len(results),
-        "total_errors": len(errors),
-        "results": results,
-        "errors": errors
+        "task_id": task.id,
+        "status": screening.status,
+        "total_files": screening.total_files,
+        "processed_candidates": screening.processed_candidates,
+        "total_processed": 0,
+        "total_errors": len(rejected_files),
+        "results": [],
+        "errors": rejected_files,
     })
-
-
 # ── History Routes ────────────────────────────────────────────────────────────
 
 @router.get("/history")
@@ -486,14 +466,23 @@ async def get_screening(
         key=lambda x: x.get("overall_score", 0),
         reverse=True
     )
+    errors = [
+        {"file": c.filename, "error": c.error_message or "Processing failed."}
+        for c in screening.candidates
+        if c.status == "FAILED"
+    ]
 
     return JSONResponse({
         "job_title": screening.job.title,
         "company_name": screening.job.company or "",
         "screening_id": screening.id,
         "created_at": screening.created_at.isoformat(),
+        "status": screening.status,
+        "error_message": screening.error_message,
+        "total_files": screening.total_files or len(screening.candidates),
+        "processed_candidates": screening.processed_candidates or len(candidates) + len(errors),
         "total_processed": len(candidates),
-        "total_errors": 0,
+        "total_errors": len(errors),
         "results": candidates,
-        "errors": []
+        "errors": errors
     })

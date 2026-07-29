@@ -600,27 +600,25 @@ async function submitForm() {
   try {
     const res  = await fetch('/api/screen', { method:'POST', body: fd });
     const data = await res.json();
-    clearInterval(iv);
 
     if (!res.ok) {
+      clearInterval(iv);
       showError(data.detail || 'Screening failed. Please try again.');
       return;
     }
 
-    // Mark all files done
-    selectedFiles.forEach((_,i) => {
-      const el = document.getElementById('pfi-'+i);
-      if (el) { el.className='proc-file-icon pfi-done'; el.textContent='✓'; }
-    });
+    if (data.status === 'QUEUED' || data.status === 'PROCESSING') {
+      await pollScreening(data.screening_id, iv);
+      return;
+    }
 
-    setTimeout(() => {
-      allResults = data.results || [];
-      renderResults(data);
-    }, 600);
-
+    clearInterval(iv);
+    markProcessedFiles(data);
+    allResults = data.results || [];
+    renderResults(data);
   } catch(e) {
     clearInterval(iv);
-    showError('Network error — please check your connection and try again.');
+    showError(e.message || 'Network error - please check your connection and try again.');
   } finally {
     document.getElementById('submitBtn').disabled = false;
     updateSteps();
@@ -628,6 +626,55 @@ async function submitForm() {
 }
 
 // ── UI state helpers ───────────────────────────────────────────────────────
+async function pollScreening(screeningId, messageTimer) {
+  let attempts = 0;
+  while (attempts < 240) {
+    attempts += 1;
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    const res = await fetch(`/api/screening/${screeningId}`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || 'Could not load screening status.');
+
+    const done = data.processed_candidates || 0;
+    const total = data.total_files || selectedFiles.length;
+    document.getElementById('procMsg').textContent =
+      `Processing resume queue: ${done}/${total} complete`;
+
+    selectedFiles.forEach((_,i) => {
+      const el = document.getElementById('pfi-'+i);
+      if (!el) return;
+      if (i < done) {
+        el.className='proc-file-icon pfi-done';
+        el.textContent='Done';
+      } else if (i === done) {
+        el.className='proc-file-icon pfi-scan';
+        el.textContent='...';
+      }
+    });
+
+    if (['COMPLETED','COMPLETED_WITH_ERRORS','FAILED'].includes(data.status)) {
+      clearInterval(messageTimer);
+      markProcessedFiles(data);
+      allResults = data.results || [];
+      renderResults(data);
+      return;
+    }
+  }
+  clearInterval(messageTimer);
+  throw new Error('Screening is still queued. Please open this screening from your dashboard later.');
+}
+
+function markProcessedFiles(data) {
+  const done = data.processed_candidates || selectedFiles.length;
+  selectedFiles.forEach((_,i) => {
+    const el = document.getElementById('pfi-'+i);
+    if (el && i < done) {
+      el.className='proc-file-icon pfi-done';
+      el.textContent='Done';
+    }
+  });
+}
 function showProc() {
   document.getElementById('emptyState').style.display  = 'none';
   document.getElementById('procState').classList.add('on');
