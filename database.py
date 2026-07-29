@@ -6,12 +6,14 @@ DATABASE_URL should point to the Supabase PostgreSQL database.
 """
 
 import os
+import logging
 
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 load_dotenv()
+logger = logging.getLogger("aptura.database")
 
 
 def normalize_database_url(url: str) -> str:
@@ -38,6 +40,16 @@ engine = create_engine(
     connect_args=connect_args,
     echo=False,
     pool_pre_ping=True,
+)
+if getattr(engine.dialect, "is_async", False):
+    raise RuntimeError(
+        f"Async SQLAlchemy dialect is not supported: {engine.dialect.name}+{engine.dialect.driver}"
+    )
+logger.info(
+    "Database engine ready: dialect=%s driver=%s async=%s",
+    engine.dialect.name,
+    engine.dialect.driver,
+    getattr(engine.dialect, "is_async", False),
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

@@ -431,7 +431,13 @@ async def settings_page(request: Request, db: Session = Depends(get_db), current
 
 @app.get("/health")
 async def health():
-    return {"status": "ok", "version": "2.0.0"}
+    return {
+        "status": "ok",
+        "version": "2.0.1-sync-db",
+        "db_dialect": engine.dialect.name,
+        "db_driver": engine.dialect.driver,
+        "db_async": getattr(engine.dialect, "is_async", False),
+    }
 
 
 # ── Run ───────────────────────────────────────────────────────────────────────
