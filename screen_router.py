@@ -25,6 +25,29 @@ from database import get_db
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api", tags=["screening"])
 
+GROQ_MODEL_REPLACEMENTS = {
+    "llama-3.1-8b-instant": "openai/gpt-oss-20b",
+    "llama-3.3-70b-versatile": "openai/gpt-oss-120b",
+}
+
+
+def _resolve_groq_model() -> str:
+    configured = (
+        os.getenv("GROQ_MODEL_NAME")
+        or os.getenv("DEEPSEEK_MODEL_NAME")
+        or os.getenv("OPENAI_MODEL_NAME")
+        or "openai/gpt-oss-20b"
+    ).strip()
+    replacement = GROQ_MODEL_REPLACEMENTS.get(configured)
+    if replacement:
+        logger.warning(
+            "Groq model %s is deprecated; using %s instead.",
+            configured,
+            replacement,
+        )
+        return replacement
+    return configured
+
 
 # ── Text Extraction ───────────────────────────────────────────────────────────
 
@@ -123,8 +146,7 @@ def screen_with_openai(api_key: str, job_description: str,
             "Authorization": f"Bearer {groq_key}",
             "Content-Type": "application/json",
         }
-        model = os.getenv("GROQ_MODEL_NAME") or os.getenv(
-            "DEEPSEEK_MODEL_NAME") or os.getenv("OPENAI_MODEL_NAME") or "gpt-4o-mini"
+        model = _resolve_groq_model()
         payload = {
             "model": model,
             "messages": [

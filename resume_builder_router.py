@@ -13,6 +13,11 @@ import security as auth
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/resume-builder", tags=["resume-builder"])
 
+GROQ_MODEL_REPLACEMENTS = {
+    "llama-3.1-8b-instant": "openai/gpt-oss-20b",
+    "llama-3.3-70b-versatile": "openai/gpt-oss-120b",
+}
+
 
 PROMPT = """You are an expert recruiter and resume strategist.
 
@@ -64,6 +69,19 @@ def _strip_json_fence(raw: str) -> str:
     return raw
 
 
+def _resolve_groq_model() -> str:
+    configured = (os.getenv("GROQ_MODEL_NAME") or "openai/gpt-oss-20b").strip()
+    replacement = GROQ_MODEL_REPLACEMENTS.get(configured)
+    if replacement:
+        logger.warning(
+            "Groq model %s is deprecated; using %s instead.",
+            configured,
+            replacement,
+        )
+        return replacement
+    return configured
+
+
 def _chat_json(prompt: str) -> dict:
     groq_base = (os.getenv("GROQ_API_BASE") or "").strip()
     groq_key = (os.getenv("GROQ_API_KEY") or "").strip()
@@ -74,7 +92,7 @@ def _chat_json(prompt: str) -> dict:
             base = base.rsplit("/models", 1)[0]
         endpoint = f"{base}/chat/completions"
         payload = {
-            "model": os.getenv("GROQ_MODEL_NAME") or "llama-3.1-8b-instant",
+            "model": _resolve_groq_model(),
             "messages": [
                 {"role": "system", "content": "You return precise recruiting and resume-building JSON."},
                 {"role": "user", "content": prompt},
