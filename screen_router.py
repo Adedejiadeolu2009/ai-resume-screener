@@ -13,7 +13,7 @@ import os
 import traceback
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, HTTPException, UploadFile, Request
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
@@ -232,6 +232,7 @@ def screen_with_openai(api_key: str, job_description: str,
 @router.post("/screen")
 async def screen_resumes(
     request: Request,
+    background_tasks: BackgroundTasks,
     job_description: str = Form(...),
     job_title: str = Form(default="Open Position"),
     company_name: str = Form(default=""),
@@ -401,23 +402,18 @@ async def screen_resumes(
     screening.total_files = len(queued_files)
     db.commit()
 
-    from screening_tasks import process_screening_task
+    from screening_tasks import process_screening, process_screening_task
+    task_id = None
     try:
         task = process_screening_task.delay(screening.id, queued_files)
+        task_id = task.id
     except Exception:
-        logger.exception("Failed to queue screening %s", screening.id)
-        screening.status = "FAILED"
-        screening.error_message = "Screening worker is unavailable."
-        db.commit()
-        return JSONResponse(
-            status_code=503,
-            content={
-                "detail": "Screening service is temporarily unavailable. Please try again later.",
-                "screening_id": screening.id,
-                "status": screening.status,
-                "errors": rejected_files,
-            },
+        logger.exception(
+            "Failed to queue screening %s with Celery; using local background task",
+            screening.id,
         )
+        background_tasks.add_task(process_screening, screening.id, queued_files)
+        task_id = f"local-{screening.id}"
 
     current_user.screenings_used_this_month += 1
     db.commit()
@@ -426,7 +422,7 @@ async def screen_resumes(
         "job_title": job_title,
         "company_name": company_name,
         "screening_id": screening.id,
-        "task_id": task.id,
+        "task_id": task_id,
         "status": screening.status,
         "total_files": screening.total_files,
         "processed_candidates": screening.processed_candidates,

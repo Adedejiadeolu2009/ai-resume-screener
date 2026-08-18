@@ -22,8 +22,7 @@ def _resolve_ai_key() -> str:
     )
 
 
-@celery_app.task(name="screening.process_screening", bind=True, max_retries=2)
-def process_screening_task(self, screening_id: int, files: list[dict]) -> dict:
+def process_screening(screening_id: int, files: list[dict]) -> dict:
     db = SessionLocal()
     processed = 0
     errors = 0
@@ -141,3 +140,8 @@ def process_screening_task(self, screening_id: int, files: list[dict]) -> dict:
         raise
     finally:
         db.close()
+
+
+@celery_app.task(name="screening.process_screening", bind=True, max_retries=2)
+def process_screening_task(self, screening_id: int, files: list[dict]) -> dict:
+    return process_screening(screening_id, files)
