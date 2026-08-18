@@ -22,7 +22,7 @@ from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import func, inspect, text
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi import FastAPI, Request, Depends
 from dotenv import load_dotenv
 import uvicorn
@@ -118,6 +118,45 @@ if IS_PRODUCTION:
             "Production requires DATABASE_URL to point to a managed database, not local SQLite.")
 
 app = FastAPI(title="Aptura AI", version="2.0.0")
+
+
+def _expects_json_response(request: _Request) -> bool:
+    path = request.url.path
+    return (
+        path.startswith("/api/")
+        or path.startswith("/auth/")
+        or "application/json" in request.headers.get("accept", "")
+    )
+
+
+@app.exception_handler(_HTTPException)
+async def http_exception_handler(request: _Request, exc: _HTTPException):
+    if _expects_json_response(request):
+        return JSONResponse(
+            status_code=exc.status_code,
+            content={"detail": exc.detail},
+            headers=getattr(exc, "headers", None),
+        )
+    if exc.status_code in {401, 404, 405}:
+        if request.cookies.get("access_token"):
+            return RedirectResponse("/dashboard")
+        return RedirectResponse("/login")
+    return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
+
+
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: _Request, exc: Exception):
+    logger.exception("Unhandled error while serving %s", request.url.path)
+    if _expects_json_response(request):
+        return JSONResponse(
+            status_code=500,
+            content={"detail": "Internal server error. Please try again later."},
+        )
+    return _Response(
+        content="Internal server error. Please try again later.",
+        status_code=500,
+        media_type="text/plain",
+    )
 
 allowed_hosts = [
     host.strip()
@@ -454,6 +493,8 @@ if __name__ == "__main__":
 
 @app.exception_handler(404)
 async def not_found_handler(request: _Request, exc: _HTTPException):
+    if _expects_json_response(request):
+        return JSONResponse(status_code=404, content={"detail": "Not found"})
     if request.cookies.get("access_token"):
         return RedirectResponse("/dashboard")
     return RedirectResponse("/login")
@@ -461,6 +502,8 @@ async def not_found_handler(request: _Request, exc: _HTTPException):
 
 @app.exception_handler(405)
 async def method_not_allowed_handler(request: _Request, exc: _HTTPException):
+    if _expects_json_response(request):
+        return JSONResponse(status_code=405, content={"detail": "Method not allowed"})
     if request.cookies.get("access_token"):
         return RedirectResponse("/dashboard")
     return RedirectResponse("/login")
@@ -468,11 +511,6 @@ async def method_not_allowed_handler(request: _Request, exc: _HTTPException):
 
 @app.exception_handler(401)
 async def unauthorized_handler(request: _Request, exc: _HTTPException):
-    accept = request.headers.get("accept", "")
-    if "text/html" in accept:
-        return RedirectResponse("/login")
-    return _Response(
-        content='{"detail":"Not authenticated"}',
-        status_code=401,
-        media_type="application/json",
-    )
+    if _expects_json_response(request):
+        return JSONResponse(status_code=401, content={"detail": "Not authenticated"})
+    return RedirectResponse("/login")

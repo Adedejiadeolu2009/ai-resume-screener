@@ -557,6 +557,14 @@ function updateSteps() {
 const msgs = ['Reading candidate experience...','Evaluating technical skills...','Comparing against job requirements...','Generating AI insights...','Ranking all candidates...'];
 let msgIdx = 0;
 
+async function readJsonResponse(response) {
+  const contentType = response.headers.get('content-type') || '';
+  if (contentType.includes('application/json')) return response.json();
+  const text = await response.text();
+  const fallback = response.ok ? 'Unexpected server response.' : `Server error (${response.status}). Please try again.`;
+  throw new Error(text && !text.startsWith('Internal Server Error') ? text : fallback);
+}
+
 async function submitForm() {
   const title = document.getElementById('jobTitle').value.trim();
   const desc  = document.getElementById('jobDesc').value.trim();
@@ -599,7 +607,7 @@ async function submitForm() {
 
   try {
     const res  = await fetch('/api/screen', { method:'POST', body: fd });
-    const data = await res.json();
+    const data = await readJsonResponse(res);
 
     if (!res.ok) {
       clearInterval(iv);
@@ -633,7 +641,7 @@ async function pollScreening(screeningId, messageTimer) {
     await new Promise(resolve => setTimeout(resolve, 2000));
 
     const res = await fetch(`/api/screening/${screeningId}`);
-    const data = await res.json();
+    const data = await readJsonResponse(res);
     if (!res.ok) throw new Error(data.detail || 'Could not load screening status.');
 
     const done = data.processed_candidates || 0;

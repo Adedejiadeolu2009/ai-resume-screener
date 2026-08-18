@@ -291,6 +291,13 @@ output.addEventListener('click', (event) => {
   if (!button) return;
   copyText(copyValues[Number(button.dataset.copyId)] || '');
 });
+async function readJsonResponse(response) {
+  const contentType = response.headers.get('content-type') || '';
+  if (contentType.includes('application/json')) return response.json();
+  const text = await response.text();
+  const fallback = response.ok ? 'Unexpected server response.' : `Server error (${response.status}). Please try again.`;
+  throw new Error(text && !text.startsWith('Internal Server Error') ? text : fallback);
+}
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
   statusEl.className = 'status';
@@ -301,7 +308,7 @@ form.addEventListener('submit', async (event) => {
       method: 'POST',
       body: new FormData(form)
     });
-    const data = await response.json();
+    const data = await readJsonResponse(response);
     if (!response.ok || !data.success) {
       throw new Error(data.detail || data.error || 'Could not generate resume.');
     }

@@ -399,11 +399,28 @@ async def screen_resumes(
         )
 
     screening.total_files = len(queued_files)
-    current_user.screenings_used_this_month += 1
     db.commit()
 
     from screening_tasks import process_screening_task
-    task = process_screening_task.delay(screening.id, queued_files)
+    try:
+        task = process_screening_task.delay(screening.id, queued_files)
+    except Exception:
+        logger.exception("Failed to queue screening %s", screening.id)
+        screening.status = "FAILED"
+        screening.error_message = "Screening worker is unavailable."
+        db.commit()
+        return JSONResponse(
+            status_code=503,
+            content={
+                "detail": "Screening service is temporarily unavailable. Please try again later.",
+                "screening_id": screening.id,
+                "status": screening.status,
+                "errors": rejected_files,
+            },
+        )
+
+    current_user.screenings_used_this_month += 1
+    db.commit()
 
     return JSONResponse(status_code=202, content={
         "job_title": job_title,
