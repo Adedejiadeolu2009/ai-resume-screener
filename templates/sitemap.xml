@@ -13,32 +13,37 @@
 
 <url>
   <loc>https://aptura.com.ng/</loc>
-  <lastmod>2026-06-25T12:46:55+00:00</lastmod>
+  <lastmod>2026-08-31T00:00:00+00:00</lastmod>
   <priority>1.00</priority>
 </url>
 <url>
   <loc>https://aptura.com.ng/about</loc>
-  <lastmod>2026-06-25T12:46:55+00:00</lastmod>
+  <lastmod>2026-08-31T00:00:00+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
   <loc>https://aptura.com.ng/login</loc>
-  <lastmod>2026-06-25T12:46:55+00:00</lastmod>
+  <lastmod>2026-08-31T00:00:00+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
   <loc>https://aptura.com.ng/resume-builder</loc>
-  <lastmod>2026-06-27T00:00:00+00:00</lastmod>
+  <lastmod>2026-08-31T00:00:00+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
+  <loc>https://aptura.com.ng/plans</loc>
+  <lastmod>2026-08-31T00:00:00+00:00</lastmod>
+  <priority>0.72</priority>
+</url>
+<url>
   <loc>https://aptura.com.ng/why-choose-us</loc>
-  <lastmod>2026-06-25T12:46:55+00:00</lastmod>
+  <lastmod>2026-08-31T00:00:00+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
   <loc>https://aptura.com.ng/contact</loc>
-  <lastmod>2026-06-25T12:46:55+00:00</lastmod>
+  <lastmod>2026-08-31T00:00:00+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 

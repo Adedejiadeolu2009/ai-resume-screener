@@ -82,13 +82,13 @@
 <main>
   <div class="hero">
     <h1>Choose your plan</h1>
-    <p>Upgrade by bank transfer. After payment, contact admin to activate your account.</p>
+    <p>Affordable career-building tools priced in naira. Upgrade by bank transfer and request activation from your account.</p>
   </div>
 
   <div class="quick-benefits">
-    <div class="qb"><div class="qb-icon">⚡</div><div class="qb-text"><strong>Lightning Speed</strong> Screen 100+ resumes in seconds</div></div>
-    <div class="qb"><div class="qb-icon">🎯</div><div class="qb-text"><strong>Accurate</strong> AI-powered candidate matching</div></div>
-    <div class="qb"><div class="qb-icon">📊</div><div class="qb-text"><strong>Detailed Reports</strong> JSON output for integration</div></div>
+    <div class="qb"><div class="qb-icon">⚡</div><div class="qb-text"><strong>Career Workflow</strong> Resume analysis, matching, and improvement guidance</div></div>
+    <div class="qb"><div class="qb-icon">🎯</div><div class="qb-text"><strong>Opportunity Fit</strong> Compare resumes against user-provided job descriptions</div></div>
+    <div class="qb"><div class="qb-icon">📊</div><div class="qb-text"><strong>Structured Output</strong> Scores, strengths, gaps, keywords, and recommendations</div></div>
     <div class="qb"><div class="qb-icon">🔒</div><div class="qb-text"><strong>Secure</strong> Your data protected</div></div>
   </div>
 
@@ -99,10 +99,10 @@
       <div class="price">₦0</div>
       <div class="per">/ month</div>
       <div class="list">
-        <div class="li"><div class="check">✓</div>5 screenings / month</div>
+        <div class="li"><div class="check">✓</div>5 resume analyses / month</div>
         <div class="li"><div class="check">✓</div>AI resume ranking</div>
-        <div class="li"><div class="check">✓</div>JSON report export</div>
-        <div class="li"><div class="check">✓</div>Basic analytics</div>
+        <div class="li"><div class="check">✓</div>Resume builder access</div>
+        <div class="li"><div class="check">✓</div>Basic career readiness dashboard</div>
       </div>
       <p style="margin-top:12px;color:var(--hint);font-size:12px">Perfect for trying out Aptura or occasional hiring needs</p>
       <a class="btn" href="/dashboard">Start Free</a>
@@ -114,10 +114,10 @@
       <div class="price">₦{{ pro_amount }}</div>
       <div class="per">/ month</div>
       <div class="list">
-        <div class="li"><div class="check">✓</div>100 screenings / month</div>
-        <div class="li"><div class="check">✓</div>Advanced AI ranking</div>
-        <div class="li"><div class="check">✓</div>Detailed JSON reports</div>
-        <div class="li"><div class="check">✓</div>Advanced analytics dashboard</div>
+        <div class="li"><div class="check">✓</div>100 resume analyses / month</div>
+        <div class="li"><div class="check">✓</div>Opportunity matching workflow</div>
+        <div class="li"><div class="check">✓</div>Skill gap analysis</div>
+        <div class="li"><div class="check">✓</div>Application material generation</div>
         <div class="li"><div class="check">✓</div>Priority support</div>
       </div>
       <p style="margin-top:12px;color:var(--hint);font-size:12px">Best for growing teams and frequent hiring</p>
@@ -132,10 +132,10 @@
       <div class="price">₦{{ enterprise_amount }}</div>
       <div class="per">/ month</div>
       <div class="list">
-        <div class="li"><div class="check">✓</div>Unlimited screenings</div>
+        <div class="li"><div class="check">✓</div>Unlimited resume analyses</div>
         <div class="li"><div class="check">✓</div>All Pro features</div>
-        <div class="li"><div class="check">✓</div>API access</div>
-        <div class="li"><div class="check">✓</div>Custom workflows</div>
+        <div class="li"><div class="check">✓</div>WebMCP agent workflows</div>
+        <div class="li"><div class="check">✓</div>Custom career workflows</div>
         <div class="li"><div class="check">✓</div>Dedicated support</div>
       </div>
       <p style="margin-top:12px;color:var(--hint);font-size:12px">For large teams and constant hiring</p>
@@ -149,28 +149,28 @@
     <h3 style="font:600 18px var(--ff-serif);margin-bottom:16px;margin-top:0">What's Included in Premium Plans</h3>
     <div class="feature-grid">
       <div class="fcard">
-        <strong>📄 Batch Screening</strong>
-        Upload multiple resumes at once and screen them all together for faster hiring cycles
+        <strong>📄 Resume Analysis</strong>
+        Analyze resumes against target roles and review structured strengths, gaps, and scoring
       </div>
       <div class="fcard">
-        <strong>📊 Advanced Analytics</strong>
-        Track hiring metrics, candidate flow, and trends over time with beautiful dashboards
+        <strong>📊 Career Readiness</strong>
+        Track readiness with transparent scores based on existing resume analysis data
       </div>
       <div class="fcard">
-        <strong>🔄 Job Management</strong>
-        Create and manage multiple job positions with their own screening criteria
+        <strong>🔄 Job Matching</strong>
+        Compare a resume to user-provided job descriptions without scraping job boards
       </div>
       <div class="fcard">
-        <strong>📧 Automated Reports</strong>
-        Get beautiful PDF reports and summaries emailed directly to your team
+        <strong>📧 Cover Letters</strong>
+        Generate tailored drafts from real resume/profile evidence and target job context
       </div>
       <div class="fcard">
-        <strong>⚙️ Custom Scoring</strong>
-        Adjust AI weights based on your company's priorities and culture
+        <strong>⚙️ Skill Gaps</strong>
+        Identify missing required skills and practical next steps for closing those gaps
       </div>
       <div class="fcard">
-        <strong>🔐 Team Collaboration</strong>
-        Add team members and share screening results securely (Enterprise only)
+        <strong>🔐 Agent Support</strong>
+        Compatible AI agents can invoke Aptura tools through WebMCP with human approval for changes
       </div>
     </div>
   </div>
@@ -229,5 +229,6 @@
     window.location.href = '/plans/status?ref=' + encodeURIComponent(ref);
   }
 </script>
+{% include "_webmcp.html" %}
 </body>
 </html>

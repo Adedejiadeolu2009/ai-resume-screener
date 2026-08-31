@@ -157,6 +157,19 @@ main { flex: 1; max-width: 1280px; width: 100%; margin: 0 auto; padding: 32px 28
 .stat-card:last-child .stat-number { color: var(--green); }
 .stat-sub { font: 400 11px var(--ff-sans); color: var(--hint); }
 
+.readiness-panel {
+  background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 22px; margin-bottom: 32px; display: grid; grid-template-columns: 210px 1fr; gap: 22px;
+}
+.readiness-score { display: flex; flex-direction: column; justify-content: center; }
+.readiness-score .label { font: 700 10px var(--ff-sans); text-transform: uppercase; letter-spacing: 1px; color: var(--hint); margin-bottom: 8px; }
+.readiness-score .value { font: 400 54px var(--ff-serif); color: var(--gold); line-height: 1; }
+.readiness-score .method { font: 400 11px/1.5 var(--ff-sans); color: var(--hint); margin-top: 10px; }
+.readiness-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; align-items: stretch; }
+.readiness-item { background: var(--elev); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+.readiness-item strong { display: block; color: var(--text); font: 700 12px var(--ff-sans); margin-bottom: 8px; }
+.readiness-item span { color: var(--teal); font: 400 26px var(--ff-serif); }
+
 /* Section Header */
 .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
 .section-title { font: 600 18px var(--ff-serif); }
@@ -211,6 +224,8 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
   .nav-right .btn-new { display: none; }
   main { padding: 24px 16px 60px; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 24px; }
+  .readiness-panel { grid-template-columns: 1fr; }
+  .readiness-grid { grid-template-columns: repeat(2, 1fr); }
   .welcome h1 { font-size: 28px; }
   nav { padding: 14px 16px; }
 }
@@ -234,6 +249,7 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
   .premium-banner { padding: 14px 12px; }
   .welcome h1 { font-size: 20px; }
   .stats-grid { grid-template-columns: 1fr; gap: 10px; }
+  .readiness-grid { grid-template-columns: 1fr; }
   .section-header { flex-direction: column; align-items: flex-start; gap: 8px; }
   thead th:nth-child(n+4), tbody td:nth-child(n+4) { display: none; }
   .action-btns { flex-direction: column; }
@@ -304,7 +320,7 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
     <main>
       <div class="welcome">
         <h1>Good to see you, {{ (user.name or 'there').split(' ')[0] }} 👋</h1>
-        <p>Here is your recruitment overview</p>
+        <p>Your career workspace combines resume analysis, opportunity matching, skill gaps, and application preparation.</p>
       </div>
 
       <!-- Premium Banner -->
@@ -354,6 +370,20 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
           <div class="stat-sub">Highly recommended</div>
         </div>
       </div>
+
+      <section class="readiness-panel" aria-label="Career readiness score">
+        <div class="readiness-score">
+          <div class="label">Career Readiness</div>
+          <div class="value">{% if career_readiness.overall is not none %}{{ career_readiness.overall }}{% else %}--{% endif %}</div>
+          <div class="method">{{ career_readiness.methodology }}</div>
+        </div>
+        <div class="readiness-grid">
+          <div class="readiness-item"><strong>Resume</strong><span>{% if career_readiness.resume is not none %}{{ career_readiness.resume }}{% else %}--{% endif %}</span></div>
+          <div class="readiness-item"><strong>Skills</strong><span>{% if career_readiness.skills is not none %}{{ career_readiness.skills }}{% else %}--{% endif %}</span></div>
+          <div class="readiness-item"><strong>Experience</strong><span>{% if career_readiness.experience is not none %}{{ career_readiness.experience }}{% else %}--{% endif %}</span></div>
+          <div class="readiness-item"><strong>Application</strong><span>{% if career_readiness.application is not none %}{{ career_readiness.application }}{% else %}--{% endif %}</span></div>
+        </div>
+      </section>
 
       <!-- Screening History -->
       <div class="section-header">
@@ -477,5 +507,6 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
   }
 </script>
 
+{% include "_webmcp.html" %}
 </body>
 </html>

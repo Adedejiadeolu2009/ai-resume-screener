@@ -47,8 +47,8 @@ async def plans_page(
         context={
             "user": current_user,
             "tier": tier,
-            "pro_amount": os.getenv("PRO_AMOUNT_NGN", "1000"),
-            "enterprise_amount": os.getenv("ENTERPRISE_AMOUNT_NGN", "2499"),
+            "pro_amount": os.getenv("PRO_AMOUNT_NGN", "2500"),
+            "enterprise_amount": os.getenv("ENTERPRISE_AMOUNT_NGN", "7500"),
             "transfer_instructions": os.getenv(
                 "MANUAL_TRANSFER_INSTRUCTIONS",
                 "Send the bank transfer amount to the account on this page and then contact admin to activate your plan."

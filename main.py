@@ -13,6 +13,7 @@ import auth_router
 import plans_router
 import admin_router
 import resume_builder_router
+import webmcp_router
 from security import get_current_user
 
 from database import engine, get_db, Base
@@ -209,6 +210,30 @@ def require_csrf(request: Request, csrf_token: str | None) -> None:
         raise _HTTPException(status_code=403, detail="CSRF validation failed")
 
 
+def build_career_readiness(candidates: list[models.Candidate]) -> dict:
+    scored = [candidate for candidate in candidates if candidate.result_json]
+    latest = scored[0] if scored else None
+    scores = (latest.result_json.get("scores") if latest and latest.result_json else {}) or {}
+    resume_score = latest.overall_score if latest and latest.overall_score is not None else None
+    skills_score = scores.get("technical_skills")
+    experience_score = scores.get("experience")
+    communication_score = scores.get("communication")
+    available = [
+        value
+        for value in (resume_score, skills_score, experience_score, communication_score)
+        if isinstance(value, (int, float))
+    ]
+
+    return {
+        "overall": round(sum(available) / len(available)) if available else None,
+        "resume": resume_score,
+        "skills": skills_score,
+        "experience": experience_score,
+        "application": communication_score,
+        "methodology": "Average of available latest resume score, technical skills, experience, and communication scores from Aptura screening results.",
+    }
+
+
 BASE_DIR = Path(__file__).parent
 templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
 
@@ -221,6 +246,7 @@ app.include_router(screen_router.router)
 app.include_router(plans_router.router)
 app.include_router(admin_router.router)
 app.include_router(resume_builder_router.router)
+app.include_router(webmcp_router.router)
 
 
 @app.get("/sitemap.xml")
@@ -229,6 +255,21 @@ async def sitemap_xml():
     return _Response(
         content=sitemap_path.read_text(encoding="utf-8"),
         media_type="application/xml",
+    )
+
+
+@app.get("/robots.txt")
+async def robots_txt():
+    return _Response(
+        content=(
+            "User-agent: *\n"
+            "Allow: /\n"
+            "Disallow: /admin\n"
+            "Disallow: /settings\n"
+            "Disallow: /api\n"
+            f"Sitemap: {APP_BASE_URL}/sitemap.xml\n"
+        ),
+        media_type="text/plain",
     )
 
 
@@ -300,6 +341,14 @@ async def dashboard_page(request: Request, db: Session = Depends(get_db), curren
         .limit(20)
         .all()
     )
+    recent_candidates = (
+        db.query(models.Candidate)
+        .join(models.Screening)
+        .filter(models.Screening.user_id == current_user.id)
+        .order_by(models.Candidate.created_at.desc())
+        .limit(20)
+        .all()
+    )
 
     screenings_data = []
     strong_hires = 0
@@ -338,6 +387,7 @@ async def dashboard_page(request: Request, db: Session = Depends(get_db), curren
             "total_candidates": total_candidates,
             "strong_hires": strong_hires,
             "avg_score": avg_score,
+            "career_readiness": build_career_readiness(recent_candidates),
             "screenings": screenings_data,
             "is_admin": admin_router.is_admin(current_user),
             "csrf_token": csrf_token,
