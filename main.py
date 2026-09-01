@@ -14,6 +14,7 @@ import plans_router
 import admin_router
 import resume_builder_router
 import webmcp_router
+import career_router
 from security import get_current_user
 
 from database import engine, get_db, Base
@@ -247,6 +248,7 @@ app.include_router(plans_router.router)
 app.include_router(admin_router.router)
 app.include_router(resume_builder_router.router)
 app.include_router(webmcp_router.router)
+app.include_router(career_router.router)
 
 
 @app.get("/sitemap.xml")
@@ -349,6 +351,17 @@ async def dashboard_page(request: Request, db: Session = Depends(get_db), curren
         .limit(20)
         .all()
     )
+    career_profile = (
+        db.query(models.CareerProfile)
+        .filter(models.CareerProfile.user_id == current_user.id)
+        .first()
+    )
+    latest_match = (
+        db.query(models.JobMatch)
+        .filter(models.JobMatch.user_id == current_user.id)
+        .order_by(models.JobMatch.created_at.desc())
+        .first()
+    )
 
     screenings_data = []
     strong_hires = 0
@@ -388,6 +401,9 @@ async def dashboard_page(request: Request, db: Session = Depends(get_db), curren
             "strong_hires": strong_hires,
             "avg_score": avg_score,
             "career_readiness": build_career_readiness(recent_candidates),
+            "career_profile": career_profile,
+            "latest_match": latest_match.result_json if latest_match else None,
+            "top_skill_gaps": ((career_profile.latest_skill_gap_json or {}).get("missingSkills") if career_profile else []) or [],
             "screenings": screenings_data,
             "is_admin": admin_router.is_admin(current_user),
             "csrf_token": csrf_token,
@@ -409,7 +425,7 @@ async def screen_page(request: Request, db: Session = Depends(get_db), current_u
         ).first()
         if screening:
             candidates = sorted(
-                [c.result_json for c in screening.candidates if c.result_json],
+                [{**c.result_json, "candidate_id": c.id} for c in screening.candidates if c.result_json],
                 key=lambda x: x.get("overall_score", 0), reverse=True
             )
             past_result = {

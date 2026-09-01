@@ -273,6 +273,8 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
     </div>
 
     <nav class="sidebar-nav">
+      <a href="/agent">Aptura Agent</a>
+      <a href="/recruiter">Recruiter Workspace</a>
       <a href="/dashboard" class="active">🏠 Dashboard</a>
       <a href="/screen">📄 Screenings</a>
       <a href="/resume-builder">📝 Resume Builder</a>
@@ -300,6 +302,7 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
         <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle menu">☰</button>
       </div>
       <div class="nav-right">
+        <a href="/agent" class="btn-new">Ask Aptura Agent</a>
         <a href="/resume-builder" class="btn-new">Build Resume</a>
         <a href="/screen" class="btn-new">+ New Screening</a>
         <div class="user-profile">
@@ -346,6 +349,31 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
           <a href="/plans" class="premium-btn">Upgrade Now</a>
         {% endif %}
       </div>
+
+      <section class="premium-banner">
+        <div class="premium-info">
+          <div class="premium-icon">AI</div>
+          <div class="premium-text">
+            <h3>Aptura Agent is ready</h3>
+            <p>Ask the agent to analyze your resume, match jobs, find skill gaps, tailor improvements, and prepare cover letters. WebMCP adds direct tool access for compatible AI-agent browsers.</p>
+          </div>
+        </div>
+        <a href="/agent" class="premium-btn">Ask Aptura Agent</a>
+      </section>
+
+      <section class="readiness-panel" aria-label="Career snapshot">
+        <div class="readiness-score">
+          <div class="label">Recent Job Match</div>
+          <div class="value">{% if latest_match %}{{ latest_match.match_score or '--' }}{% else %}--{% endif %}</div>
+          <div class="method">{% if latest_match %}{{ latest_match.job_title }}{% else %}Paste a job description in Aptura Agent to calculate a match score.{% endif %}</div>
+        </div>
+        <div class="readiness-grid">
+          <div class="readiness-item"><strong>Resume Health</strong><span>{% if career_readiness.resume is not none %}{{ career_readiness.resume }}{% else %}--{% endif %}</span></div>
+          <div class="readiness-item"><strong>Target Role</strong><span style="font-size:16px;line-height:1.2">{{ career_profile.target_role if career_profile and career_profile.target_role else 'Set' }}</span></div>
+          <div class="readiness-item"><strong>Top Skill Gaps</strong><span>{{ top_skill_gaps | length }}</span></div>
+          <div class="readiness-item"><strong>Applications</strong><span>--</span></div>
+        </div>
+      </section>
 
       <!-- Stats Grid -->
       <div class="stats-grid">

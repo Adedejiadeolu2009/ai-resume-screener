@@ -82,7 +82,7 @@
 <main>
   <div class="hero">
     <h1>Choose your plan</h1>
-    <p>Affordable career-building tools priced in naira. Upgrade by bank transfer and request activation from your account.</p>
+    <p>Candidate and recruiter plans priced in naira. Upgrade by bank transfer and request activation from your account.</p>
   </div>
 
   <div class="quick-benefits">
@@ -110,7 +110,7 @@
 
     <div class="card {% if tier == 'PRO' %}active{% endif %}">
       <div class="tag">PRO</div>
-      <div class="title">Pro Plan</div>
+      <div class="title">Pro Candidate</div>
       <div class="price">₦{{ pro_amount }}</div>
       <div class="per">/ month</div>
       <div class="list">
@@ -120,15 +120,15 @@
         <div class="li"><div class="check">✓</div>Application material generation</div>
         <div class="li"><div class="check">✓</div>Priority support</div>
       </div>
-      <p style="margin-top:12px;color:var(--hint);font-size:12px">Best for growing teams and frequent hiring</p>
+      <p style="margin-top:12px;color:var(--hint);font-size:12px">Best for active job seekers building and tailoring applications</p>
       <button class="btn btn-primary" onclick="requestUpgrade('PRO')" {% if tier == 'PRO' %}disabled{% endif %}>
         {% if tier == 'PRO' %}✓ Active{% else %}Upgrade to Pro{% endif %}
       </button>
     </div>
 
     <div class="card {% if tier == 'ENTERPRISE' %}active{% endif %}">
-      <div class="tag">ENTERPRISE</div>
-      <div class="title">Enterprise</div>
+      <div class="tag">RECRUITER / TEAM</div>
+      <div class="title">Recruiter / Team</div>
       <div class="price">₦{{ enterprise_amount }}</div>
       <div class="per">/ month</div>
       <div class="list">
@@ -138,7 +138,7 @@
         <div class="li"><div class="check">✓</div>Custom career workflows</div>
         <div class="li"><div class="check">✓</div>Dedicated support</div>
       </div>
-      <p style="margin-top:12px;color:var(--hint);font-size:12px">For large teams and constant hiring</p>
+      <p style="margin-top:12px;color:var(--hint);font-size:12px">For recruiters and teams screening, ranking, comparing, and shortlisting candidates</p>
       <button class="btn btn-primary" onclick="requestUpgrade('ENTERPRISE')" {% if tier == 'ENTERPRISE' %}disabled{% endif %}>
         {% if tier == 'ENTERPRISE' %}✓ Active{% else %}Upgrade to Enterprise{% endif %}
       </button>

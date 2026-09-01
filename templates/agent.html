@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aptura Agent - Aptura AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/premium-animations.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0A0B0E;--card:#13151C;--elev:#1A1D27;--input:#1F2330;--border:rgba(255,255,255,.07);--border-lit:rgba(201,168,76,.35);--gold:#C9A84C;--gold-light:#E8D5A3;--gold-bg:rgba(201,168,76,.1);--teal:#2DD4BF;--teal-bg:rgba(45,212,191,.1);--red:#F87171;--amber:#FBBF24;--green:#4ADE80;--text:#F0EDE6;--muted:#9A9691;--hint:#5A5750;--ff-serif:'Cormorant Garamond',Georgia,serif;--ff-sans:'Outfit',system-ui,sans-serif}
+body{background:var(--bg);color:var(--text);font-family:var(--ff-sans);min-height:100vh}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 70% 50% at 12% 0%,rgba(201,168,76,.05),transparent 60%),radial-gradient(ellipse 50% 40% at 90% 100%,rgba(45,212,191,.04),transparent 55%)}
+nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 28px;border-bottom:1px solid var(--border);background:rgba(10,11,14,.86);position:sticky;top:0;z-index:80;backdrop-filter:blur(12px)}
+.brand{display:flex;align-items:center;gap:12px}.back{color:var(--muted);text-decoration:none;border:1px solid var(--border);border-radius:7px;padding:8px 11px;font:600 12px var(--ff-sans)}.mark{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--gold),#8B6914);display:grid;place-items:center;color:#0A0B0E;font:700 15px var(--ff-serif)}.brand-name{font:600 17px var(--ff-serif)}.brand-name span{color:var(--gold)}.nav-right{display:flex;align-items:center;gap:10px}.nav-link{color:var(--muted);text-decoration:none;font:600 13px var(--ff-sans)}.logout{color:var(--muted);text-decoration:none;border:1px solid var(--border);border-radius:7px;padding:8px 11px;font:600 12px var(--ff-sans)}
+main{position:relative;z-index:1;max-width:1440px;margin:0 auto;padding:30px 24px 70px}.head{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-bottom:20px}.title{font:300 42px var(--ff-serif)}.sub{color:var(--muted);font:300 14px/1.65 var(--ff-sans);max-width:720px;margin-top:5px}.agent-ready{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(45,212,191,.28);background:var(--teal-bg);color:var(--teal);border-radius:7px;padding:8px 11px;font:800 11px var(--ff-sans);letter-spacing:1px;text-transform:uppercase}
+.layout{display:grid;grid-template-columns:360px minmax(0,1fr) 360px;gap:18px;align-items:start}.panel{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}.panel-head{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px}.panel-title{font:600 17px var(--ff-serif)}.panel-body{padding:18px}.field{margin-bottom:14px}.field label{display:block;color:var(--hint);font:800 10px var(--ff-sans);letter-spacing:1.3px;text-transform:uppercase;margin-bottom:7px}input,textarea{width:100%;background:var(--input);border:1px solid var(--border);border-radius:8px;color:var(--text);font:14px var(--ff-sans);outline:none}input{height:42px;padding:0 12px}textarea{min-height:145px;padding:12px;line-height:1.55;resize:vertical}#resumeText{min-height:310px}input:focus,textarea:focus{border-color:var(--border-lit);box-shadow:0 0 0 3px rgba(201,168,76,.08)}
+.btn{height:40px;border-radius:8px;border:1px solid var(--border);background:rgba(255,255,255,.03);color:var(--text);font:800 11px var(--ff-sans);letter-spacing:.6px;text-transform:uppercase;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:7px;text-decoration:none;padding:0 13px}.btn.primary{background:linear-gradient(135deg,var(--gold),#A07820);border:0;color:#0A0B0E}.btn.teal{background:var(--teal-bg);border-color:rgba(45,212,191,.25);color:var(--teal)}.btn.danger{border-color:rgba(248,113,113,.25);color:var(--red)}.btn:disabled{opacity:.55;cursor:not-allowed}.row{display:flex;gap:8px;flex-wrap:wrap}.quick{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}.quick .btn{width:100%;height:44px;white-space:normal;line-height:1.2}.mission{border:1px solid var(--border);background:var(--elev);border-radius:9px;padding:12px;margin-bottom:10px}.mission strong{display:block;font:700 13px var(--ff-sans);margin-bottom:4px}.mission span{display:block;color:var(--muted);font-size:12px;line-height:1.45}
+.chat{min-height:560px;display:flex;flex-direction:column}.messages{height:455px;overflow:auto;padding:18px;display:flex;flex-direction:column;gap:12px}.msg{max-width:82%;border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--muted);font:400 13px/1.55 var(--ff-sans);white-space:pre-wrap}.msg.user{margin-left:auto;background:var(--gold-bg);border-color:var(--border-lit);color:var(--gold-light)}.msg.agent{background:var(--elev)}.composer{border-top:1px solid var(--border);padding:14px;display:grid;grid-template-columns:1fr auto;gap:10px}.composer textarea{min-height:48px;max-height:120px}
+.activity{display:flex;flex-direction:column;gap:8px}.activity div{border:1px solid var(--border);background:var(--elev);border-radius:8px;padding:9px 11px;color:var(--muted);font-size:12px}.activity .done{color:var(--teal);border-color:rgba(45,212,191,.22)}.activity .wait{color:var(--amber);border-color:rgba(251,191,36,.25)}
+.result{display:grid;gap:12px}.metric{background:var(--elev);border:1px solid var(--border);border-radius:10px;padding:13px}.metric .label{color:var(--hint);font:800 10px var(--ff-sans);letter-spacing:1.2px;text-transform:uppercase}.metric .value{font:400 34px var(--ff-serif);color:var(--gold);margin-top:3px}.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.chip{border:1px solid var(--border-lit);background:var(--gold-bg);color:var(--gold-light);border-radius:6px;padding:5px 8px;font:600 12px var(--ff-sans)}.list{display:grid;gap:7px;margin-top:8px}.list div{color:var(--muted);font-size:13px;line-height:1.45}.approval{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.62);padding:28px;overflow:auto}.approval.on{display:block}.approval-card{max-width:1120px;margin:0 auto;background:var(--card);border:1px solid var(--border-lit);border-radius:12px;overflow:hidden}.approval-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border)}.approval-col{background:var(--card);padding:16px}.approval-col h3{font:600 16px var(--ff-serif);margin-bottom:10px}.approval-col textarea{min-height:420px}.status{display:none;margin-top:10px;border-radius:8px;padding:10px 12px;font:600 12px var(--ff-sans)}.status.ok{display:block;color:var(--teal);background:var(--teal-bg);border:1px solid rgba(45,212,191,.22)}.status.err{display:block;color:var(--red);background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.22)}
+.tools{display:grid;gap:9px}.tool{border:1px solid var(--border);background:var(--elev);border-radius:9px;padding:11px}.tool strong{display:flex;justify-content:space-between;gap:10px;font-size:13px}.tool span{display:block;color:var(--muted);font-size:12px;line-height:1.45;margin-top:4px}.status-pill{color:var(--teal);font-size:10px;text-transform:uppercase;letter-spacing:1px}.small{color:var(--hint);font-size:12px;line-height:1.55;margin-top:10px}
+@media(max-width:1180px){.layout{grid-template-columns:1fr 1fr}.chat-panel{grid-column:1/-1;order:-1}.messages{height:360px}}@media(max-width:760px){nav{padding:13px 14px}.nav-link{display:none}main{padding:22px 14px 50px}.head{display:block}.title{font-size:34px}.layout{grid-template-columns:1fr}.quick{grid-template-columns:1fr}.approval-grid{grid-template-columns:1fr}.msg{max-width:94%}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="brand">
+    <a class="back" href="/dashboard">Dashboard</a>
+    <div class="mark">A</div>
+    <div class="brand-name">Ap<span>tura</span> Agent</div>
+  </div>
+  <div class="nav-right">
+    <a class="nav-link" href="/resume-builder">Resume Builder</a>
+    <a class="nav-link" href="/recruiter">Recruiter</a>
+    <a class="logout" href="/auth/logout">Sign out</a>
+  </div>
+</nav>
+<main>
+  <div class="head">
+    <div>
+      <h1 class="title">Aptura Agent</h1>
+      <p class="sub">Build, analyze, match, improve, apply, and track with an AI career copilot that uses real Aptura workflows. Resume or profile changes are saved only after your approval.</p>
+    </div>
+    <div class="agent-ready">Agent Ready</div>
+  </div>
+
+  <div class="layout">
+    <section class="panel">
+      <div class="panel-head"><div class="panel-title">Career Workspace</div></div>
+      <div class="panel-body">
+        <div class="field"><label for="resumeFile">Upload Resume</label><input id="resumeFile" type="file" accept=".pdf,.docx,.txt"></div>
+        <div class="field"><label for="targetRole">Target Role</label><input id="targetRole" value="{{ profile.target_role or '' }}" placeholder="Remote backend engineering internship"></div>
+        <div class="field"><label for="resumeText">Editable Resume Text</label><textarea id="resumeText" placeholder="Upload or paste your resume. You can type, paste, delete, save, and reload this content.">{{ profile.resume_text or '' }}</textarea></div>
+        <div class="row"><button class="btn primary" id="saveResumeBtn">Save Resume</button><button class="btn" data-action="analyze">Analyze</button></div>
+        <div id="resumeStatus" class="status"></div>
+      </div>
+    </section>
+
+    <section class="panel chat-panel">
+      <div class="panel-head"><div class="panel-title">AI Career Copilot</div><button class="btn teal" data-action="prepare">Get Interview Ready</button></div>
+      <div class="panel-body">
+        <div class="quick">
+          <button class="btn" data-action="analyze">Analyze My Resume</button>
+          <button class="btn" data-action="match">Match a Job</button>
+          <button class="btn" data-action="improve">Improve My Resume</button>
+          <button class="btn" data-action="gaps">Find Skill Gaps</button>
+          <button class="btn" data-action="cover">Generate Cover Letter</button>
+          <button class="btn" data-action="prepare">Get Interview Ready</button>
+        </div>
+        <div class="chat">
+          <div class="messages" id="messages">
+            <div class="msg agent">Tell me your target role, paste a job description when you have one, and I will use Aptura tools to analyze, match, improve, and prepare materials.</div>
+          </div>
+          <div class="composer">
+            <textarea id="agentInput" placeholder="Ask Aptura Agent, for example: Prepare me for this internship."></textarea>
+            <button class="btn primary" id="sendBtn">Send</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <div class="panel-head"><div class="panel-title">Activity</div></div>
+      <div class="panel-body">
+        <div class="activity" id="activity"></div>
+        <div id="mainStatus" class="status"></div>
+      </div>
+      <div class="panel-head"><div class="panel-title">Agent Capabilities</div></div>
+      <div class="panel-body">
+        <div class="tools">
+          <div class="tool"><strong>Resume Analysis <b class="status-pill">Ready</b></strong><span>Understand strengths, weaknesses, and ATS readiness.</span></div>
+          <div class="tool"><strong>Resume Score <b class="status-pill">Ready</b></strong><span>Retrieve your latest Aptura readiness and scoring breakdown.</span></div>
+          <div class="tool"><strong>Job Match <b class="status-pill">Ready</b></strong><span>Compare your resume with a target opportunity.</span></div>
+          <div class="tool"><strong>Resume Improvement <b class="status-pill">Approval</b></strong><span>Generate proposed edits that only save after you approve.</span></div>
+          <div class="tool"><strong>Cover Letter <b class="status-pill">Ready</b></strong><span>Create a tailored draft from your resume evidence and job context.</span></div>
+          <div class="tool"><strong>Skill Gap <b class="status-pill">Ready</b></strong><span>See what skills you need for your target role.</span></div>
+        </div>
+        <p class="small">Aptura works normally for you. In compatible AI-agent browsers, WebMCP lets agents work with Aptura's tools directly.</p>
+      </div>
+    </aside>
+  </div>
+
+  <div class="layout" style="margin-top:18px">
+    <section class="panel">
+      <div class="panel-head"><div class="panel-title">Career Missions</div></div>
+      <div class="panel-body">
+        <button class="mission" data-action="prepare"><strong>Get Interview Ready</strong><span>Analyze resume, calculate readiness, inspect a role, find gaps, propose improvements, generate materials.</span></button>
+        <button class="mission" data-action="match"><strong>Match Me To This Job</strong><span>Analyze the job description, compare your resume, show matching and missing skills, then offer tailoring.</span></button>
+        <button class="mission" data-action="improve"><strong>Fix My Resume</strong><span>Find weak sections, show before and after edits, and save only after approval.</span></button>
+        <button class="mission" data-action="plan"><strong>Build My Career Plan</strong><span>Inspect your profile, identify gaps, and create prioritized milestones.</span></button>
+      </div>
+    </section>
+    <section class="panel">
+      <div class="panel-head"><div class="panel-title">Job Matching</div></div>
+      <div class="panel-body">
+        <div class="field"><label for="jobTitle">Job Title</label><input id="jobTitle" placeholder="Backend Engineering Intern"></div>
+        <div class="field"><label for="company">Company</label><input id="company" placeholder="Company name"></div>
+        <div class="field"><label for="requiredSkills">Required Skills</label><input id="requiredSkills" placeholder="Python, FastAPI, PostgreSQL"></div>
+        <div class="field"><label for="jobDesc">Job Description</label><textarea id="jobDesc" placeholder="Paste the full job description."></textarea></div>
+        <div class="row"><button class="btn primary" data-action="match">Match Job</button><button class="btn" data-action="cover">Generate Cover Letter</button></div>
+      </div>
+    </section>
+    <section class="panel">
+      <div class="panel-head"><div class="panel-title">Structured Results</div><button class="btn" id="tailorBtn">Tailor My Resume</button></div>
+      <div class="panel-body"><div class="result" id="results"></div></div>
+    </section>
+  </div>
+</main>
+
+<div class="approval" id="approval">
+  <div class="approval-card">
+    <div class="panel-head"><div class="panel-title">Approve Resume Changes</div><button class="btn" id="closeApproval">Close</button></div>
+    <div class="approval-grid">
+      <div class="approval-col"><h3>Before</h3><textarea id="beforeText" readonly></textarea></div>
+      <div class="approval-col"><h3>After</h3><textarea id="afterText"></textarea></div>
+    </div>
+    <div class="panel-body row"><button class="btn primary" id="approveBtn">Approve Changes</button><button class="btn danger" id="rejectBtn">Reject</button><button class="btn" id="editBtn">Edit Before Approving</button></div>
+  </div>
+</div>
+
+<script>
+const messages = document.getElementById('messages');
+const activity = document.getElementById('activity');
+const results = document.getElementById('results');
+const resumeText = document.getElementById('resumeText');
+const targetRole = document.getElementById('targetRole');
+const jobTitle = document.getElementById('jobTitle');
+const company = document.getElementById('company');
+const jobDesc = document.getElementById('jobDesc');
+const requiredSkills = document.getElementById('requiredSkills');
+const mainStatus = document.getElementById('mainStatus');
+const resumeStatus = document.getElementById('resumeStatus');
+let latestProposal = null;
+
+function escapeHtml(value){return String(value ?? '').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch]));}
+function skills(){return requiredSkills.value.split(',').map(s=>s.trim()).filter(Boolean);}
+function showStatus(el,msg,type){el.className='status '+type;el.textContent=msg;}
+function addMsg(who,text){const div=document.createElement('div');div.className='msg '+who;div.textContent=text;messages.appendChild(div);messages.scrollTop=messages.scrollHeight;}
+function setActivity(items, wait){activity.innerHTML=(items||[]).map(x=>`<div class="done">[done] ${escapeHtml(x)}</div>`).join('')+(wait?`<div class="wait">[wait] ${escapeHtml(wait)}</div>`:'');}
+async function api(url, body, options={}){
+  const res = await fetch(url, {method:options.method||'POST', credentials:'same-origin', headers:body instanceof FormData?{}:{'Content-Type':'application/json'}, body:body instanceof FormData?body:JSON.stringify(body||{})});
+  const data = await res.json().catch(()=>({}));
+  if(!res.ok || data.success===false) throw new Error(data.error || data.detail || 'Request failed.');
+  return data;
+}
+function renderList(title, items){return `<div class="metric"><div class="label">${escapeHtml(title)}</div><div class="list">${(items||[]).map(x=>`<div>${escapeHtml(x)}</div>`).join('') || '<div>None returned.</div>'}</div></div>`;}
+function renderChips(title, items){return `<div class="metric"><div class="label">${escapeHtml(title)}</div><div class="chips">${(items||[]).map(x=>`<span class="chip">${escapeHtml(x)}</span>`).join('') || '<span class="chip">None returned</span>'}</div></div>`;}
+function renderResult(data){
+  const m = data.match || data.analysis || data.skill_gap || data.career_plan || data.cover_letter || data.result || {};
+  if(data.match){
+    results.innerHTML = `<div class="metric"><div class="label">Match Score</div><div class="value">${escapeHtml(m.match_score ?? '--')}</div></div>`+
+      renderChips('Matching Skills', m.matching_skills)+renderList('Missing Skills', m.missing_skills)+
+      `<div class="metric"><div class="label">Experience Alignment</div><div class="value">${escapeHtml(m.experience_alignment ?? '--')}</div></div>`+
+      renderList('Recommended Improvements', m.recommended_improvements)+
+      `<div class="metric"><div class="label">Project Alignment</div><div class="list"><div>${escapeHtml(m.project_alignment || 'No project evidence returned.')}</div></div></div>`;
+  } else if(data.analysis){
+    results.innerHTML = `<div class="metric"><div class="label">Resume Health</div><div class="value">${escapeHtml(m.score ?? '--')}</div></div>`+
+      renderList('Strengths', m.strengths)+renderList('Weaknesses', m.weaknesses)+renderChips('Keywords', m.keywords || m.matching_skills)+renderList('Interview Prep', m.interview_questions);
+  } else if(data.skill_gap){
+    results.innerHTML = `<div class="metric"><div class="label">Skill Coverage</div><div class="value">${escapeHtml(m.skillCoverageScore ?? '--')}</div></div>`+
+      renderChips('Matching Skills', m.matchingSkills)+renderList('Missing Skills', m.missingSkills)+renderList('Next Steps', m.recommendedNextSteps);
+  } else if(data.cover_letter){
+    const letter = (m.cover_letter || {});
+    results.innerHTML = `<div class="metric"><div class="label">Subject</div><div class="list"><div>${escapeHtml(letter.subject || '')}</div></div></div><div class="metric"><div class="label">Cover Letter</div><div class="list"><div style="white-space:pre-wrap">${escapeHtml(letter.body || '')}</div></div></div>`+renderList('Highlights Used', letter.highlights);
+  } else if(data.proposal){
+    latestProposal = data.proposal;
+    openApproval(data.proposal.before, data.proposal.after);
+    results.innerHTML = renderList('Resume Rewrite Advice', (((data.proposal.proposed_changes||{}).resume||{}).rewrite_advice || []));
+  } else if(data.career_plan){
+    results.innerHTML = renderList('Next 7 Days', m.next_7_days)+renderList('Next 30 Days', m.next_30_days)+renderList('Priority Gaps', m.priority_gaps);
+  } else {
+    results.innerHTML = `<div class="metric"><div class="label">Result</div><div class="list"><div>${escapeHtml(JSON.stringify(m,null,2))}</div></div></div>`;
+  }
+}
+function payload(){return {message:document.getElementById('agentInput').value.trim(), job_title:jobTitle.value.trim()||targetRole.value.trim(), company:company.value.trim(), job_description:jobDesc.value.trim(), required_skills:skills(), resume_text:resumeText.value.trim()};}
+async function runAction(action, message){
+  setActivity([], 'Working');
+  mainStatus.className='status';
+  try{
+    let data;
+    if(action==='analyze') data=await api('/api/career/analyze-resume',{resume_text:resumeText.value.trim(),job_description:jobDesc.value.trim()});
+    if(action==='match') data=await api('/api/career/match-job',{job_title:jobTitle.value.trim()||targetRole.value.trim()||'Target opportunity',company:company.value.trim(),job_description:jobDesc.value.trim(),required_skills:skills(),resume_text:resumeText.value.trim()});
+    if(action==='improve') data=await api('/api/career/improve-resume',{target_role:jobTitle.value.trim()||targetRole.value.trim()||'Target role',instructions:message||'Improve this resume for the target role.',job_description:jobDesc.value.trim(),resume_text:resumeText.value.trim()});
+    if(action==='gaps') data=await api('/api/career/analyze-skill-gap',{target_role:jobTitle.value.trim()||targetRole.value.trim()||'Target role',required_skills:skills(),resume_text:resumeText.value.trim()});
+    if(action==='cover') data=await api('/api/career/generate-cover-letter',{job_title:jobTitle.value.trim()||targetRole.value.trim()||'Target role',company:company.value.trim(),job_description:jobDesc.value.trim(),resume_text:resumeText.value.trim(),tone:'professional'});
+    if(action==='plan') data=await api('/api/career/career-plan',{target_role:jobTitle.value.trim()||targetRole.value.trim()||'Target role',required_skills:skills(),resume_text:resumeText.value.trim()});
+    if(action==='prepare') data=await api('/api/career/agent',{...payload(),message:message||'Prepare me for this internship.'});
+    setActivity(data.activity || [], data.proposal ? 'Waiting for approval' : '');
+    renderResult(data.result || data);
+    addMsg('agent', data.reply || 'I completed the Aptura workflow and returned structured results.');
+  }catch(e){setActivity([], 'Needs input');showStatus(mainStatus,e.message,'err');addMsg('agent', e.message);}
+}
+document.querySelectorAll('[data-action]').forEach(btn=>btn.addEventListener('click',()=>runAction(btn.dataset.action, btn.textContent.trim())));
+document.getElementById('sendBtn').addEventListener('click',()=>{const text=document.getElementById('agentInput').value.trim();if(!text)return;addMsg('user',text);document.getElementById('agentInput').value='';runAction('prepare',text);});
+document.getElementById('saveResumeBtn').addEventListener('click',async()=>{try{const data=await api('/api/career/save-resume',{resume_text:resumeText.value.trim(),target_role:targetRole.value.trim()});setActivity(data.activity||[]);showStatus(resumeStatus,'Resume saved. Reload will preserve this content.','ok');}catch(e){showStatus(resumeStatus,e.message,'err');}});
+document.getElementById('resumeFile').addEventListener('change',async(e)=>{const file=e.target.files[0];if(!file)return;const fd=new FormData();fd.append('file',file);setActivity([], 'Extracting resume text');try{const data=await api('/api/career/upload-resume',fd);resumeText.value=(data.profile||{}).resume_text||'';setActivity(data.activity||[]);showStatus(resumeStatus,'Resume uploaded and remains editable.','ok');}catch(err){showStatus(resumeStatus,err.message,'err');}});
+document.getElementById('tailorBtn').addEventListener('click',()=>runAction('improve','Tailor my resume to this job.'));
+function openApproval(before, after){document.getElementById('beforeText').value=before||'';document.getElementById('afterText').value=after||'';document.getElementById('approval').classList.add('on');}
+document.getElementById('closeApproval').onclick=()=>document.getElementById('approval').classList.remove('on');
+document.getElementById('rejectBtn').onclick=()=>{document.getElementById('approval').classList.remove('on');setActivity(['Resume changes rejected']);};
+document.getElementById('editBtn').onclick=()=>document.getElementById('afterText').focus();
+document.getElementById('approveBtn').onclick=async()=>{try{const approved=document.getElementById('afterText').value;const data=await api('/api/career/approve-resume',{approved_resume_text:approved,target_role:targetRole.value.trim()});resumeText.value=approved;document.getElementById('approval').classList.remove('on');setActivity(data.activity||[]);showStatus(resumeStatus,'Approved resume changes saved.','ok');}catch(e){showStatus(mainStatus,e.message,'err');}};
+{% if latest_match %}renderResult({match: {{ latest_match | tojson }} });{% endif %}
+</script>
+{% include "_webmcp.html" %}
+</body>
+</html>

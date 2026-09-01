@@ -349,8 +349,8 @@ textarea{min-height:140px;resize:vertical}
 
 <main>
   <div class="page-header">
-    <h1 class="page-title">Screen Candidates</h1>
-    <p class="page-sub">Describe the role, upload resumes — our AI does the rest in seconds</p>
+    <h1 class="page-title">Recruiter Workspace</h1>
+    <p class="page-sub">Create a role, add candidate resumes, screen, rank, compare, and shortlist. Aptura provides AI recommendations, not autonomous hiring decisions.</p>
   </div>
 
   <!-- Steps -->
@@ -374,7 +374,7 @@ textarea{min-height:140px;resize:vertical}
     <div id="formPanel">
       <div class="panel">
         <div class="panel-hdr">
-          <div class="panel-title">Role Configuration</div>
+            <div class="panel-title">Create or Paste Job Description</div>
           <div class="panel-sub">Tell us about the position you're hiring for</div>
         </div>
         <div class="panel-body">
@@ -721,6 +721,7 @@ function recClass(r) {
 }
 
 function renderResults(data) {
+  window.currentScreeningId = data.screening_id || window.currentScreeningId || null;
   document.getElementById('procState').classList.remove('on');
   document.getElementById('emptyState').style.display = 'none';
   document.getElementById('resultsWrap').classList.add('on');
@@ -815,6 +816,7 @@ function buildCard(c, i) {
           ${c.experience_years?`<span class="cpill pill-exp">${c.experience_years} yrs exp</span>`:''}
           ${c.highest_education?`<span class="cpill pill-edu">${c.highest_education}</span>`:''}
           ${c.salary_expectation?`<span class="cpill pill-sal">${c.salary_expectation}</span>`:''}
+          ${c.candidate_id?`<span class="cpill pill-edu">ID ${c.candidate_id}</span>`:''}
         </div>
       </div>
       <div class="score-wrap">
@@ -851,6 +853,9 @@ function buildCard(c, i) {
       </svg>
       <span id="tog-${i}">View Full Analysis</span>
     </div>
+    <div class="card-toggle" onclick="shortlistCandidate(${i})">
+      <span id="short-${i}">Shortlist Candidate</span>
+    </div>
   </div>`;
 }
 
@@ -862,6 +867,26 @@ function toggleCard(i) {
   det.classList.toggle('open', !open);
   chev.classList.toggle('up', !open);
   lbl.textContent = open ? 'View Full Analysis' : 'Collapse';
+}
+
+async function shortlistCandidate(i) {
+  const candidate = allResults[i];
+  if (!candidate || !candidate.candidate_id || !window.currentScreeningId) {
+    alert('Open a completed screening before shortlisting.');
+    return;
+  }
+  const res = await fetch('/api/recruiter/shortlist', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({candidate_id:candidate.candidate_id, screening_id:window.currentScreeningId})
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || data.success === false) {
+    alert(data.error || data.detail || 'Could not shortlist candidate.');
+    return;
+  }
+  const label = document.getElementById(`short-${i}`);
+  if (label) label.textContent = 'Shortlisted';
 }
 
 // ── Load past result if coming from dashboard ──────────────────────────────

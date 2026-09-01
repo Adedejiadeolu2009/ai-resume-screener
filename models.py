@@ -58,6 +58,10 @@ class User(Base):
         "Screening", back_populates="user", cascade="all, delete-orphan")
     payments = relationship(
         "Payment", back_populates="user", cascade="all, delete-orphan")
+    career_profile = relationship(
+        "CareerProfile", back_populates="user", uselist=False, cascade="all, delete-orphan")
+    job_matches = relationship(
+        "JobMatch", back_populates="user", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<User {self.email}>"
@@ -133,6 +137,58 @@ class Candidate(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     screening = relationship("Screening", back_populates="candidates")
+
+
+class CareerProfile(Base):
+    """
+    Candidate-side career workspace. Stores editable resume/profile state so
+    uploads can be corrected, saved, and reused by Aptura Agent workflows.
+    """
+    __tablename__ = "career_profiles"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), unique=True, nullable=False)
+    target_role = Column(String(255), nullable=True)
+    resume_text = Column(Text, nullable=True)
+    resume_filename = Column(String(255), nullable=True)
+    latest_analysis_json = Column(JSON, nullable=True)
+    latest_skill_gap_json = Column(JSON, nullable=True)
+    updated_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    user = relationship("User", back_populates="career_profile")
+
+
+class JobMatch(Base):
+    """
+    Candidate-side match result for a user-provided opportunity.
+    """
+    __tablename__ = "job_matches"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    job_title = Column(String(255), nullable=False)
+    company = Column(String(255), nullable=True)
+    job_description = Column(Text, nullable=False)
+    required_skills = Column(JSON, nullable=True)
+    result_json = Column(JSON, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    user = relationship("User", back_populates="job_matches")
+
+
+class RecruiterShortlist(Base):
+    """
+    Lightweight recruiter shortlist tied to existing screening candidates.
+    """
+    __tablename__ = "recruiter_shortlists"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    screening_id = Column(Integer, ForeignKey("screenings.id"), nullable=False)
+    candidate_id = Column(Integer, ForeignKey("candidates.id"), nullable=False)
+    notes = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
 
 
 class Payment(Base):

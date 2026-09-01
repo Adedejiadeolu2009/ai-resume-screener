@@ -9,6 +9,7 @@ from pydantic import AliasChoices, BaseModel, ConfigDict, Field
 from sqlalchemy.orm import Session
 
 import models
+import career_services as career
 import security as auth
 from database import get_db
 from resume_builder_router import PROMPT as RESUME_BUILDER_PROMPT
@@ -65,6 +66,28 @@ class SkillGapInput(BaseModel):
     target_role: str = Field(..., validation_alias=AliasChoices("targetRole", "target_role"), min_length=1, max_length=120)
     required_skills: list[str] = Field(..., validation_alias=AliasChoices("requiredSkills", "required_skills"), min_length=1, max_length=60)
     resume_text: str | None = Field(default=None, max_length=12000)
+
+
+class AnalyzeJobInput(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    job_title: str = Field(..., validation_alias=AliasChoices("jobTitle", "job_title"), min_length=1, max_length=120)
+    job_description: str = Field(..., validation_alias=AliasChoices("jobDescription", "job_description"), min_length=20, max_length=20000)
+
+
+class ScreeningIdInput(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    screening_id: int = Field(..., validation_alias=AliasChoices("screeningId", "screening_id"))
+
+
+class CompareCandidatesInput(ScreeningIdInput):
+    candidate_ids: list[int] = Field(default_factory=list, validation_alias=AliasChoices("candidateIds", "candidate_ids"), max_length=10)
+
+
+class ShortlistCandidateInput(ScreeningIdInput):
+    candidate_id: int = Field(..., validation_alias=AliasChoices("candidateId", "candidate_id"))
+    notes: str | None = Field(default=None, max_length=2000)
 
 
 def _ai_key() -> str:
@@ -171,25 +194,8 @@ async def analyze_resume(
     current_user: models.User = Depends(auth.get_current_user),
 ):
     try:
-        candidate = _latest_candidate(db, current_user.id)
-        if not payload.resume_text and candidate and candidate.result_json and not payload.job_description:
-            return {"success": True, "source": "latest_screening", "analysis": _normalize_screening_result(candidate.result_json)}
-
-        resume_text = (payload.resume_text or _candidate_resume_text(candidate)).strip()
-        if len(resume_text) < 50:
-            raise HTTPException(400, "Provide resume_text or run a resume screening first.")
-
-        api_key = _ai_key()
-        if not api_key:
-            raise HTTPException(500, "AI service is not configured.")
-
-        result = screen_with_openai(
-            api_key,
-            (payload.job_description or _default_job_description(candidate)).strip(),
-            resume_text,
-            (payload.candidate_name or (candidate.candidate_name if candidate else "Current resume")).strip(),
-        )
-        return {"success": True, "source": "generated_analysis", "analysis": _normalize_screening_result(result)}
+        result = career.analyze_resume(db, current_user, payload.resume_text, payload.job_description, payload.candidate_name)
+        return {"success": True, "source": "generated_analysis", "analysis": result}
     except Exception as exc:
         return _safe_error(exc)
 
@@ -221,35 +227,23 @@ async def match_resume_to_job(
     current_user: models.User = Depends(auth.get_current_user),
 ):
     try:
-        candidate = _latest_candidate(db, current_user.id)
-        resume_text = (payload.resume_text or _candidate_resume_text(candidate)).strip()
-        if len(resume_text) < 50:
-            raise HTTPException(400, "Provide resume_text or run a resume screening first.")
-
-        skills = ", ".join(s.strip() for s in payload.required_skills if s.strip())
-        job_description = f"Job title: {payload.job_title}\n\n{payload.job_description}"
-        if skills:
-            job_description += f"\n\nRequired skills: {skills}"
-
-        api_key = _ai_key()
-        if not api_key:
-            raise HTTPException(500, "AI service is not configured.")
-
-        result = screen_with_openai(
-            api_key,
-            job_description,
-            resume_text,
-            (payload.candidate_name or (candidate.candidate_name if candidate else "Current resume")).strip(),
+        normalized = career.match_resume_to_job(
+            db,
+            current_user,
+            payload.job_title,
+            "",
+            payload.job_description,
+            payload.required_skills,
+            payload.resume_text,
         )
-        normalized = _normalize_screening_result(result)
         return {
             "success": True,
             "job_title": payload.job_title,
-            "match_score": normalized["score"],
-            "matching_skills": normalized["keywords"],
+            "match_score": normalized["match_score"],
+            "matching_skills": normalized["matching_skills"],
             "missing_skills": normalized["missing_skills"],
-            "recommendations": normalized["recommendations"],
-            "analysis": normalized,
+            "recommendations": normalized["recommended_improvements"],
+            "analysis": normalized["analysis"],
         }
     except Exception as exc:
         return _safe_error(exc)
@@ -262,25 +256,15 @@ async def improve_resume(
     current_user: models.User = Depends(auth.get_current_user),
 ):
     try:
-        candidate = _latest_candidate(db, current_user.id)
-        resume_text = (payload.resume_text or _candidate_resume_text(candidate)).strip()
-        if len(resume_text) < 50:
-            raise HTTPException(400, "Provide resume_text or run a resume screening first.")
-
-        prompt = RESUME_BUILDER_PROMPT.format(
-            job_title=payload.target_role or payload.instructions or "Target role",
-            seniority=payload.seniority or "Mid-level",
-            industry=payload.industry or "General",
-            target_company=payload.job_description or payload.instructions or "Not specified",
-            resume_text=resume_text[:12000],
-        )
-        result = _chat_json(prompt)
+        result = career.improve_resume(db, current_user, payload.target_role, payload.instructions, payload.job_description, payload.resume_text)
         return {
             "success": True,
             "requires_human_approval": True,
             "saved": False,
-            "message": "Proposed resume improvements generated. Review and approve before using or saving them.",
-            "proposed_changes": result,
+            "message": result["message"],
+            "proposed_changes": result["proposed_changes"],
+            "before": result["before"],
+            "after": result["after"],
         }
     except Exception as exc:
         return _safe_error(exc)
@@ -293,35 +277,7 @@ async def generate_cover_letter(
     current_user: models.User = Depends(auth.get_current_user),
 ):
     try:
-        candidate = _latest_candidate(db, current_user.id)
-        resume_text = (payload.resume_text or _candidate_resume_text(candidate)).strip()
-        if len(resume_text) < 50:
-            raise HTTPException(400, "Provide resume_text or run a resume screening first.")
-
-        company = payload.company_name or "the company"
-        prompt = f"""You are an expert career writer.
-
-Return ONLY valid JSON with this exact shape:
-{{
-  "cover_letter": {{
-    "job_title": "{payload.job_title}",
-    "company_name": "{company}",
-    "tone": "{payload.tone}",
-    "subject": "<short email subject line>",
-    "body": "<tailored cover letter, 3-5 concise paragraphs>",
-    "highlights": ["<resume evidence used>", "<resume evidence used>", "<resume evidence used>"],
-    "customization_notes": ["<why this fits the job>", "<keyword or responsibility addressed>"]
-  }}
-}}
-
-JOB DESCRIPTION:
-{payload.job_description[:20000]}
-
-RESUME:
-{resume_text[:12000]}
-
-Do not invent credentials. If evidence is missing, keep the phrasing modest."""
-        result = _chat_json(prompt)
+        result = career.cover_letter(db, current_user, payload.job_title, payload.company_name, payload.job_description, payload.resume_text, payload.tone)
         return {"success": True, "result": result}
     except Exception as exc:
         return _safe_error(exc)
@@ -333,32 +289,73 @@ async def analyze_skill_gap(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(auth.get_current_user),
 ):
-    candidate = _latest_candidate(db, current_user.id)
-    resume_text = (payload.resume_text or _candidate_resume_text(candidate)).strip()
-    required_skills = _dedupe_skills(payload.required_skills)
-    current_skills = _current_skills(candidate, resume_text, required_skills)
-    current_keys = {skill.casefold() for skill in current_skills}
-    matching_skills = [skill for skill in required_skills if skill.casefold() in current_keys]
-    missing_skills = [skill for skill in required_skills if skill.casefold() not in current_keys]
-    coverage = round((len(matching_skills) / len(required_skills)) * 100) if required_skills else 0
+    result = career.skill_gap(db, current_user, payload.target_role, payload.required_skills, payload.resume_text)
+    return {"success": True, **result}
 
-    recommended_next_steps = [
-        f"Add evidence for {skill} through a project, role bullet, certification, or measurable achievement."
-        for skill in missing_skills[:6]
-    ]
-    if not recommended_next_steps:
-        recommended_next_steps.append(
-            "Your resume already shows the required skills Aptura could verify. Strengthen the application with measurable outcomes and role-specific keywords."
-        )
 
+@router.post("/analyze-job")
+async def analyze_job(payload: AnalyzeJobInput, current_user: models.User = Depends(auth.get_current_user)):
+    try:
+        prompt = f"""Return ONLY valid JSON.
+{{"job_title":"{payload.job_title}","role_summary":"<summary>","requirements":["<requirement>"],"required_skills":["<skill>"],"preferred_skills":["<skill>"],"screening_notes":["<note>"]}}
+
+JOB DESCRIPTION:
+{payload.job_description[:20000]}
+
+Do not invent requirements; extract only what is stated or clearly implied."""
+        return {"success": True, "analysis": _chat_json(prompt)}
+    except Exception as exc:
+        return _safe_error(exc)
+
+
+def _owned_screening(db: Session, user_id: int, screening_id: int) -> models.Screening:
+    screening = db.query(models.Screening).filter(models.Screening.id == screening_id, models.Screening.user_id == user_id).first()
+    if not screening:
+        raise HTTPException(404, "Screening not found.")
+    return screening
+
+
+def _candidate_payload(candidate: models.Candidate) -> dict[str, Any]:
+    result = candidate.result_json or {}
     return {
-        "success": True,
-        "targetRole": payload.target_role,
-        "methodology": "Compares the target role's required skills against Aptura's latest stored resume analysis and any supplied resume text. It does not infer unverified skills.",
-        "skillCoverageScore": coverage,
-        "currentSkills": current_skills,
-        "matchingSkills": matching_skills,
-        "missingSkills": missing_skills,
-        "recommendedSkills": missing_skills,
-        "recommendedNextSteps": recommended_next_steps,
+        "candidate_id": candidate.id,
+        "candidate_name": candidate.candidate_name,
+        "match_score": candidate.overall_score,
+        "recommendation": candidate.recommendation,
+        "matching_requirements": result.get("strengths") or [],
+        "missing_or_uncertain_requirements": result.get("gaps") or [],
+        "explanation": result.get("executive_summary"),
     }
+
+
+@router.post("/rank-candidates")
+async def rank_candidates(payload: ScreeningIdInput, db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
+    screening = _owned_screening(db, current_user.id, payload.screening_id)
+    ranked = sorted([_candidate_payload(c) for c in screening.candidates if c.result_json], key=lambda c: c.get("match_score") or 0, reverse=True)
+    return {"success": True, "screening_id": screening.id, "ranked_candidates": ranked, "note": "AI recommendation only. Aptura does not make autonomous hiring decisions."}
+
+
+@router.post("/compare-candidates")
+async def compare_candidates(payload: CompareCandidatesInput, db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
+    screening = _owned_screening(db, current_user.id, payload.screening_id)
+    allowed = set(payload.candidate_ids or [])
+    candidates = [c for c in screening.candidates if c.result_json and (not allowed or c.id in allowed)]
+    compared = sorted([_candidate_payload(c) for c in candidates], key=lambda c: c.get("match_score") or 0, reverse=True)
+    return {"success": True, "screening_id": screening.id, "comparison": compared, "note": "Use this as a screening aid, not a hiring decision."}
+
+
+@router.post("/shortlist-candidate")
+async def shortlist_candidate(payload: ShortlistCandidateInput, db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
+    screening = _owned_screening(db, current_user.id, payload.screening_id)
+    candidate = next((c for c in screening.candidates if c.id == payload.candidate_id), None)
+    if not candidate:
+        raise HTTPException(404, "Candidate not found.")
+    existing = (
+        db.query(models.RecruiterShortlist)
+        .filter(models.RecruiterShortlist.user_id == current_user.id, models.RecruiterShortlist.screening_id == screening.id, models.RecruiterShortlist.candidate_id == candidate.id)
+        .first()
+    )
+    if not existing:
+        db.add(models.RecruiterShortlist(user_id=current_user.id, screening_id=screening.id, candidate_id=candidate.id, notes=payload.notes))
+        db.commit()
+    return {"success": True, "candidate": _candidate_payload(candidate), "status": "shortlisted"}

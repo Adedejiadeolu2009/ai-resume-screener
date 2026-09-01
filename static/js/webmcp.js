@@ -332,6 +332,94 @@
       },
     });
 
+    await registerTool({
+      name: "analyze_job",
+      title: "Analyze Job",
+      description: "Extract role requirements and screening notes from a recruiter-provided job description.",
+      inputSchema: {
+        type: "object",
+        required: ["jobTitle", "jobDescription"],
+        properties: {
+          jobTitle: { type: "string" },
+          jobDescription: { type: "string" },
+        },
+        additionalProperties: false,
+      },
+      annotations: { readOnlyHint: true, untrustedContentHint: true },
+      execute: async (input = {}) => jsonFetch("/api/webmcp/analyze-job", {
+        method: "POST",
+        body: JSON.stringify({
+          jobTitle: input.jobTitle || input.job_title || currentJobTitle(input),
+          jobDescription: input.jobDescription || input.job_description || currentJobDescription(input),
+        }),
+      }),
+    });
+
+    await registerTool({
+      name: "rank_candidates",
+      title: "Rank Candidates",
+      description: "Return ranked candidates from an existing Aptura recruiter screening.",
+      inputSchema: {
+        type: "object",
+        required: ["screeningId"],
+        properties: { screeningId: { type: "number" } },
+        additionalProperties: false,
+      },
+      annotations: { readOnlyHint: true },
+      execute: async (input = {}) => jsonFetch("/api/webmcp/rank-candidates", {
+        method: "POST",
+        body: JSON.stringify({ screeningId: input.screeningId || input.screening_id || window.currentScreeningId }),
+      }),
+    });
+
+    await registerTool({
+      name: "compare_candidates",
+      title: "Compare Candidates",
+      description: "Compare candidates from an existing screening with AI match scores, requirements, gaps, and concise explanations.",
+      inputSchema: {
+        type: "object",
+        required: ["screeningId"],
+        properties: {
+          screeningId: { type: "number" },
+          candidateIds: { type: "array", items: { type: "number" } },
+        },
+        additionalProperties: false,
+      },
+      annotations: { readOnlyHint: true },
+      execute: async (input = {}) => jsonFetch("/api/webmcp/compare-candidates", {
+        method: "POST",
+        body: JSON.stringify({
+          screeningId: input.screeningId || input.screening_id || window.currentScreeningId,
+          candidateIds: Array.isArray(input.candidateIds) ? input.candidateIds : Array.isArray(input.candidate_ids) ? input.candidate_ids : [],
+        }),
+      }),
+    });
+
+    await registerTool({
+      name: "shortlist_candidate",
+      title: "Shortlist Candidate",
+      description: "Shortlist one candidate from an existing screening in the current recruiter's workspace.",
+      inputSchema: {
+        type: "object",
+        required: ["screeningId", "candidateId"],
+        properties: {
+          screeningId: { type: "number" },
+          candidateId: { type: "number" },
+          notes: { type: "string" },
+        },
+        additionalProperties: false,
+      },
+      annotations: { readOnlyHint: false },
+      execute: async (input = {}) => jsonFetch("/api/webmcp/shortlist-candidate", {
+        method: "POST",
+        body: JSON.stringify({
+          screeningId: input.screeningId || input.screening_id || window.currentScreeningId,
+          candidateId: input.candidateId || input.candidate_id,
+          notes: input.notes || "",
+        }),
+      }),
+    });
+
     window.apturaWebMCP = {
       available: true,
       tools: state.registered.slice(),

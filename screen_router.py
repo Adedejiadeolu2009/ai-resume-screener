@@ -497,7 +497,7 @@ async def get_screening(
         raise HTTPException(404, "Screening not found.")
 
     candidates = sorted(
-        [c.result_json for c in screening.candidates if c.result_json],
+        [{**c.result_json, "candidate_id": c.id} for c in screening.candidates if c.result_json],
         key=lambda x: x.get("overall_score", 0),
         reverse=True
     )
