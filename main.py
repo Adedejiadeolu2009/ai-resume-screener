@@ -17,7 +17,7 @@ import webmcp_router
 import career_router
 from security import get_current_user
 
-from database import engine, get_db, Base
+from database import engine, get_db, Base, SessionLocal
 from starlette.middleware.sessions import SessionMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from sqlalchemy.orm import Session, joinedload
@@ -90,6 +90,21 @@ def ensure_db_columns():
 
 ensure_db_columns()
 logger.info("Database columns ready")
+
+
+def sync_admin_on_startup():
+    """Promote the ADMIN_EMAIL account's is_admin DB flag. Safe to run
+    every startup — idempotent, and a no-op once the flag is already set.
+    See admin_router.is_admin() for why this replaces pure env-var checks."""
+    db = SessionLocal()
+    try:
+        admin_router.sync_admin_flag(db)
+    finally:
+        db.close()
+
+
+sync_admin_on_startup()
+logger.info("Admin flag synced")
 
 # ── App ──────────────────────────────────────────────────────────────────────
 
@@ -211,27 +226,60 @@ def require_csrf(request: Request, csrf_token: str | None) -> None:
         raise _HTTPException(status_code=403, detail="CSRF validation failed")
 
 
-def build_career_readiness(candidates: list[models.Candidate]) -> dict:
-    scored = [candidate for candidate in candidates if candidate.result_json]
-    latest = scored[0] if scored else None
-    scores = (latest.result_json.get("scores") if latest and latest.result_json else {}) or {}
-    resume_score = latest.overall_score if latest and latest.overall_score is not None else None
-    skills_score = scores.get("technical_skills")
-    experience_score = scores.get("experience")
-    communication_score = scores.get("communication")
-    available = [
-        value
-        for value in (resume_score, skills_score, experience_score, communication_score)
-        if isinstance(value, (int, float))
-    ]
+# Mirrors the limits enforced server-side in screen_router.screen_resumes —
+# this copy is read-only (for display); the POST /api/screen route is what
+# actually enforces the cap.
+FREE_SCREENING_LIMIT = 5
+PRO_SCREENING_LIMIT = 100
+
+
+def screening_quota(user: models.User) -> dict:
+    from datetime import datetime as _dt
+    tier = (user.tier or "FREE").upper()
+    now = _dt.utcnow()
+    active = user.premium_until is None or user.premium_until > now
+    if tier == "ENTERPRISE" and active:
+        return {"tier": "ENTERPRISE", "limit": None, "used": user.screenings_used_this_month or 0, "remaining": None}
+    if tier == "PRO" and active:
+        limit = PRO_SCREENING_LIMIT
+    else:
+        tier = "FREE"
+        limit = FREE_SCREENING_LIMIT
+    used = user.screenings_used_this_month or 0
+    return {"tier": tier, "limit": limit, "used": used, "remaining": max(limit - used, 0)}
+
+
+def build_career_readiness(profile: models.CareerProfile | None) -> dict:
+    """
+    Readiness for the SIGNED-IN USER'S OWN resume, sourced from their career
+    profile (populated by career_services.analyze_resume / skill_gap).
+
+    This previously took `recent_candidates` — the resumes this user has
+    screened as a recruiter — and reported the most recently screened
+    CANDIDATE's score as if it were the logged-in user's own readiness.
+    That's a different person's resume. This version reads the user's own
+    analysis instead, and returns concrete next actions instead of only a
+    number.
+    """
+    analysis = (profile.latest_analysis_json if profile else None) or {}
+    gap = (profile.latest_skill_gap_json if profile else None) or {}
+    scores = analysis.get("scores") or {}
+
+    actions = list((gap.get("recommendedNextSteps") or [])[:4])
+    if not actions:
+        actions = list((analysis.get("recommended_improvements") or [])[:4])
+    if not actions:
+        actions = ["Analyze your resume in the Career Agent to get your readiness score and a personalized action list."]
 
     return {
-        "overall": round(sum(available) / len(available)) if available else None,
-        "resume": resume_score,
-        "skills": skills_score,
-        "experience": experience_score,
-        "application": communication_score,
-        "methodology": "Average of available latest resume score, technical skills, experience, and communication scores from Aptura screening results.",
+        "overall": analysis.get("score"),
+        "resume": analysis.get("score"),
+        "skills": scores.get("technical_skills"),
+        "experience": scores.get("experience"),
+        "communication": scores.get("communication"),
+        "recommendation": analysis.get("recommendation"),
+        "actions": actions,
+        "methodology": "Your latest Aptura resume analysis and skill-gap check from the Career Agent — not your recruiter screening history.",
     }
 
 
@@ -400,7 +448,7 @@ async def dashboard_page(request: Request, db: Session = Depends(get_db), curren
             "total_candidates": total_candidates,
             "strong_hires": strong_hires,
             "avg_score": avg_score,
-            "career_readiness": build_career_readiness(recent_candidates),
+            "career_readiness": build_career_readiness(career_profile),
             "career_profile": career_profile,
             "latest_match": latest_match.result_json if latest_match else None,
             "top_skill_gaps": ((career_profile.latest_skill_gap_json or {}).get("missingSkills") if career_profile else []) or [],
@@ -429,6 +477,7 @@ async def screen_page(request: Request, db: Session = Depends(get_db), current_u
                 key=lambda x: x.get("overall_score", 0), reverse=True
             )
             past_result = {
+                "screening_id": screening.id,
                 "job_title": screening.job.title,
                 "company_name": screening.job.company or "",
                 "total_processed": len(candidates),
@@ -444,6 +493,7 @@ async def screen_page(request: Request, db: Session = Depends(get_db), current_u
             "user": current_user,
             "past_result": past_result,
             "csrf_token": get_csrf_token(request),
+            "quota": screening_quota(current_user),
         }
     )
 

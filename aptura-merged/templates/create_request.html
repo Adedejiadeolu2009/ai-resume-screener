@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Request a Plan Upgrade — Aptura AI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/premium-animations.css">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#0A0B0E;--panel:#13151C;--elev:#1A1D27;--border:rgba(255,255,255,.08);--gold:#C9A84C;--teal:#2DD4BF;--text:#F0EDE6;--muted:#9A9691;--hint:#5A5750;--serif:'Cormorant Garamond',Georgia,serif;--sans:'Outfit',system-ui,sans-serif}
+    body{min-height:100vh;background:var(--bg);color:var(--text);font-family:var(--sans)}
+    nav{display:flex;align-items:center;justify-content:space-between;padding:16px 32px;border-bottom:1px solid var(--border);background:rgba(10,11,14,.9);position:sticky;top:0;z-index:10}
+    .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--text)}
+    .mark{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,var(--gold),#A07820);display:grid;place-items:center;color:#0A0B0E;font:700 16px var(--serif)}
+    .brand span{font:500 18px var(--serif)}
+    .nav-links{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+    a{color:var(--gold);text-decoration:none}
+    .btn{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:8px;padding:10px 14px;background:rgba(255,255,255,.03);color:var(--text);font-weight:700;font-size:13px;cursor:pointer}
+    .btn-primary{background:linear-gradient(135deg,var(--gold),#A07820);border:none;color:#0A0B0E}
+    main{max-width:720px;margin:0 auto;padding:46px 20px 70px}
+    .eyebrow{display:inline-flex;align-items:center;gap:8px;color:var(--gold);font-size:12px;font-weight:800;letter-spacing:.8px;text-transform:uppercase}
+    h1{font:500 36px/1.15 var(--serif);margin:14px 0 10px}
+    p.lead{color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:24px}
+    .panel{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:26px;position:relative;overflow:hidden}
+    .panel::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 45% at 25% 0%,rgba(201,168,76,.12),transparent 60%);pointer-events:none}
+    .panel>*{position:relative}
+    .confirmation{margin-bottom:22px;padding:16px;border-radius:10px;border:1px solid rgba(74,222,128,.25);background:rgba(74,222,128,.08)}
+    .confirmation .label{color:var(--hint);font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+    .confirmation .value{font-weight:800;color:var(--text);word-break:break-word;font-size:15px}
+    .confirmation p{color:var(--muted);font-size:13px;line-height:1.6;margin-top:10px}
+    label{display:block;font-size:12px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--hint);margin-bottom:8px}
+    .plan-options{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+    @media(max-width:520px){.plan-options{grid-template-columns:1fr}}
+    .plan-option{position:relative;border:1px solid var(--border);border-radius:10px;padding:16px;cursor:pointer;background:rgba(255,255,255,.02);transition:border-color .2s ease, background .2s ease}
+    .plan-option input{position:absolute;opacity:0;pointer-events:none}
+    .plan-option .name{font:600 18px var(--serif);color:var(--text)}
+    .plan-option .price{color:var(--gold);font-weight:800;font-size:15px;margin-top:4px}
+    .plan-option:has(input:checked){border-color:rgba(201,168,76,.5);background:rgba(201,168,76,.06)}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+    .note{margin-top:18px;color:var(--hint);font-size:12px;line-height:1.6}
+  </style>
+</head>
+<body>
+  <nav>
+    <a class="brand" href="/dashboard"><div class="mark">A</div><span>Aptura AI</span></a>
+    <div class="nav-links">
+      <a class="btn" href="/plans">Plans</a>
+      <a class="btn btn-primary" href="/dashboard">Dashboard</a>
+    </div>
+  </nav>
+
+  <main>
+    <div class="eyebrow">Manual transfer request</div>
+    <h1>Request a plan upgrade</h1>
+    <p class="lead">Generate a payment reference, complete the bank transfer for the exact amount shown, and admin will activate your plan once the transfer is verified.</p>
+
+    <section class="panel">
+      {% if created %}
+        <div class="confirmation">
+          <div class="label">Payment reference</div>
+          <div class="value">{{ ref }}</div>
+          <p><strong>Plan:</strong> {{ plan }} &nbsp;·&nbsp; <strong>Amount:</strong> ₦{{ "{:,}".format(amount) }}</p>
+          <p>Copy this reference into your bank transfer description exactly, then complete the transfer. Your plan activates once admin verifies it.</p>
+        </div>
+        <div class="actions">
+          <a class="btn btn-primary" href="/plans/status?ref={{ ref }}">Check status</a>
+          <a class="btn" href="/dashboard">Back to dashboard</a>
+        </div>
+      {% else %}
+        <form method="post" action="/create-request">
+          <label>Choose a plan</label>
+          <div class="plan-options">
+            <label class="plan-option">
+              <input type="radio" name="plan" value="PRO" checked />
+              <div class="name">Pro</div>
+              <div class="price">₦{{ "{:,}".format(pro_amount) }} / month</div>
+            </label>
+            <label class="plan-option">
+              <input type="radio" name="plan" value="ENTERPRISE" />
+              <div class="name">Enterprise</div>
+              <div class="price">₦{{ "{:,}".format(enterprise_amount) }} / month</div>
+            </label>
+          </div>
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+          <button class="btn btn-primary" type="submit" style="width:100%">Generate reference</button>
+          <p class="note">The amount is fixed by the plan you select — it's set on our end so there's nothing to mistype or misconfigure.</p>
+        </form>
+      {% endif %}
+    </section>
+  </main>
+{% include "_webmcp.html" %}
+</body>
+</html>

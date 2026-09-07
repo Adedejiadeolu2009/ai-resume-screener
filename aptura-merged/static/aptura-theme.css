@@ -1,0 +1,198 @@
+/*
+  aptura-theme.css — shared design tokens and base chrome.
+
+  This is the start of a shared stylesheet. Existing pages still carry their
+  own inline <style> blocks with duplicated token values — safe as-is, but
+  worth migrating onto this file page by page so a color/spacing change only
+  has to happen once. New pages should build on this rather than re-declare
+  the tokens inline.
+*/
+
+:root {
+  --bg: #0A0B0E;
+  --panel: #13151C;
+  --card: #13151C; /* alias — existing pages use --card, newer ones use --panel; same value */
+  --elev: #1A1D27;
+  --input: #1F2330;
+  --border: rgba(255, 255, 255, .08);
+  --border-soft: rgba(255, 255, 255, .05);
+  --border-lit: rgba(201, 168, 76, .35);
+
+  --gold: #C9A84C;
+  --gold-dark: #A07820;
+  --gold-light: #E8D5A3;
+  --gold-bg: rgba(201, 168, 76, .1);
+  --teal: #2DD4BF;
+  --teal-bg: rgba(45, 212, 191, .1);
+  --green: #4ADE80;
+  --red: #F87171;
+  --amber: #FBBF24;
+
+  --text: #F0EDE6;
+  --muted: #9A9691;
+  --hint: #5A5750;
+
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --sans: 'Outfit', system-ui, -apple-system, sans-serif;
+  --ff-serif: var(--serif); /* alias — existing pages use --ff-serif/--ff-sans */
+  --ff-sans: var(--sans);
+
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--sans); }
+a { color: var(--gold); text-decoration: none; }
+
+/* ── Nav ─────────────────────────────────────────────────────────── */
+.aptura-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 32px; border-bottom: 1px solid var(--border);
+  background: rgba(10, 11, 14, .9); backdrop-filter: blur(6px);
+  position: sticky; top: 0; z-index: 20;
+}
+.aptura-brand { display: flex; align-items: center; gap: 12px; color: var(--text); }
+.aptura-brand .mark {
+  width: 34px; height: 34px; border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+  display: grid; place-items: center; color: #0A0B0E; font: 700 16px var(--serif);
+  position: relative; overflow: hidden;
+}
+.aptura-brand span { font: 500 18px var(--serif); }
+.aptura-nav-links { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+/* ── Buttons ─────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 10px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border);
+  background: rgba(255, 255, 255, .03); color: var(--text);
+  font-weight: 700; font-size: 13px; font-family: var(--sans); cursor: pointer;
+}
+.btn-primary { background: linear-gradient(135deg, var(--gold), var(--gold-dark)); border: none; color: #0A0B0E; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+
+/* ── Panels / cards ──────────────────────────────────────────────── */
+.panel {
+  background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 24px; position: relative; overflow: hidden;
+}
+.panel::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(ellipse 70% 45% at 25% 0%, rgba(201, 168, 76, .10), transparent 60%);
+}
+.panel > * { position: relative; }
+
+label {
+  display: block; font-size: 12px; font-weight: 800; letter-spacing: .6px;
+  text-transform: uppercase; color: var(--hint); margin-bottom: 8px;
+}
+input[type=text], input[type=number], input[type=email], textarea, select {
+  width: 100%; background: var(--elev); border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 11px 12px; color: var(--text); font-family: var(--sans); font-size: 14px;
+}
+input:focus, textarea:focus, select:focus {
+  outline: none; border-color: rgba(201, 168, 76, .5); box-shadow: 0 0 0 3px rgba(201, 168, 76, .12);
+}
+
+/* ── Authenticated app shell (sidebar + top nav) ────────────────────
+   Copied faithfully from the real dashboard.html/settings.html shell so
+   any page using this include renders identically to those two. Pages
+   opt in with: <div class="app-wrapper"><aside id="sidebar">...</aside>
+   <div class="content"><nav>...</nav><main>...</main></div></div>
+   plus <div class="backdrop" id="backdrop"></div> and app-shell.js.      */
+
+.app-wrapper { display: flex; min-height: 100vh; }
+
+.sidebar {
+  width: 240px; background: linear-gradient(180deg, rgba(12,14,20,0.98), rgba(8,9,12,0.98));
+  padding: 24px 16px; border-right: 1px solid rgba(255,255,255,0.02);
+  flex-shrink: 0; z-index: 1000; position: relative;
+  display: flex; flex-direction: column;
+}
+.sidebar-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; padding: 0 8px; }
+.sidebar-brand-mark { width: 36px; height: 36px; background: linear-gradient(135deg, var(--gold), #8B6914); border-radius: 8px; display: flex; align-items: center; justify-content: center; font: 600 16px var(--ff-serif); color: #0A0B0E; }
+.sidebar-brand-name { font: 600 16px var(--ff-serif); }
+.sidebar-brand-name span { color: var(--gold); }
+
+.sidebar-nav { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.sidebar-nav a {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px; border-radius: 10px;
+  color: var(--muted); text-decoration: none;
+  font: 500 13px var(--ff-sans); transition: all 0.2s;
+}
+.sidebar-nav a:hover, .sidebar-nav a.active {
+  background: linear-gradient(90deg, rgba(201,168,76,0.08), rgba(45,212,191,0.03));
+  color: var(--text);
+}
+
+.sidebar-footer {
+  background: linear-gradient(135deg, rgba(201,168,76,0.06), rgba(45,212,191,0.03));
+  border: 1px solid rgba(255,255,255,0.03); border-radius: 10px;
+  padding: 12px 14px; margin-top: auto;
+}
+.sidebar-footer-title { font: 700 12px var(--ff-sans); color: var(--gold); margin-bottom: 6px; }
+.sidebar-footer-desc { font: 400 11px var(--ff-sans); color: var(--hint); margin-bottom: 8px; }
+.sidebar-footer-link { display: inline-block; font: 700 11px var(--ff-sans); color: var(--gold); text-decoration: none; }
+
+.content { flex: 1; display: flex; flex-direction: column; position: relative; z-index: 1; }
+
+.app-wrapper nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 28px; border-bottom: 1px solid var(--border);
+  background: rgba(10,11,14,0.7); backdrop-filter: blur(8px);
+  position: sticky; top: 0; z-index: 100;
+}
+.nav-left { display: flex; align-items: center; gap: 16px; }
+.hamburger-btn {
+  display: none; width: 40px; height: 40px; border: 1px solid var(--border);
+  background: rgba(255,255,255,0.03); border-radius: 8px;
+  color: var(--text); cursor: pointer; font-size: 20px; align-items: center; justify-content: center;
+}
+.nav-right { display: flex; align-items: center; gap: 16px; }
+.btn-new {
+  background: linear-gradient(135deg, var(--gold), #A07820); color: #0A0B0E;
+  font: 700 12px var(--ff-sans); padding: 10px 18px; border: none; border-radius: 8px;
+  cursor: pointer; text-decoration: none; display: flex; align-items: center; gap: 6px;
+  transition: all 0.2s; box-shadow: 0 2px 12px rgba(201,168,76,0.2);
+}
+.btn-new:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(201,168,76,0.35); }
+
+.user-profile { display: flex; align-items: center; gap: 12px; }
+.user-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--gold-bg); border: 1px solid var(--border-lit);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: var(--gold); overflow: hidden; flex-shrink: 0;
+}
+.user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.user-name { font: 500 13px var(--ff-sans); color: var(--text); }
+.btn-logout {
+  background: none; border: 1px solid var(--border); border-radius: 6px;
+  color: var(--muted); font: 600 12px var(--ff-sans); padding: 6px 12px;
+  cursor: pointer; transition: all 0.2s; text-decoration: none;
+}
+.btn-logout:hover { border-color: var(--red); color: var(--red); }
+
+.app-wrapper main { flex: 1; max-width: 1280px; width: 100%; margin: 0 auto; padding: 32px 28px 60px; position: relative; z-index: 1; }
+.welcome { margin-bottom: 28px; }
+.welcome h1 { font: 300 36px var(--ff-serif); margin-bottom: 4px; }
+.welcome p { font: 300 14px var(--ff-sans); color: var(--muted); }
+
+.backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 500; }
+
+@media (max-width: 1024px) {
+  .sidebar { width: 220px; padding: 20px 12px; }
+  .app-wrapper { flex-direction: column; }
+  .sidebar { position: fixed; left: 0; top: 0; bottom: 0; height: 100vh; transform: translateX(-100%); transition: transform 0.3s ease; border-right: none; border-bottom: none; z-index: 1001; width: 240px; }
+  .sidebar.open { transform: translateX(0); }
+  .content { margin-left: 0; }
+  .hamburger-btn { display: flex; }
+  .app-wrapper main { padding: 24px 16px 60px; }
+  .welcome h1 { font-size: 28px; }
+  .app-wrapper nav { padding: 14px 16px; }
+}
+@media (max-width: 480px) {
+  .user-name { display: none; }
+}

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Career Agent — Aptura AI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/aptura-theme.css">
+  <link rel="stylesheet" href="/static/premium-animations.css">
+  <style>
+    .app-wrapper main { max-width: 1040px; margin: 0 auto; padding: 32px 20px 80px; display: grid; gap: 20px; grid-template-columns: 320px 1fr; align-items: start; }
+    @media (max-width: 860px) { .app-wrapper main { grid-template-columns: 1fr; } }
+    .col-side { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 90px; }
+    @media (max-width: 860px) { .col-side { position: static; } }
+
+    /* ── Readiness card ─────────────────────────────────────────── */
+    .readiness-head { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+    .readiness-ring {
+      width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; flex-shrink: 0;
+      background: conic-gradient(var(--gold) calc(var(--pct, 0) * 1%), var(--elev) 0);
+      position: relative;
+    }
+    .readiness-ring::after { content: ''; position: absolute; inset: 5px; border-radius: 50%; background: var(--panel); }
+    .readiness-ring span { position: relative; font: 700 18px var(--serif); }
+    .readiness-title { font: 600 16px var(--serif); }
+    .readiness-sub { color: var(--muted); font-size: 12px; margin-top: 2px; }
+    .readiness-empty { color: var(--muted); font-size: 13px; line-height: 1.6; }
+    .action-list { list-style: none; padding: 0; margin-top: 6px; display: flex; flex-direction: column; gap: 8px; }
+    .action-list li { font-size: 12.5px; line-height: 1.5; padding-left: 16px; position: relative; color: var(--text); }
+    .action-list li::before { content: '\2192'; position: absolute; left: 0; color: var(--gold); }
+
+    /* ── Context panel ──────────────────────────────────────────── */
+    .ctx-section + .ctx-section { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-soft); }
+    .ctx-section textarea { min-height: 90px; resize: vertical; font-size: 13px; }
+    .ctx-row { display: flex; gap: 8px; }
+    .ctx-row input { flex: 1; }
+    .ctx-status { font-size: 11px; color: var(--hint); margin-top: 6px; }
+    .ctx-status.saved { color: var(--teal); }
+    .btn-sm { padding: 7px 11px; font-size: 12px; }
+
+    /* ── Chat panel ──────────────────────────────────────────────── */
+    .chat-panel { display: flex; flex-direction: column; height: 640px; padding: 0; overflow: hidden; }
+    .chat-thread { flex: 1; overflow-y: auto; padding: 22px; display: flex; flex-direction: column; gap: 16px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 22px 16px; }
+    .chip {
+      border: 1px solid var(--border); background: rgba(255,255,255,.03); color: var(--muted);
+      border-radius: 999px; padding: 7px 13px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: var(--sans);
+    }
+    .chip:hover { color: var(--text); border-color: rgba(201,168,76,.4); }
+
+    .msg { max-width: 82%; }
+    .msg.user { align-self: flex-end; }
+    .msg.assistant { align-self: flex-start; }
+    .msg-bubble { padding: 12px 15px; border-radius: 14px; font-size: 13.5px; line-height: 1.55; }
+    .msg.user .msg-bubble { background: linear-gradient(135deg, var(--gold), var(--gold-dark)); color: #0A0B0E; font-weight: 600; border-bottom-right-radius: 4px; }
+    .msg.assistant .msg-bubble { background: var(--elev); border: 1px solid var(--border-soft); border-bottom-left-radius: 4px; }
+    .msg.assistant.error .msg-bubble { border-color: rgba(220,120,90,.3); background: rgba(220,120,90,.07); color: #E8B4A0; }
+
+    .typing-dots { display: inline-flex; gap: 4px; padding: 2px 0; }
+    .typing-dots span { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); animation: typing-bounce 1.1s infinite ease-in-out; }
+    .typing-dots span:nth-child(2) { animation-delay: .15s; }
+    .typing-dots span:nth-child(3) { animation-delay: .3s; }
+    @keyframes typing-bounce { 0%, 60%, 100% { transform: translateY(0); opacity: .5; } 30% { transform: translateY(-4px); opacity: 1; } }
+
+    .activity-trail { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    .activity-trail span { font-size: 10.5px; color: var(--hint); background: rgba(255,255,255,.04); border-radius: 999px; padding: 3px 9px; }
+
+    .result-card + .result-card { margin-top: 12px; }
+    .result-head { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .score-pill {
+      display: inline-flex; align-items: center; justify-content: center; min-width: 42px; height: 42px; padding: 0 8px;
+      border-radius: 12px; font: 700 16px var(--serif); background: var(--panel); border: 1px solid var(--border); flex-shrink: 0;
+    }
+    .score-pill.strong-hire { color: var(--gold); border-color: rgba(201,168,76,.4); }
+    .score-pill.hire { color: var(--teal); border-color: rgba(45,212,191,.35); }
+    .result-title { font-weight: 700; font-size: 13.5px; }
+    .result-sub { color: var(--muted); font-size: 11.5px; }
+    .result-summary { color: var(--text); font-size: 13px; line-height: 1.6; margin-bottom: 10px; }
+    .block-title { font-size: 10.5px; text-transform: uppercase; letter-spacing: .5px; color: var(--hint); margin: 10px 0 6px; }
+    .result-card ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 5px; }
+    .result-card li { font-size: 12.5px; padding-left: 14px; position: relative; }
+    .result-card li::before { content: '\2014'; position: absolute; left: 0; color: var(--hint); }
+
+    .before-after { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 4px; }
+    @media (max-width: 620px) { .before-after { grid-template-columns: 1fr; } }
+    .ba-col { background: var(--panel); border: 1px solid var(--border-soft); border-radius: 8px; padding: 10px; font-size: 11.5px; max-height: 160px; overflow-y: auto; white-space: pre-wrap; line-height: 1.5; }
+    .ba-label { font-size: 10px; text-transform: uppercase; color: var(--hint); margin-bottom: 6px; letter-spacing: .5px; }
+
+    .composer { display: flex; gap: 10px; padding: 16px 22px; border-top: 1px solid var(--border); }
+    .composer input { flex: 1; }
+    .composer button { flex-shrink: 0; }
+  </style>
+</head>
+<body>
+<div class="app-wrapper">
+  {% include "_app_sidebar.html" %}
+  <div class="content">
+    <nav>
+      <div class="nav-left">
+        <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle menu">☰</button>
+      </div>
+      <div class="nav-right">
+        <a href="/screen" class="btn-new">+ New Screening</a>
+        {% include "_app_user_menu.html" %}
+      </div>
+    </nav>
+
+    <main>
+    <div class="col-side">
+      <!-- Career readiness -->
+      <div class="panel" id="readiness-card">
+        {% set analysis = profile.latest_analysis_json %}
+        {% if analysis and analysis.score is not none %}
+          <div class="readiness-head">
+            <div class="readiness-ring" style="--pct: {{ analysis.score }};"><span>{{ analysis.score }}</span></div>
+            <div>
+              <div class="readiness-title">Career readiness</div>
+              <div class="readiness-sub">{{ analysis.recommendation or 'Based on your latest resume' }}</div>
+            </div>
+          </div>
+          <div class="block-title">Do this next</div>
+          <ul class="action-list" id="readiness-actions">
+            {% set gap = profile.latest_skill_gap_json %}
+            {% set steps = (gap.recommendedNextSteps if gap else None) or analysis.recommended_improvements or [] %}
+            {% for step in steps[:4] %}<li>{{ step }}</li>{% endfor %}
+            {% if not steps %}<li>Ask the agent to find your skill gaps for a target role.</li>{% endif %}
+          </ul>
+        {% else %}
+          <div class="readiness-title" style="margin-bottom:8px;">Career readiness</div>
+          <p class="readiness-empty">You haven't analyzed a resume yet. Add yours below, then ask the agent to analyze it — your readiness score and action list will show up here.</p>
+        {% endif %}
+      </div>
+
+      <!-- Context panel -->
+      <div class="panel">
+        <div class="ctx-section">
+          <label for="ctx-resume">Your resume</label>
+          <textarea id="ctx-resume" placeholder="Paste your resume text here...">{{ profile.resume_text or '' }}</textarea>
+          <div class="ctx-row" style="margin-top:8px;">
+            <input type="file" id="ctx-resume-file" accept=".pdf,.docx,.txt" hidden />
+            <button type="button" class="btn btn-sm" id="ctx-upload-btn">Upload file</button>
+            <button type="button" class="btn btn-sm" id="ctx-save-btn">Save</button>
+          </div>
+          <div class="ctx-status" id="ctx-resume-status">{% if profile.resume_filename %}Saved from {{ profile.resume_filename }}{% endif %}</div>
+        </div>
+        <div class="ctx-section">
+          <label for="ctx-target-role">Target role</label>
+          <input type="text" id="ctx-target-role" value="{{ profile.target_role or '' }}" placeholder="e.g. Senior Backend Engineer" />
+        </div>
+        <div class="ctx-section">
+          <label for="ctx-job-title">Job you're going for (optional)</label>
+          <div class="ctx-row" style="margin-bottom:8px;">
+            <input type="text" id="ctx-job-title" placeholder="Job title" />
+            <input type="text" id="ctx-company" placeholder="Company" />
+          </div>
+          <textarea id="ctx-job-description" placeholder="Paste the job description to unlock matching, gap analysis, and cover letters."></textarea>
+        </div>
+        <div class="ctx-section">
+          <label for="ctx-skills">Required skills (comma-separated)</label>
+          <input type="text" id="ctx-skills" placeholder="e.g. Python, AWS, System design" />
+        </div>
+      </div>
+    </div>
+
+    <div class="col-main">
+      <div class="panel chat-panel">
+        <div class="chat-thread" id="chat-thread">
+          <div class="msg assistant">
+            <div class="msg-bubble">Hi{{ ' ' + user.name if user.name else '' }} — I'm your Aptura career agent. Fill in your resume on the left (or paste it right here), then ask me anything: analyze your resume, compare it to a job, find skill gaps, build a plan, or write a cover letter.</div>
+          </div>
+        </div>
+        <div class="chips">
+          <button class="chip" data-msg="Analyze my resume">Analyze my resume</button>
+          <button class="chip" data-msg="How well do I match this job?">Match this job</button>
+          <button class="chip" data-msg="What are my skill gaps for this role?">Find skill gaps</button>
+          <button class="chip" data-msg="Build me a career plan">Build a career plan</button>
+          <button class="chip" data-msg="Write me a cover letter for this job">Write a cover letter</button>
+          <button class="chip" data-msg="Improve my resume">Improve my resume</button>
+        </div>
+        <form class="composer" id="composer">
+          <input type="text" id="chat-input" placeholder="Ask the agent anything..." autocomplete="off" />
+          <button type="submit" class="btn btn-primary">Send</button>
+        </form>
+      </div>
+    </div>
+  </main>
+  </div>
+</div>
+<div class="backdrop" id="backdrop"></div>
+
+  <script id="latest-match-seed" type="application/json">{{ (latest_match or {}) | tojson }}</script>
+  <script src="/static/js/app-shell.js" defer></script>
+  <script src="/static/js/career-agent.js" defer></script>
+{% include "_webmcp.html" %}
+</body>
+</html>

@@ -1,0 +1,27 @@
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-mark">A</div>
+      <div class="sidebar-brand-name">Ap<span>tura</span></div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="/agent">Aptura Agent</a>
+      <a href="/recruiter">Recruiter Workspace</a>
+      <a href="/dashboard">🏠 Dashboard</a>
+      <a href="/screen">📄 Screenings</a>
+      <a href="/resume-builder">📝 Resume Builder</a>
+      <a href="/plans">💎 Plans & Upgrade</a>
+      <a href="/analytics">📊 Analytics</a>
+      {% if is_admin %}
+      <a href="/admin">🛡️ Admin</a>
+      {% endif %}
+      <a href="/contact">📧 Support</a>
+      <a href="/settings">⚙️ Settings</a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-footer-title">{{ tier or 'FREE' }} Plan</div>
+      <div class="sidebar-footer-desc">{% if tier == 'PRO' or tier == 'ENTERPRISE' %}Premium active{% else %}5 free screenings/month{% endif %}</div>
+      <a href="/plans" class="sidebar-footer-link">Upgrade →</a>
+    </div>
+  </aside>

@@ -1,0 +1,11 @@
+        <div class="user-profile">
+          <div class="user-avatar">
+            {% if user.avatar_url %}
+              <img src="{{ user.avatar_url }}" alt="{{ user.name }}">
+            {% else %}
+              {{ (user.name or user.email)[:2] | upper }}
+            {% endif %}
+          </div>
+          <span class="user-name">{{ user.name or user.email.split('@')[0] }}</span>
+        </div>
+        <a href="/auth/logout" class="btn-logout">Sign out</a>

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Screen Resumes — Aptura AI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/aptura-theme.css">
+  <link rel="stylesheet" href="/static/premium-animations.css">
+  <style>
+    .app-wrapper main { max-width: 900px; margin: 0 auto; padding: 40px 20px 80px; }
+    .page-head h1 { font: 500 34px/1.15 var(--serif); margin-bottom: 6px; }
+    .page-head p { color: var(--muted); font-size: 15px; line-height: 1.6; margin-bottom: 26px; }
+
+    .quota-pill {
+      display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px;
+      border-radius: 999px; border: 1px solid var(--border); background: rgba(255,255,255,.03);
+      color: var(--muted); font-size: 12px; font-weight: 700;
+    }
+    .quota-pill.low { color: var(--gold); border-color: rgba(201,168,76,.35); }
+    .quota-pill.unlimited { color: var(--teal); border-color: rgba(45,212,191,.35); }
+
+    /* ── Setup form ─────────────────────────────────────────────── */
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+    @media (max-width: 560px) { .field-row { grid-template-columns: 1fr; } }
+    textarea { min-height: 130px; resize: vertical; font-family: var(--sans); line-height: 1.5; }
+    .char-count { text-align: right; font-size: 11px; color: var(--hint); margin-top: 4px; }
+
+    .dropzone {
+      margin-top: 6px; border: 1.5px dashed var(--border); border-radius: var(--radius);
+      padding: 28px 18px; text-align: center; cursor: pointer; background: rgba(255,255,255,.015);
+      transition: border-color .2s ease, background .2s ease;
+    }
+    .dropzone.drag { border-color: var(--gold); background: rgba(201,168,76,.06); }
+    .dropzone .dz-title { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+    .dropzone .dz-sub { color: var(--hint); font-size: 12px; }
+
+    .file-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    .file-chip {
+      display: inline-flex; align-items: center; gap: 8px; background: var(--elev);
+      border: 1px solid var(--border); border-radius: 999px; padding: 6px 6px 6px 12px; font-size: 12px;
+    }
+    .file-chip button {
+      all: unset; cursor: pointer; width: 18px; height: 18px; display: grid; place-items: center;
+      border-radius: 50%; color: var(--muted); font-size: 14px; line-height: 1;
+    }
+    .file-chip button:hover { background: rgba(255,255,255,.08); color: var(--text); }
+
+    #form-error {
+      margin-top: 14px; padding: 10px 14px; border-radius: var(--radius-sm);
+      border: 1px solid rgba(220,120,90,.3); background: rgba(220,120,90,.08); color: #E8B4A0; font-size: 13px;
+    }
+
+    .setup-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 22px; flex-wrap: wrap; }
+    .setup-footer .btn-primary { padding: 12px 22px; font-size: 14px; }
+
+    /* ── Theater ────────────────────────────────────────────────── */
+    #theater { margin-top: 8px; }
+    .theater-head { margin-bottom: 18px; }
+    .theater-head h2 { font: 500 26px var(--serif); }
+    .theater-head .theater-sub { color: var(--muted); font-size: 13px; margin-top: 4px; }
+
+    .progress-track { height: 6px; border-radius: 999px; background: var(--elev); overflow: hidden; margin-top: 14px; }
+    .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--gold-dark), var(--gold)); transition: width .5s cubic-bezier(.16,1,.3,1); }
+    .progress-meta { display: flex; justify-content: space-between; font-size: 12px; color: var(--hint); margin-top: 8px; }
+    #now-reading { color: var(--gold); }
+
+    .board { display: flex; flex-direction: column; gap: 10px; margin-top: 22px; }
+    .theater-row {
+      display: grid; grid-template-columns: 44px 1fr 52px 120px auto; align-items: center; gap: 14px;
+      background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius-sm);
+      padding: 12px 16px;
+    }
+    @media (max-width: 620px) { .theater-row { grid-template-columns: 32px 1fr 44px; } .theater-row .row-badge, .theater-row .row-actions { grid-column: 2 / -1; } }
+    .theater-row.row-enter { animation: row-enter .5s cubic-bezier(.16,1,.3,1) both; }
+    @keyframes row-enter { from { opacity: 0; transform: translateY(10px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+    .rank-num { font: 600 16px var(--serif); color: var(--hint); }
+    .row-name { font-weight: 700; font-size: 14px; }
+    .row-file { font-size: 11px; color: var(--hint); margin-top: 2px; }
+    .row-score { font: 700 18px var(--serif); text-align: center; }
+    .row-badge {
+      text-align: center; padding: 6px 10px; border-radius: 999px; font-size: 11px; font-weight: 800;
+      letter-spacing: .3px; border: 1px solid transparent;
+    }
+    .row-badge.strong-hire { background: rgba(201,168,76,.14); color: var(--gold); border-color: rgba(201,168,76,.35); position: relative; overflow: hidden; }
+    .row-badge.strong-hire::after {
+      content: ''; position: absolute; inset: -50%; background: linear-gradient(120deg, transparent 40%, rgba(255,255,255,.5), transparent 60%);
+      transform: translateX(-120%); animation: badge-sheen 2.2s ease-in-out .3s 1;
+    }
+    @keyframes badge-sheen { to { transform: translateX(120%); } }
+    .row-badge.hire { background: rgba(45,212,191,.12); color: var(--teal); border-color: rgba(45,212,191,.3); }
+    .row-badge.maybe { background: rgba(255,255,255,.04); color: var(--muted); border-color: var(--border); }
+    .row-badge.no-hire { background: transparent; color: var(--hint); border-color: var(--border-soft); }
+
+    .row-actions { display: flex; gap: 6px; }
+    .row-expand {
+      background: none; border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--muted);
+      font-size: 11px; font-weight: 700; padding: 7px 10px; cursor: pointer; font-family: var(--sans);
+    }
+    .row-expand:hover { color: var(--text); border-color: rgba(255,255,255,.2); }
+    .row-shortlist {
+      background: none; border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--muted);
+      font-size: 11px; font-weight: 700; padding: 7px 10px; cursor: pointer; font-family: var(--sans); white-space: nowrap;
+    }
+    .row-shortlist:hover:not(:disabled) { color: var(--gold); border-color: rgba(201,168,76,.4); }
+    .row-shortlist.on { color: var(--gold); border-color: rgba(201,168,76,.4); background: rgba(201,168,76,.08); cursor: default; }
+
+    .row-detail {
+      background: var(--elev); border: 1px solid var(--border-soft); border-radius: var(--radius-sm);
+      padding: 16px 18px; margin-top: -4px; animation: row-enter .3s cubic-bezier(.16,1,.3,1) both;
+    }
+    .detail-summary { color: var(--muted); font-size: 13px; line-height: 1.6; margin-bottom: 14px; }
+    .detail-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    @media (max-width: 620px) { .detail-grid { grid-template-columns: 1fr; } }
+    .detail-grid h4 { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: var(--hint); margin-bottom: 8px; }
+    .detail-grid ul { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+    .detail-grid li { font-size: 12px; color: var(--text); padding-left: 12px; position: relative; }
+    .detail-grid li::before { content: '—'; position: absolute; left: 0; color: var(--hint); }
+
+    #error-list { margin-top: 18px; border: 1px solid rgba(220,120,90,.25); background: rgba(220,120,90,.06); border-radius: var(--radius-sm); padding: 14px 16px; }
+    .error-title { font-weight: 700; font-size: 12px; color: #E8B4A0; margin-bottom: 8px; }
+    .error-row { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  </style>
+</head>
+<body>
+<div class="app-wrapper">
+  {% include "_app_sidebar.html" %}
+  <div class="content">
+    <nav>
+      <div class="nav-left">
+        <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle menu">☰</button>
+      </div>
+      <div class="nav-right">
+        <span class="quota-pill {% if quota.limit is none %}unlimited{% elif quota.remaining <= 1 %}low{% endif %}" id="quota-pill">
+          {% if quota.limit is none %}Enterprise · Unlimited screenings{% else %}{{ quota.remaining }} of {{ quota.limit }} screenings left this month{% endif %}
+        </span>
+        <a href="/agent" class="btn-new">Ask Aptura Agent</a>
+        {% include "_app_user_menu.html" %}
+      </div>
+    </nav>
+
+    <main>
+    <section id="setup-panel">
+      <div class="page-head">
+        <h1>Screen resumes</h1>
+        <p>Paste the job, drop the resumes. Aptura reads each one and ranks them live as it goes.</p>
+      </div>
+
+      <form id="screening-form" class="panel">
+        <div class="field-row">
+          <div>
+            <label for="job_title">Job title</label>
+            <input type="text" id="job_title" name="job_title" placeholder="Senior Backend Engineer" maxlength="255" />
+          </div>
+          <div>
+            <label for="company_name">Company</label>
+            <input type="text" id="company_name" name="company_name" placeholder="Acme Inc." maxlength="255" />
+          </div>
+        </div>
+
+        <label for="job_description">Job description</label>
+        <textarea id="job_description" name="job_description" maxlength="20000" placeholder="Paste the full job description — responsibilities, requirements, and any must-have skills." required></textarea>
+        <div class="char-count"><span id="char-count">0</span> / 20,000</div>
+
+        <label style="margin-top:18px;">Resumes</label>
+        <div class="dropzone" id="dropzone">
+          <div class="dz-title">Drop resumes here, or click to browse</div>
+          <div class="dz-sub">PDF, DOCX, or TXT · up to 10MB each · up to 50 files</div>
+        </div>
+        <input type="file" id="file-input" accept=".pdf,.docx,.txt" multiple hidden />
+        <div class="file-chips" id="file-chips"></div>
+
+        <div id="form-error" hidden></div>
+
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+        <div class="setup-footer">
+          <span style="color:var(--hint); font-size:12px;">Each screening counts toward your monthly plan limit.</span>
+          <button type="submit" class="btn btn-primary" id="start-btn" disabled>Start screening →</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="theater" hidden>
+      <div class="theater-head">
+        <h2 id="theater-title"></h2>
+        <div class="theater-sub"><span id="now-reading"></span></div>
+        <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+        <div class="progress-meta">
+          <span id="progress-label">0 / 0 read</span>
+          <a href="/screen" style="color:var(--hint);">New screening</a>
+        </div>
+      </div>
+      <div class="board" id="board"></div>
+      <div id="error-list" hidden></div>
+    </section>
+  </main>
+  </div>
+</div>
+<div class="backdrop" id="backdrop"></div>
+
+  {% if past_result %}
+  <script id="theater-seed" type="application/json">{{ past_result | tojson }}</script>
+  {% endif %}
+  <script src="/static/js/app-shell.js" defer></script>
+  <script src="/static/js/screening-theater.js" defer></script>
+{% include "_webmcp.html" %}
+</body>
+</html>
