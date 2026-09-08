@@ -14,7 +14,7 @@ import security as auth
 from database import get_db
 from resume_builder_router import PROMPT as RESUME_BUILDER_PROMPT
 from resume_builder_router import _chat_json
-from screen_router import extract_text, screen_with_openai
+from screen_router import extract_text, screen_with_gemini
 
 
 logger = logging.getLogger(__name__)
