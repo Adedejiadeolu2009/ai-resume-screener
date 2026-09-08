@@ -17,6 +17,7 @@ from resume_builder_router import _chat_json
 from screen_router import extract_text, screen_with_gemini
 
 
+
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/webmcp", tags=["webmcp"])
 
