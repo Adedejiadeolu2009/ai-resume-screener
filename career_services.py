@@ -11,16 +11,15 @@ from sqlalchemy.orm import Session
 import models
 from resume_builder_router import PROMPT as RESUME_BUILDER_PROMPT
 from resume_builder_router import _chat_json
-from screen_router import extract_text, screen_with_openai
+from screen_router import extract_text, screen_with_gemini
 
 
 def ai_key() -> str:
-    return (
-        os.getenv("OPENAI_API_KEY", "").strip()
-        or os.getenv("DEEPSEEK_API_KEY", "").strip()
-        or os.getenv("GROQ_API_KEY", "").strip()
-        or os.getenv("GEMINI_API_KEY", "").strip()
-    )
+    # screen_with_gemini (the actual screening function in your real
+    # screen_router.py) only accepts a Gemini key, so this must resolve
+    # GEMINI_API_KEY specifically — not just "any AI key exists" the way
+    # the old OPENAI/DEEPSEEK/GROQ-first order implied.
+    return os.getenv("GEMINI_API_KEY", "").strip()
 
 
 def latest_candidate(db: Session, user_id: int) -> models.Candidate | None:
@@ -105,7 +104,7 @@ def analyze_resume(db: Session, user: models.User, resume_text: str | None = Non
     key = ai_key()
     if not key:
         raise HTTPException(500, "AI service is not configured.")
-    result = screen_with_openai(
+    result = screen_with_gemini(
         key,
         (job_description or default_job_description(db, user)).strip(),
         text,
@@ -207,7 +206,7 @@ def match_resume_to_job(db: Session, user: models.User, job_title: str, company:
     job_context = f"Job title: {job_title}\nCompany: {company or 'Not specified'}\n\n{job_description}"
     if skills:
         job_context += "\n\nRequired skills:\n" + "\n".join(f"- {skill}" for skill in skills)
-    result = screen_with_openai(key, job_context, text, user.name or "Current resume")
+    result = screen_with_gemini(key, job_context, text, user.name or "Current resume")
     normalized = normalize_screening_result(result)
     payload = {
         "job_title": job_title,
