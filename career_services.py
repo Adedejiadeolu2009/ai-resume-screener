@@ -11,15 +11,14 @@ from sqlalchemy.orm import Session
 import models
 from resume_builder_router import PROMPT as RESUME_BUILDER_PROMPT
 from resume_builder_router import _chat_json
-from screen_router import extract_text, screen_with_gemini
+from screen_router import extract_text, resolve_ai_provider
 
 
 def ai_key() -> str:
-    # screen_with_gemini (the actual screening function in your real
-    # screen_router.py) only accepts a Gemini key, so this must resolve
-    # GEMINI_API_KEY specifically — not just "any AI key exists" the way
-    # the old OPENAI/DEEPSEEK/GROQ-first order implied.
-    return os.getenv("GEMINI_API_KEY", "").strip()
+    # Kept for backward compatibility with anything still calling it, but
+    # resolve_ai_provider() (screen_router.py) is the real source of truth
+    # for which provider actually runs — Groq only now, no Gemini.
+    return os.getenv("GROQ_API_KEY", "").strip()
 
 
 def latest_candidate(db: Session, user_id: int) -> models.Candidate | None:
@@ -101,11 +100,10 @@ def analyze_resume(db: Session, user: models.User, resume_text: str | None = Non
     text = current_resume_text(db, user, resume_text)
     if len(text) < 50:
         raise HTTPException(400, "Upload, paste, or save resume text before analysis.")
-    key = ai_key()
-    if not key:
+    provider, screen_fn = resolve_ai_provider()
+    if not screen_fn:
         raise HTTPException(500, "AI service is not configured.")
-    result = screen_with_gemini(
-        key,
+    result = screen_fn(
         (job_description or default_job_description(db, user)).strip(),
         text,
         (candidate_name or user.name or "Current resume").strip(),
@@ -199,14 +197,14 @@ def match_resume_to_job(db: Session, user: models.User, job_title: str, company:
     text = current_resume_text(db, user, resume_text)
     if len(text) < 50:
         raise HTTPException(400, "Upload, paste, or save resume text before matching a job.")
-    key = ai_key()
-    if not key:
+    provider, screen_fn = resolve_ai_provider()
+    if not screen_fn:
         raise HTTPException(500, "AI service is not configured.")
     skills = dedupe_skills(required_skills or [])
     job_context = f"Job title: {job_title}\nCompany: {company or 'Not specified'}\n\n{job_description}"
     if skills:
         job_context += "\n\nRequired skills:\n" + "\n".join(f"- {skill}" for skill in skills)
-    result = screen_with_gemini(key, job_context, text, user.name or "Current resume")
+    result = screen_fn(job_context, text, user.name or "Current resume")
     normalized = normalize_screening_result(result)
     payload = {
         "job_title": job_title,

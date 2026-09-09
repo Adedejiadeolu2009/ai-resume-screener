@@ -8,21 +8,9 @@ import traceback
 from celery_worker import celery_app
 from database import SessionLocal
 import models
-from screen_router import extract_text, screen_with_openai
+from screen_router import extract_text, resolve_ai_provider
 
 logger = logging.getLogger(__name__)
-
-
-def _resolve_ai_key() -> str:
-    # Your real setup only configures GEMINI_API_KEY. Kept as a fallback
-    # chain (harmless) in case you add other providers later, but Gemini
-    # is what's actually wired up right now.
-    return (
-        os.environ.get("GEMINI_API_KEY", "").strip()
-        or os.environ.get("OPENAI_API_KEY", "").strip()
-        or os.environ.get("DEEPSEEK_API_KEY", "").strip()
-        or os.environ.get("GROQ_API_KEY", "").strip()
-    )
 
 
 def process_screening(screening_id: int, files: list[dict]) -> dict:
@@ -48,9 +36,9 @@ def process_screening(screening_id: int, files: list[dict]) -> dict:
         db.commit()
 
         job = screening.job
-        api_key = _resolve_ai_key()
-        if not api_key:
-            raise RuntimeError("AI service is not configured. Set GEMINI_API_KEY in .env.")
+        provider, screen_fn = resolve_ai_provider()
+        if not screen_fn:
+            raise RuntimeError("AI service is not configured. Set GROQ_API_KEY.")
 
         for item in files:
             candidate = db.query(models.Candidate).filter(
@@ -80,8 +68,7 @@ def process_screening(screening_id: int, files: list[dict]) -> dict:
                 if len(resume_text.strip()) < 50:
                     raise ValueError("Could not extract enough text from this file.")
 
-                result = screen_with_gemini(
-                    api_key,
+                result = screen_fn(
                     job.description,
                     resume_text,
                     candidate_name,

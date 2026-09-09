@@ -1,8 +1,8 @@
 """
 routers/screen_router.py — Resume Screening Routes
 =====================================================
-Uses Google Gemini API — completely free tier, no dollar payment needed.
-Free limit: 1,500 requests/day which is plenty for a growing business.
+Screens resumes via Groq, using the OpenAI SDK pointed at Groq's
+OpenAI-compatible endpoint (https://api.groq.com/openai/v1).
 
 Screening runs on a Celery worker instead of blocking the request:
 POST /api/screen creates the Screening + Candidate rows (status=QUEUED,
@@ -40,6 +40,8 @@ router = APIRouter(prefix="/api", tags=["screening"])
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB per file
 MAX_FILES = 50
 ALLOWED_EXTENSIONS = {'.pdf', '.docx', '.doc', '.txt'}
+
+DEFAULT_GROQ_MODEL = "openai/gpt-oss-20b"
 
 
 # ── Text Extraction ───────────────────────────────────────────────────────────
@@ -113,37 +115,59 @@ Return ONLY this JSON structure with no other text before or after it:
 The recommendation field must be one of: "Strong Hire", "Hire", "Maybe", "No Hire"."""
 
 
-def screen_with_gemini(api_key: str, job_description: str,
-                       resume_text: str, candidate_name: str) -> dict:
-    """Use Google Gemini (free) to screen a resume."""
-    from google import genai
-    from google.genai import types
+def screen_with_groq(api_key: str, job_description: str,
+                     resume_text: str, candidate_name: str) -> dict:
+    """
+    Screen a resume via Groq, using the OpenAI SDK pointed at Groq's
+    OpenAI-compatible endpoint — chat.completions.create, the older and
+    more battle-tested shape (swapped from responses.create on request).
+    """
+    from openai import OpenAI
 
-    client = genai.Client(api_key=api_key)
+    client = OpenAI(api_key=api_key, base_url="https://api.groq.com/openai/v1")
 
     prompt = PROMPT.format(
         job_description=job_description,
         resume_text=resume_text[:8000],
         candidate_name=candidate_name
     )
+    model = (os.environ.get("GROQ_MODEL_NAME") or DEFAULT_GROQ_MODEL).strip()
 
-    response = client.models.generate_content(
-        model="gemini-2.0-flash",   # Free tier, fast and smart
-        contents=prompt,
-        config=types.GenerateContentConfig(
-            temperature=0.2,        # Low temperature = more consistent JSON output
-        )
+    response = client.chat.completions.create(
+        model=model,
+        messages=[
+            {"role": "system", "content": "Return ONLY valid JSON. No markdown, no commentary, no text outside the JSON object."},
+            {"role": "user", "content": prompt},
+        ],
+        temperature=0.2,
     )
 
-    raw = response.text.strip()
+    raw = response.choices[0].message.content.strip()
 
-    # Strip markdown fences if Gemini added them
+    # Strip markdown fences if the model added them anyway
     if raw.startswith("```"):
         lines = raw.split("\n")
         raw = "\n".join(lines[1:-1] if lines[-1].strip()
                         == "```" else lines[1:])
 
     return json.loads(raw.strip())
+
+
+def resolve_ai_provider():
+    """
+    Single source of truth for which AI provider actually screens resumes —
+    every other file (screening_tasks.py, career_services.py) calls this
+    instead of hardcoding a provider, so they can't drift out of sync again.
+    Returns (provider_name, call_fn) where
+    call_fn(job_description, resume_text, candidate_name) -> dict,
+    or (None, None) if GROQ_API_KEY isn't set.
+    """
+    groq_key = os.environ.get("GROQ_API_KEY", "").strip()
+    if groq_key:
+        def _call(job_description, resume_text, candidate_name):
+            return screen_with_groq(groq_key, job_description, resume_text, candidate_name)
+        return "groq", _call
+    return None, None
 
 
 # ── Main Screening Route ──────────────────────────────────────────────────────
@@ -181,9 +205,9 @@ async def screen_resumes(
     if not file_payloads:
         raise HTTPException(400, "At least one resume file is required.")
 
-    resolved_key = os.environ.get("GEMINI_API_KEY", "").strip()
-    if not resolved_key:
-        raise HTTPException(500, "AI service is not configured. Please contact support.")
+    provider, _ = resolve_ai_provider()
+    if not provider:
+        raise HTTPException(500, "AI service is not configured. Set GROQ_API_KEY in your environment.")
 
     # ── Save job to DB ────────────────────────────────────────────────────────
     job = db.query(models.Job).filter(
