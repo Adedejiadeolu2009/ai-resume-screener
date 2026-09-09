@@ -8,7 +8,7 @@ import traceback
 from celery_worker import celery_app
 from database import SessionLocal
 import models
-from screen_router import extract_text, screen_with_gemini
+from screen_router import extract_text, screen_with_openai
 
 logger = logging.getLogger(__name__)
 

@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 import models
 from resume_builder_router import PROMPT as RESUME_BUILDER_PROMPT
 from resume_builder_router import _chat_json
-from screen_router import extract_text, screen_with_gemini
+from screen_router import extract_text, screen_with_openai
 
 
 def ai_key() -> str:
