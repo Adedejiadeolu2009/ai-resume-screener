@@ -106,16 +106,33 @@
     thread.scrollTop = thread.scrollHeight;
   }
 
+  const THINKING_LABELS = [
+    "Reading your resume\u2026",
+    "Weighing the evidence\u2026",
+    "Cross-checking the role\u2026",
+    "Drafting a straight answer\u2026",
+  ];
+
   function addAssistantTyping() {
     const el = document.createElement("div");
     el.className = "msg assistant";
-    el.innerHTML = `<div class="msg-bubble"><span class="typing-dots"><span></span><span></span><span></span></span></div>`;
+    el.innerHTML = `<div class="msg-bubble"><span class="agent-pulse"><span class="bars"><span></span><span></span><span></span><span></span><span></span></span><span class="pulse-label">${THINKING_LABELS[0]}</span></span></div>`;
     thread.appendChild(el);
     thread.scrollTop = thread.scrollHeight;
+
+    let i = 0;
+    const label = el.querySelector(".pulse-label");
+    const timer = setInterval(() => {
+      i = (i + 1) % THINKING_LABELS.length;
+      if (label) label.textContent = THINKING_LABELS[i];
+      else clearInterval(timer);
+    }, 1400);
+    el._pulseTimer = timer;
     return el;
   }
 
   function setAssistantHtml(el, html, isError) {
+    if (el._pulseTimer) clearInterval(el._pulseTimer);
     el.className = "msg assistant" + (isError ? " error" : "");
     el.querySelector(".msg-bubble").innerHTML = html;
     thread.scrollTop = thread.scrollHeight;

@@ -256,19 +256,40 @@
   function rowInner(r, rank) {
     const cls = tierClass(r.recommendation);
     const isShortlisted = shortlisted.has(String(r.candidate_id));
+    const isStrong = cls === "strong-hire";
     return `
       <div class="rank"><span class="rank-num">#${rank}</span></div>
       <div class="row-main">
         <div class="row-name">${escapeHtml(r.candidate_name || r.filename || "Candidate")}</div>
         <div class="row-file">${escapeHtml(r.filename || "")}</div>
       </div>
-      <div class="row-score">${r.overall_score != null ? r.overall_score : "\u2014"}</div>
-      <div class="row-badge ${cls}">${escapeHtml(r.recommendation || "\u2014")}</div>
+      <div class="row-score" data-target="${r.overall_score != null ? r.overall_score : ""}">${r.overall_score != null ? 0 : "\u2014"}</div>
+      <div class="row-badge ${cls}${isStrong ? " stamp-in" : ""}">${escapeHtml(r.recommendation || "\u2014")}</div>
       <div class="row-actions">
         <button type="button" class="row-shortlist${isShortlisted ? " on" : ""}" ${isShortlisted ? "disabled" : ""}>${isShortlisted ? "\u2605 Shortlisted" : "\u2606 Shortlist"}</button>
         <button type="button" class="row-expand">Details</button>
       </div>
     `;
+  }
+
+  // Counts a score up from 0 to its target instead of just appearing —
+  // a small thing, but it's the difference between a number that arrives
+  // and a number that feels like it was just computed.
+  function animateScoreCountUp(row) {
+    const el = row.querySelector(".row-score");
+    if (!el) return;
+    const target = Number(el.dataset.target);
+    if (!Number.isFinite(target)) return;
+    const duration = 900;
+    const start = performance.now();
+    function tick(now) {
+      const t = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - t, 3); // ease-out-cubic
+      el.textContent = Math.round(target * eased);
+      if (t < 1) requestAnimationFrame(tick);
+      else el.textContent = target;
+    }
+    requestAnimationFrame(tick);
   }
 
   function buildRow(r, rank) {
@@ -352,8 +373,11 @@
       const id = row.dataset.candidateId;
       const prev = prevRects[id];
       if (!prev) {
+        const isStrong = row.querySelector(".row-badge")?.classList.contains("strong-hire");
         row.classList.add("row-enter");
-        setTimeout(() => row.classList.remove("row-enter"), 550);
+        if (isStrong) row.classList.add("tier-glow");
+        animateScoreCountUp(row);
+        setTimeout(() => row.classList.remove("row-enter", "tier-glow"), 900);
         return;
       }
       const next = row.getBoundingClientRect();
