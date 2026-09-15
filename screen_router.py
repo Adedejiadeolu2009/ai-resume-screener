@@ -4,29 +4,23 @@ routers/screen_router.py — Resume Screening Routes
 Screens resumes via Groq, using the OpenAI SDK pointed at Groq's
 OpenAI-compatible endpoint (https://api.groq.com/openai/v1).
 
-Screening runs on a Celery worker instead of blocking the request:
-POST /api/screen creates the Screening + Candidate rows (status=QUEUED,
-with each file's content stashed as base64 on the row) and dispatches a
-Celery task, then returns immediately with a screening_id. The worker
-(screening_tasks.py) processes each resume and updates the Candidate rows
-as it goes. GET /api/screening/{id} reports live progress so the frontend
-can poll it and show results as they land.
-
-Running this requires, in addition to `python main.py`:
-  1) A Redis server actually running (not just the `redis` pip package —
-     that's just the client library). Locally: `redis-server`, or via Docker.
-  2) A Celery worker process: `celery -A celery_worker.celery_app worker --loglevel=info`
-Both need to be running alongside the web server for screenings to process.
+Screening runs via FastAPI's built-in BackgroundTasks — no Redis, no
+separate worker process. POST /api/screen creates the Screening +
+Candidate rows (status=QUEUED) and returns immediately with a
+screening_id; a background task then processes each resume in the same
+process and updates the Candidate rows as it goes. GET /api/screening/{id}
+reports live progress so the frontend can poll it and show results as
+they land. Nothing extra needs to run alongside `python main.py` —
+this is the simple version, by design.
 """
 
-import base64
 import io
 import json
 import logging
 import os
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, HTTPException, UploadFile, Request
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
@@ -156,7 +150,7 @@ def screen_with_groq(api_key: str, job_description: str,
 def resolve_ai_provider():
     """
     Single source of truth for which AI provider actually screens resumes —
-    every other file (screening_tasks.py, career_services.py) calls this
+    every other file (career_services.py, resume_builder_router.py) calls this
     instead of hardcoding a provider, so they can't drift out of sync again.
     Returns (provider_name, call_fn) where
     call_fn(job_description, resume_text, candidate_name) -> dict,
@@ -172,8 +166,111 @@ def resolve_ai_provider():
 
 # ── Main Screening Route ──────────────────────────────────────────────────────
 
+def process_screening_background(
+    screening_id: int,
+    candidate_files: list,
+    job_description: str,
+) -> None:
+    """
+    Runs after the request has already returned, in the same process (no
+    Redis, no separate worker — just Python's own background task queue).
+    Uses its own DB session since the request-scoped one is gone by the
+    time this runs. candidate_files: [(candidate_id, filename, content_bytes)].
+    """
+    import logging
+    import traceback
+    from database import SessionLocal
+
+    logger = logging.getLogger(__name__)
+    db = SessionLocal()
+    try:
+        screening = db.query(models.Screening).filter(models.Screening.id == screening_id).first()
+        if not screening:
+            return
+
+        provider, screen_fn = resolve_ai_provider()
+        if not screen_fn:
+            screening.status = "FAILED"
+            screening.error_message = "AI service is not configured."
+            db.commit()
+            return
+
+        for candidate_id, filename, file_bytes in candidate_files:
+            candidate = db.query(models.Candidate).filter(models.Candidate.id == candidate_id).first()
+            if not candidate:
+                continue
+
+            candidate.status = "PROCESSING"
+            db.commit()
+
+            try:
+                candidate_name = Path(filename).stem.replace("_", " ").replace("-", " ").title()
+                resume_text = extract_text(filename, file_bytes)
+                if len(resume_text.strip()) < 50:
+                    raise ValueError("Could not extract enough text from this file.")
+
+                result = screen_fn(job_description, resume_text, candidate_name)
+                result["filename"] = filename
+                result["file_size_kb"] = round(len(file_bytes) / 1024, 1)
+                result["candidate_id"] = candidate.id
+
+                candidate.candidate_name = result.get("candidate_name", candidate_name)
+                candidate.overall_score = result.get("overall_score", 0)
+                candidate.recommendation = result.get("recommendation", "")
+                candidate.result_json = result
+                candidate.status = "COMPLETED"
+                candidate.error_message = None
+
+            except json.JSONDecodeError:
+                candidate.status = "FAILED"
+                candidate.error_message = "AI returned an unexpected response. Please try again."
+            except ValueError as e:
+                candidate.status = "FAILED"
+                candidate.error_message = str(e)
+            except Exception as e:
+                logger.error("Error processing %s: %s", filename, traceback.format_exc())
+                candidate.status = "FAILED"
+                candidate.error_message = f"Processing failed: {e}"
+            finally:
+                done = (
+                    db.query(models.Candidate)
+                    .filter(models.Candidate.screening_id == screening_id, models.Candidate.status.in_(["COMPLETED", "FAILED"]))
+                    .count()
+                )
+                screening.processed_candidates = done
+                db.commit()
+
+        completed = db.query(models.Candidate).filter(
+            models.Candidate.screening_id == screening_id, models.Candidate.status == "COMPLETED"
+        ).count()
+        failed = db.query(models.Candidate).filter(
+            models.Candidate.screening_id == screening_id, models.Candidate.status == "FAILED"
+        ).count()
+
+        screening.total_candidates = completed
+        screening.processed_candidates = completed + failed
+        if completed and failed:
+            screening.status = "COMPLETED_WITH_ERRORS"
+        elif completed:
+            screening.status = "COMPLETED"
+        else:
+            screening.status = "FAILED"
+        db.commit()
+    except Exception:
+        db.rollback()
+        screening = db.query(models.Screening).filter(models.Screening.id == screening_id).first()
+        if screening:
+            screening.status = "FAILED"
+            screening.error_message = "Screening failed unexpectedly."
+            db.commit()
+        logger.error("Background screening %s crashed: %s", screening_id, traceback.format_exc())
+    finally:
+        db.close()
+
+
 @router.post("/screen")
 async def screen_resumes(
+    background_tasks: BackgroundTasks,
     request: Request,
     job_description: str = Form(...),
     job_title: str = Form(default="Open Position"),
@@ -237,28 +334,25 @@ async def screen_resumes(
     db.commit()
     db.refresh(screening)
 
-    # Create a Candidate row per file, with content stashed as base64 —
-    # Celery's broker message is JSON, so raw bytes can't travel with the
-    # task itself. The worker (screening_tasks.py) reads this back by id.
+    # Create a Candidate row per file up front (status=QUEUED) so progress
+    # counting has something to count against from the very first poll.
+    # No need to stash file content on the row here — BackgroundTasks runs
+    # in the same process, so the raw bytes travel directly as a function
+    # argument instead of round-tripping through the database.
     candidate_rows = []
     for fp in file_payloads:
-        c = models.Candidate(
-            screening_id=screening.id,
-            filename=fp["filename"],
-            status="QUEUED",
-            file_content_b64=base64.b64encode(fp["content"]).decode("ascii"),
-        )
+        c = models.Candidate(screening_id=screening.id, filename=fp["filename"], status="QUEUED")
         db.add(c)
         candidate_rows.append(c)
     db.commit()
     for c in candidate_rows:
         db.refresh(c)
 
-    # Dispatch to the Celery worker (import here, not at module load, so the
-    # web process can still start even if celery_worker/Redis aren't ready).
-    from screening_tasks import process_screening_task
-    task_files = [{"candidate_id": c.id, "filename": c.filename} for c in candidate_rows]
-    process_screening_task.delay(screening.id, task_files)
+    task_payload = [
+        (c.id, fp["filename"], fp["content"])
+        for c, fp in zip(candidate_rows, file_payloads)
+    ]
+    background_tasks.add_task(process_screening_background, screening.id, task_payload, job_description)
 
     return JSONResponse({
         "job_title": job_title,
