@@ -36,6 +36,23 @@ MAX_FILES = 50
 ALLOWED_EXTENSIONS = {'.pdf', '.docx', '.doc', '.txt'}
 
 DEFAULT_GROQ_MODEL = "openai/gpt-oss-20b"
+GROQ_MODEL_REPLACEMENTS = {
+    "llama-3.1-8b-instant": DEFAULT_GROQ_MODEL,
+}
+
+
+def resolve_groq_model() -> str:
+    configured = (os.environ.get("GROQ_MODEL_NAME")
+                  or DEFAULT_GROQ_MODEL).strip()
+    replacement = GROQ_MODEL_REPLACEMENTS.get(configured)
+    if replacement:
+        logger.warning(
+            "Groq model %s is deprecated; using %s instead.",
+            configured,
+            replacement,
+        )
+        return replacement
+    return configured
 
 
 # ── Text Extraction ───────────────────────────────────────────────────────────
@@ -125,7 +142,7 @@ def screen_with_groq(api_key: str, job_description: str,
         resume_text=resume_text[:8000],
         candidate_name=candidate_name
     )
-    model = (os.environ.get("GROQ_MODEL_NAME") or DEFAULT_GROQ_MODEL).strip()
+    model = resolve_groq_model()
 
     response = client.chat.completions.create(
         model=model,
@@ -184,7 +201,8 @@ def process_screening_background(
     logger = logging.getLogger(__name__)
     db = SessionLocal()
     try:
-        screening = db.query(models.Screening).filter(models.Screening.id == screening_id).first()
+        screening = db.query(models.Screening).filter(
+            models.Screening.id == screening_id).first()
         if not screening:
             return
 
@@ -196,7 +214,8 @@ def process_screening_background(
             return
 
         for candidate_id, filename, file_bytes in candidate_files:
-            candidate = db.query(models.Candidate).filter(models.Candidate.id == candidate_id).first()
+            candidate = db.query(models.Candidate).filter(
+                models.Candidate.id == candidate_id).first()
             if not candidate:
                 continue
 
@@ -204,17 +223,21 @@ def process_screening_background(
             db.commit()
 
             try:
-                candidate_name = Path(filename).stem.replace("_", " ").replace("-", " ").title()
+                candidate_name = Path(filename).stem.replace(
+                    "_", " ").replace("-", " ").title()
                 resume_text = extract_text(filename, file_bytes)
                 if len(resume_text.strip()) < 50:
-                    raise ValueError("Could not extract enough text from this file.")
+                    raise ValueError(
+                        "Could not extract enough text from this file.")
 
-                result = screen_fn(job_description, resume_text, candidate_name)
+                result = screen_fn(
+                    job_description, resume_text, candidate_name)
                 result["filename"] = filename
                 result["file_size_kb"] = round(len(file_bytes) / 1024, 1)
                 result["candidate_id"] = candidate.id
 
-                candidate.candidate_name = result.get("candidate_name", candidate_name)
+                candidate.candidate_name = result.get(
+                    "candidate_name", candidate_name)
                 candidate.overall_score = result.get("overall_score", 0)
                 candidate.recommendation = result.get("recommendation", "")
                 candidate.result_json = result
@@ -228,7 +251,8 @@ def process_screening_background(
                 candidate.status = "FAILED"
                 candidate.error_message = str(e)
             except Exception as e:
-                logger.error("Error processing %s: %s", filename, traceback.format_exc())
+                logger.error("Error processing %s: %s",
+                             filename, traceback.format_exc())
                 candidate.status = "FAILED"
                 candidate.error_message = f"Processing failed: {e}"
             finally:
@@ -258,12 +282,14 @@ def process_screening_background(
         db.commit()
     except Exception:
         db.rollback()
-        screening = db.query(models.Screening).filter(models.Screening.id == screening_id).first()
+        screening = db.query(models.Screening).filter(
+            models.Screening.id == screening_id).first()
         if screening:
             screening.status = "FAILED"
             screening.error_message = "Screening failed unexpectedly."
             db.commit()
-        logger.error("Background screening %s crashed: %s", screening_id, traceback.format_exc())
+        logger.error("Background screening %s crashed: %s",
+                     screening_id, traceback.format_exc())
     finally:
         db.close()
 
@@ -284,7 +310,8 @@ async def screen_resumes(
     if not files or all(f.filename == "" for f in files):
         raise HTTPException(400, "At least one resume file is required.")
     if len(files) > MAX_FILES:
-        raise HTTPException(400, f"Maximum {MAX_FILES} files allowed per screening.")
+        raise HTTPException(
+            400, f"Maximum {MAX_FILES} files allowed per screening.")
 
     file_payloads = []
     for upload in files:
@@ -292,11 +319,13 @@ async def screen_resumes(
             continue
         ext = Path(upload.filename).suffix.lower()
         if ext not in ALLOWED_EXTENSIONS:
-            raise HTTPException(400, f"File '{upload.filename}' has unsupported format. Allowed: PDF, DOCX, TXT")
+            raise HTTPException(
+                400, f"File '{upload.filename}' has unsupported format. Allowed: PDF, DOCX, TXT")
         content = await upload.read()
         if len(content) > MAX_FILE_SIZE:
             size_mb = len(content) / (1024 * 1024)
-            raise HTTPException(400, f"File '{upload.filename}' is too large ({size_mb:.1f}MB). Maximum: 10MB")
+            raise HTTPException(
+                400, f"File '{upload.filename}' is too large ({size_mb:.1f}MB). Maximum: 10MB")
         file_payloads.append({"filename": upload.filename, "content": content})
 
     if not file_payloads:
@@ -304,7 +333,8 @@ async def screen_resumes(
 
     provider, _ = resolve_ai_provider()
     if not provider:
-        raise HTTPException(500, "AI service is not configured. Set GROQ_API_KEY in your environment.")
+        raise HTTPException(
+            500, "AI service is not configured. Set GROQ_API_KEY in your environment.")
 
     # ── Save job to DB ────────────────────────────────────────────────────────
     job = db.query(models.Job).filter(
@@ -341,7 +371,8 @@ async def screen_resumes(
     # argument instead of round-tripping through the database.
     candidate_rows = []
     for fp in file_payloads:
-        c = models.Candidate(screening_id=screening.id, filename=fp["filename"], status="QUEUED")
+        c = models.Candidate(screening_id=screening.id,
+                             filename=fp["filename"], status="QUEUED")
         db.add(c)
         candidate_rows.append(c)
     db.commit()
@@ -352,7 +383,8 @@ async def screen_resumes(
         (c.id, fp["filename"], fp["content"])
         for c, fp in zip(candidate_rows, file_payloads)
     ]
-    background_tasks.add_task(process_screening_background, screening.id, task_payload, job_description)
+    background_tasks.add_task(
+        process_screening_background, screening.id, task_payload, job_description)
 
     return JSONResponse({
         "job_title": job_title,
@@ -414,7 +446,8 @@ async def get_screening(
         if c.status == "COMPLETED" and c.result_json:
             results.append(c.result_json)
         elif c.status == "FAILED":
-            errors.append({"file": c.filename, "error": c.error_message or "Processing failed."})
+            errors.append(
+                {"file": c.filename, "error": c.error_message or "Processing failed."})
 
     results.sort(key=lambda x: x.get("overall_score", 0), reverse=True)
 
