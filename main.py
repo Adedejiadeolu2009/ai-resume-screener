@@ -80,11 +80,13 @@ def ensure_db_columns():
         for table_name, columns in column_specs.items():
             if table_name not in tables:
                 continue
-            existing = {column["name"] for column in insp.get_columns(table_name)}
+            existing = {column["name"]
+                        for column in insp.get_columns(table_name)}
             for column_name, ddl in columns.items():
                 if column_name not in existing:
                     conn.execute(
-                        text(f"ALTER TABLE {table_name} ADD COLUMN {column_name} {ddl}")
+                        text(
+                            f"ALTER TABLE {table_name} ADD COLUMN {column_name} {ddl}")
                     )
 
 
@@ -164,13 +166,16 @@ async def http_exception_handler(request: _Request, exc: _HTTPException):
 @app.exception_handler(Exception)
 async def unhandled_exception_handler(request: _Request, exc: Exception):
     logger.exception("Unhandled error while serving %s", request.url.path)
+    is_development = APP_ENV not in {"production", "prod"}
+    detail = str(
+        exc) if is_development else "Internal server error. Please try again later."
     if _expects_json_response(request):
         return JSONResponse(
             status_code=500,
-            content={"detail": "Internal server error. Please try again later."},
+            content={"detail": detail},
         )
     return _Response(
-        content="Internal server error. Please try again later.",
+        content=detail,
         status_code=500,
         media_type="text/plain",
     )
@@ -269,7 +274,8 @@ def build_career_readiness(profile: models.CareerProfile | None) -> dict:
     if not actions:
         actions = list((analysis.get("recommended_improvements") or [])[:4])
     if not actions:
-        actions = ["Analyze your resume in the Career Agent to get your readiness score and a personalized action list."]
+        actions = [
+            "Analyze your resume in the Career Agent to get your readiness score and a personalized action list."]
 
     return {
         "overall": analysis.get("score"),
@@ -473,7 +479,8 @@ async def screen_page(request: Request, db: Session = Depends(get_db), current_u
         ).first()
         if screening:
             candidates = sorted(
-                [{**c.result_json, "candidate_id": c.id} for c in screening.candidates if c.result_json],
+                [{**c.result_json, "candidate_id": c.id}
+                    for c in screening.candidates if c.result_json],
                 key=lambda x: x.get("overall_score", 0), reverse=True
             )
             past_result = {
@@ -586,6 +593,8 @@ async def settings_page(request: Request, db: Session = Depends(get_db), current
 
 @app.get("/health")
 async def health():
+    with engine.connect() as connection:
+        connection.execute(text("SELECT 1"))
     return {
         "status": "ok",
         "version": "2.0.1-sync-db",
