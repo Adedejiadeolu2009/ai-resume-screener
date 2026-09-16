@@ -82,7 +82,8 @@ def _json_success(data: dict[str, Any]) -> JSONResponse:
 
 def _safe_error(exc: Exception) -> JSONResponse:
     status = exc.status_code if isinstance(exc, HTTPException) else 500
-    detail = exc.detail if isinstance(exc, HTTPException) else "AI service is unavailable. Please try again later."
+    detail = exc.detail if isinstance(
+        exc, HTTPException) else "AI service is unavailable. Please try again later."
     return JSONResponse(status_code=status, content={"success": False, "error": detail})
 
 
@@ -97,7 +98,7 @@ async def agent_page(request: Request, db: Session = Depends(get_db), current_us
     )
     return templates.TemplateResponse(
         request=request,
-        name="agent.html",
+        name="agents.html",
         context={
             "user": current_user,
             "profile": profile,
@@ -136,7 +137,8 @@ async def get_profile(db: Session = Depends(get_db), current_user: models.User =
 async def upload_resume(file: UploadFile = File(...), db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     try:
         content = await file.read()
-        profile = career.save_uploaded_resume(db, current_user, file.filename or "resume.txt", content)
+        profile = career.save_uploaded_resume(
+            db, current_user, file.filename or "resume.txt", content)
         return _json_success({"profile": career.profile_payload(profile), "activity": ["Resume uploaded", "Resume text extracted", "Editable profile updated"]})
     except Exception as exc:
         return _safe_error(exc)
@@ -145,7 +147,8 @@ async def upload_resume(file: UploadFile = File(...), db: Session = Depends(get_
 @router.post("/api/career/save-resume")
 async def save_resume(payload: SaveResumeInput, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     try:
-        profile = career.save_resume_text(db, current_user, payload.resume_text, target_role=payload.target_role)
+        profile = career.save_resume_text(
+            db, current_user, payload.resume_text, target_role=payload.target_role)
         return _json_success({"profile": career.profile_payload(profile), "activity": ["Resume saved"]})
     except Exception as exc:
         return _safe_error(exc)
@@ -154,7 +157,8 @@ async def save_resume(payload: SaveResumeInput, db: Session = Depends(get_db), c
 @router.post("/api/career/analyze-resume")
 async def analyze_resume(payload: AnalyzeInput, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     try:
-        result = career.analyze_resume(db, current_user, payload.resume_text, payload.job_description)
+        result = career.analyze_resume(
+            db, current_user, payload.resume_text, payload.job_description)
         return _json_success({"analysis": result, "activity": ["Resume analyzed", "Readiness calculated"]})
     except Exception as exc:
         return _safe_error(exc)
@@ -180,7 +184,8 @@ async def match_job(payload: MatchJobInput, db: Session = Depends(get_db), curre
 @router.post("/api/career/improve-resume")
 async def improve_resume(payload: ImproveInput, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     try:
-        result = career.improve_resume(db, current_user, payload.target_role, payload.instructions, payload.job_description, payload.resume_text)
+        result = career.improve_resume(db, current_user, payload.target_role,
+                                       payload.instructions, payload.job_description, payload.resume_text)
         return _json_success({"proposal": result, "activity": ["Resume weaknesses inspected", "Proposed edits generated", "Waiting for approval"]})
     except Exception as exc:
         return _safe_error(exc)
@@ -189,7 +194,8 @@ async def improve_resume(payload: ImproveInput, db: Session = Depends(get_db), c
 @router.post("/api/career/approve-resume")
 async def approve_resume(payload: ApproveResumeInput, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     try:
-        profile = career.save_resume_text(db, current_user, payload.approved_resume_text, target_role=payload.target_role)
+        profile = career.save_resume_text(
+            db, current_user, payload.approved_resume_text, target_role=payload.target_role)
         return _json_success({"profile": career.profile_payload(profile), "activity": ["Approved changes saved"]})
     except Exception as exc:
         return _safe_error(exc)
@@ -198,7 +204,8 @@ async def approve_resume(payload: ApproveResumeInput, db: Session = Depends(get_
 @router.post("/api/career/generate-cover-letter")
 async def generate_cover_letter(payload: CoverLetterInput, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     try:
-        result = career.cover_letter(db, current_user, payload.job_title, payload.company, payload.job_description, payload.resume_text, payload.tone)
+        result = career.cover_letter(db, current_user, payload.job_title, payload.company,
+                                     payload.job_description, payload.resume_text, payload.tone)
         return _json_success({"cover_letter": result, "activity": ["Resume evidence reviewed", "Cover letter generated"]})
     except Exception as exc:
         return _safe_error(exc)
@@ -207,7 +214,8 @@ async def generate_cover_letter(payload: CoverLetterInput, db: Session = Depends
 @router.post("/api/career/analyze-skill-gap")
 async def analyze_skill_gap(payload: SkillGapInput, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     try:
-        result = career.skill_gap(db, current_user, payload.target_role, payload.required_skills, payload.resume_text)
+        result = career.skill_gap(
+            db, current_user, payload.target_role, payload.required_skills, payload.resume_text)
         return _json_success({"skill_gap": result, "activity": ["Required skills compared", "Skill gap found"]})
     except Exception as exc:
         return _safe_error(exc)
@@ -216,7 +224,8 @@ async def analyze_skill_gap(payload: SkillGapInput, db: Session = Depends(get_db
 @router.post("/api/career/career-plan")
 async def build_career_plan(payload: SkillGapInput, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     try:
-        result = career.career_plan(db, current_user, payload.target_role, payload.required_skills)
+        result = career.career_plan(
+            db, current_user, payload.target_role, payload.required_skills)
         return _json_success({"career_plan": result, "activity": ["Profile inspected", "Skill gaps prioritized", "Career plan generated"]})
     except Exception as exc:
         return _safe_error(exc)
@@ -230,30 +239,42 @@ async def agent_chat(payload: AgentInput, db: Session = Depends(get_db), current
         result: dict[str, Any] = {}
         if "cover" in message:
             if not payload.job_description or not payload.job_title:
-                raise HTTPException(400, "Add a job title and job description before generating a cover letter.")
-            result["cover_letter"] = career.cover_letter(db, current_user, payload.job_title, payload.company, payload.job_description, payload.resume_text)
+                raise HTTPException(
+                    400, "Add a job title and job description before generating a cover letter.")
+            result["cover_letter"] = career.cover_letter(
+                db, current_user, payload.job_title, payload.company, payload.job_description, payload.resume_text)
             activity += ["Resume evidence reviewed", "Cover letter generated"]
         elif "match" in message or "internship" in message or "job" in message:
             if payload.job_description:
-                result["match"] = career.match_resume_to_job(db, current_user, payload.job_title or "Target opportunity", payload.company, payload.job_description, payload.required_skills, payload.resume_text)
-                activity += ["Job requirements extracted", "Resume compared", "Match calculated"]
+                result["match"] = career.match_resume_to_job(
+                    db, current_user, payload.job_title or "Target opportunity", payload.company, payload.job_description, payload.required_skills, payload.resume_text)
+                activity += ["Job requirements extracted",
+                             "Resume compared", "Match calculated"]
             else:
-                result["analysis"] = career.analyze_resume(db, current_user, payload.resume_text)
+                result["analysis"] = career.analyze_resume(
+                    db, current_user, payload.resume_text)
                 activity += ["Resume analyzed", "Waiting for job description"]
         elif "gap" in message or "plan" in message:
             if not payload.required_skills:
-                raise HTTPException(400, "Add required skills to calculate skill gaps or build a plan.")
-            result["skill_gap"] = career.skill_gap(db, current_user, payload.job_title or "Target role", payload.required_skills, payload.resume_text)
+                raise HTTPException(
+                    400, "Add required skills to calculate skill gaps or build a plan.")
+            result["skill_gap"] = career.skill_gap(
+                db, current_user, payload.job_title or "Target role", payload.required_skills, payload.resume_text)
             if "plan" in message:
-                result["career_plan"] = career.career_plan(db, current_user, payload.job_title or "Target role", payload.required_skills)
-                activity += ["Profile inspected", "Skill gaps prioritized", "Career plan generated"]
+                result["career_plan"] = career.career_plan(
+                    db, current_user, payload.job_title or "Target role", payload.required_skills)
+                activity += ["Profile inspected",
+                             "Skill gaps prioritized", "Career plan generated"]
             else:
                 activity += ["Required skills compared", "Skill gap found"]
         elif "fix" in message or "improve" in message or "tailor" in message:
-            result["proposal"] = career.improve_resume(db, current_user, payload.job_title or "Target role", payload.message, payload.job_description, payload.resume_text)
-            activity += ["Resume weaknesses inspected", "Proposed edits generated", "Waiting for approval"]
+            result["proposal"] = career.improve_resume(
+                db, current_user, payload.job_title or "Target role", payload.message, payload.job_description, payload.resume_text)
+            activity += ["Resume weaknesses inspected",
+                         "Proposed edits generated", "Waiting for approval"]
         else:
-            result["analysis"] = career.analyze_resume(db, current_user, payload.resume_text, payload.job_description)
+            result["analysis"] = career.analyze_resume(
+                db, current_user, payload.resume_text, payload.job_description)
             activity += ["Resume analyzed", "Readiness calculated"]
         return _json_success({
             "reply": "I used Aptura's career tools and returned structured results below.",
@@ -290,6 +311,7 @@ async def shortlist_candidate(payload: ShortlistInput, db: Session = Depends(get
         .first()
     )
     if not existing:
-        db.add(models.RecruiterShortlist(user_id=current_user.id, screening_id=screening.id, candidate_id=candidate.id, notes=payload.notes))
+        db.add(models.RecruiterShortlist(user_id=current_user.id,
+               screening_id=screening.id, candidate_id=candidate.id, notes=payload.notes))
         db.commit()
     return _json_success({"activity": ["Candidate shortlisted"], "candidate_id": candidate.id})
