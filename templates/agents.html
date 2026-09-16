@@ -89,18 +89,50 @@
     .composer { display: flex; gap: 10px; padding: 16px 22px; border-top: 1px solid var(--border); }
     .composer input { flex: 1; }
     .composer button { flex-shrink: 0; }
+
+    /* ── Space-evolution shell ── */
+    :root { --bg:#0A0B0E; --panel:#13151C; --elev:#1A1D27; --border:rgba(255,255,255,.08); --gold:#C9A84C; --gold-dark:#A07820; --gold-light:#E8D5A3; --teal:#2DD4BF; --text:#F0EDE6; --muted:#9A9691; --hint:#5A5750; --serif:'Cormorant Garamond',Georgia,serif; --sans:'Outfit',system-ui,sans-serif; --border-soft:rgba(255,255,255,.06); }
+    body { background:var(--bg); color:var(--text); font-family:var(--sans); }
+    body::before { content:''; position:fixed; inset:0; z-index:-1; pointer-events:none; background:radial-gradient(ellipse 70% 55% at 10% 0%,rgba(201,168,76,.08),transparent 62%),radial-gradient(ellipse 55% 48% at 92% 100%,rgba(45,212,191,.055),transparent 60%); }
+    .app-wrapper { min-height:100vh; display:flex; position:relative; z-index:1; }
+    .sidebar { width:248px; flex:0 0 248px; min-height:100vh; padding:22px 14px 18px; background:rgba(19,21,28,.86); border-right:1px solid var(--border); display:flex; flex-direction:column; position:sticky; top:0; height:100vh; backdrop-filter:blur(18px); }
+    .sidebar-brand { display:flex; align-items:center; gap:10px; padding:0 10px 24px; border-bottom:1px solid var(--border); }
+    .sidebar-brand-mark { width:34px; height:34px; border-radius:9px; background:linear-gradient(135deg,var(--gold),var(--gold-dark)); display:grid; place-items:center; color:var(--bg); font:700 16px var(--serif); box-shadow:0 0 28px rgba(201,168,76,.16); }
+    .sidebar-brand-name { font:600 20px var(--serif); }.sidebar-brand-name span { color:var(--gold); }
+    .sidebar-nav { display:grid; gap:4px; margin-top:22px; }.sidebar-nav a { display:flex; align-items:center; padding:11px 12px; border:1px solid transparent; border-radius:8px; color:var(--muted); font-size:13px; text-decoration:none; transition:background .2s,color .2s,border-color .2s; }.sidebar-nav a:hover { background:rgba(255,255,255,.04); color:var(--text); }.sidebar-nav a.active { background:rgba(201,168,76,.1); border-color:rgba(201,168,76,.35); color:var(--gold); }
+    .sidebar-footer { margin-top:auto; padding:14px 12px; border:1px solid var(--border); border-radius:10px; background:linear-gradient(145deg,rgba(201,168,76,.08),rgba(45,212,191,.025)); }.sidebar-footer-title { font:600 16px var(--serif); color:var(--gold-light); }.sidebar-footer-desc { margin-top:3px; color:var(--hint); font-size:11px; line-height:1.4; }.sidebar-footer-link { display:inline-block; margin-top:12px; color:var(--gold); font-size:12px; font-weight:700; text-decoration:none; }
+    .content { min-width:0; flex:1; }.content > nav { height:68px; padding:14px 32px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border); background:rgba(10,11,14,.78); position:sticky; top:0; z-index:100; backdrop-filter:blur(18px); }.hamburger-btn { display:none; background:none; border:0; color:var(--text); font-size:22px; cursor:pointer; }.content .aptura-nav { display:none; }.nav-right { display:flex; align-items:center; gap:10px; }.btn-new { display:inline-flex; align-items:center; min-height:34px; padding:8px 11px; border:1px solid var(--border); border-radius:7px; color:var(--muted); font-size:11px; font-weight:700; text-decoration:none; white-space:nowrap; }.btn-new:hover { border-color:rgba(201,168,76,.35); color:var(--gold); }.user-profile { display:flex; align-items:center; gap:8px; margin-left:4px; }.user-avatar { width:28px; height:28px; border-radius:50%; display:grid; place-items:center; overflow:hidden; background:rgba(201,168,76,.1); border:1px solid rgba(201,168,76,.35); color:var(--gold); font-size:10px; font-weight:700; }.user-avatar img { width:100%; height:100%; object-fit:cover; }.user-name { color:var(--muted); font-size:12px; }.content > main { max-width:1100px; padding:32px 28px 80px; }
+    .context-kicker { display:flex; align-items:center; gap:9px; margin-bottom:8px; color:var(--gold); font-size:10px; font-weight:800; letter-spacing:1.8px; text-transform:uppercase; }.context-kicker::before { content:''; width:24px; height:1px; background:var(--gold); opacity:.7; }
+    @media(max-width:900px) { .sidebar { position:fixed; left:0; top:0; z-index:300; transform:translateX(-100%); transition:transform .25s ease; box-shadow:20px 0 70px rgba(0,0,0,.35); }.sidebar.open { transform:translateX(0); }.hamburger-btn { display:block; }.content > nav { padding:14px 18px; }.user-name { display:none; }.btn-new { padding:7px 8px; font-size:10px; }.content > main { padding:26px 18px 48px; } }
+    @media(max-width:600px) { .content .nav-right .btn-new:nth-child(1), .user-profile { display:none; }.content > main { padding:22px 14px 50px; }.chat-panel { height:calc(100vh - 150px); min-height:560px; }.ctx-row { flex-wrap:wrap; }.ctx-row input { min-width:150px; } }
   </style>
 </head>
 <body>
-  <nav class="aptura-nav">
-    <a class="aptura-brand" href="/dashboard"><div class="mark">A</div><span>Aptura AI</span></a>
-    <div class="aptura-nav-links">
-      <a class="btn" href="/screen">Screen Resumes</a>
-      <a class="btn" href="/dashboard">Dashboard</a>
-    </div>
-  </nav>
+  <div class="app-wrapper">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand"><div class="sidebar-brand-mark">A</div><div class="sidebar-brand-name">Ap<span>tura</span></div></div>
+      <nav class="sidebar-nav">
+        <a href="/agent" class="active">Aptura Agent</a>
+        <a href="/recruiter">Recruiter Workspace</a>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/screen">Screenings</a>
+        <a href="/resume-builder">Resume Builder</a>
+        <a href="/plans">Plans &amp; Upgrade</a>
+        <a href="/analytics">Analytics</a>
+        {% if is_admin %}<a href="/admin">Admin</a>{% endif %}
+        <a href="/contact">Support</a>
+        <a href="/settings">Settings</a>
+      </nav>
+      <div class="sidebar-footer"><div class="sidebar-footer-title">{{ tier or 'FREE' }} Plan</div><div class="sidebar-footer-desc">{% if tier == 'PRO' or tier == 'ENTERPRISE' %}Premium active{% else %}5 free screenings/month{% endif %}</div><a href="/plans" class="sidebar-footer-link">Review plan &rarr;</a></div>
+    </aside>
+    <div class="content">
+      <nav>
+        <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle menu">&#9776;</button>
+        <div class="nav-right"><a href="/screen" class="btn-new">Screen Resumes</a><a href="/resume-builder" class="btn-new">Build Resume</a><div class="user-profile"><div class="user-avatar">{% if user.avatar_url %}<img src="{{ user.avatar_url }}" alt="{{ user.name }}">{% else %}{{ (user.name or user.email)[:2] | upper }}{% endif %}</div><span class="user-name">{{ user.name or user.email.split('@')[0] }}</span></div><a href="/auth/logout" class="btn-logout">Sign out</a></div>
+      </nav>
 
   <main>
+    <div class="context-kicker">Career intelligence workspace</div>
     <div class="col-side">
       <!-- Career readiness -->
       <div class="panel" id="readiness-card">
@@ -179,9 +211,22 @@
       </div>
     </div>
   </main>
+    </div>
+  </div>
+  <div class="backdrop" id="backdrop"></div>
 
   <script id="latest-match-seed" type="application/json">{{ (latest_match or {}) | tojson }}</script>
   <script src="/static/js/career-agent.js" defer></script>
+  <script>
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    const sidebar = document.getElementById('sidebar');
+    const backdrop = document.getElementById('backdrop');
+    if (hamburgerBtn && sidebar && backdrop) {
+      hamburgerBtn.addEventListener('click', () => { sidebar.classList.toggle('open'); backdrop.style.display = sidebar.classList.contains('open') ? 'block' : 'none'; });
+      backdrop.addEventListener('click', () => { sidebar.classList.remove('open'); backdrop.style.display = 'none'; });
+      document.querySelectorAll('.sidebar-nav a').forEach((link) => link.addEventListener('click', () => { sidebar.classList.remove('open'); backdrop.style.display = 'none'; }));
+    }
+  </script>
 {% include "_webmcp.html" %}
 </body>
 </html>

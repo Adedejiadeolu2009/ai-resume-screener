@@ -321,31 +321,42 @@ textarea{min-height:140px;resize:vertical}
   .score-grid{grid-template-columns:1fr 1fr}
 }
 @media print{nav,#formPanel,.steps{display:none}main{padding:0}}
+
+/* ── Space-evolution shell ── */
+.app-wrapper{min-height:100vh;display:flex;position:relative;z-index:1}
+.sidebar{width:248px;flex:0 0 248px;min-height:100vh;padding:22px 14px 18px;background:rgba(19,21,28,.84);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;backdrop-filter:blur(18px)}
+.sidebar-brand{display:flex;align-items:center;gap:10px;padding:0 10px 24px;border-bottom:1px solid var(--border)}
+.sidebar-brand-mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));display:grid;place-items:center;color:var(--bg);font:700 16px var(--ff-serif);box-shadow:0 0 28px rgba(201,168,76,.16)}
+.sidebar-brand-name{font:600 20px var(--ff-serif)}.sidebar-brand-name span{color:var(--gold)}
+.sidebar-nav{display:grid;gap:4px;margin-top:22px}.sidebar-nav a{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:8px;color:var(--muted);font-size:13px;text-decoration:none;transition:background .2s,color .2s,border-color .2s;border:1px solid transparent}.sidebar-nav a:hover{background:rgba(255,255,255,.04);color:var(--text)}.sidebar-nav a.active{background:var(--gold-bg);border-color:var(--border-lit);color:var(--gold)}
+.sidebar-footer{margin-top:auto;padding:14px 12px;border:1px solid var(--border);border-radius:10px;background:linear-gradient(145deg,rgba(201,168,76,.08),rgba(45,212,191,.025))}.sidebar-footer-title{font:600 16px var(--ff-serif);color:var(--gold-light)}.sidebar-footer-desc{margin-top:3px;color:var(--hint);font-size:11px;line-height:1.4}.sidebar-footer-link{display:inline-block;margin-top:12px;color:var(--gold);font-size:12px;font-weight:700;text-decoration:none}.content{min-width:0;flex:1}.content>nav{height:68px;padding:14px 32px}.hamburger-btn{display:none;background:none;border:0;color:var(--text);font-size:22px;cursor:pointer}.content .nav-right{gap:10px}.btn-new{display:inline-flex;align-items:center;min-height:34px;padding:8px 11px;border:1px solid var(--border);border-radius:7px;color:var(--muted);font-size:11px;font-weight:700;text-decoration:none;white-space:nowrap}.btn-new:hover{border-color:var(--border-lit);color:var(--gold)}.user-profile{display:flex;align-items:center;gap:8px;margin-left:4px}.user-avatar{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;overflow:hidden;background:var(--gold-bg);border:1px solid var(--border-lit);color:var(--gold);font-size:10px;font-weight:700}.user-avatar img{width:100%;height:100%;object-fit:cover}.user-name{color:var(--muted);font-size:12px}
+@media(max-width:900px){.sidebar{position:fixed;left:0;top:0;z-index:300;transform:translateX(-100%);transition:transform .25s ease;box-shadow:20px 0 70px rgba(0,0,0,.35)}.sidebar.open{transform:translateX(0)}.hamburger-btn{display:block}.content>nav{padding:14px 18px}.content .nav-right{gap:6px}.user-name{display:none}.btn-new{padding:7px 8px;font-size:10px}.content main{padding:26px 18px 48px}}
+@media(max-width:600px){.content .nav-right .btn-new:nth-child(1),.user-profile{display:none}.page-title{font-size:32px}.steps{display:grid;grid-template-columns:1fr}.step{border-right:0;border-bottom:1px solid var(--border)}.step:last-child{border-bottom:0}.frow{grid-template-columns:1fr}.screen-grid{gap:16px}.panel{position:static}.results-hdr{display:block}.hdr-actions{margin-top:12px}.summary-bar{gap:8px}.sum-card{padding:12px 8px}}
 </style>
 </head>
 <body>
-
-<nav>
-  <div class="brand">
-    <a href="/dashboard" class="back-btn">← Dashboard</a>
-    <div class="brand-mark">A</div>
-    <div><div class="brand-name">Ap<span>tura</span> AI</div></div>
-  </div>
-  <div class="nav-right">
-    <a href="/resume-builder" class="back-btn">Resume Builder</a>
-    <div class="user-chip">
-      <div class="user-av">
-        {% if user.avatar_url %}
-          <img src="{{ user.avatar_url }}" alt="avatar">
-        {% else %}
-          {{ (user.name or user.email)[:2] | upper }}
-        {% endif %}
-      </div>
-      <span class="user-nm">{{ user.name or user.email.split('@')[0] }}</span>
-    </div>
-    <a href="/auth/logout" class="btn-logout">Sign out</a>
-  </div>
-</nav>
+<div class="app-wrapper">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand"><div class="sidebar-brand-mark">A</div><div class="sidebar-brand-name">Ap<span>tura</span></div></div>
+    <nav class="sidebar-nav">
+      <a href="/agent">Aptura Agent</a>
+      <a href="/recruiter">Recruiter Workspace</a>
+      <a href="/dashboard">Dashboard</a>
+      <a href="/screen" class="active">Screenings</a>
+      <a href="/resume-builder">Resume Builder</a>
+      <a href="/plans">Plans &amp; Upgrade</a>
+      <a href="/analytics">Analytics</a>
+      {% if is_admin %}<a href="/admin">Admin</a>{% endif %}
+      <a href="/contact">Support</a>
+      <a href="/settings">Settings</a>
+    </nav>
+    <div class="sidebar-footer"><div class="sidebar-footer-title">{{ tier or 'FREE' }} Plan</div><div class="sidebar-footer-desc">{% if tier == 'PRO' or tier == 'ENTERPRISE' %}Premium active{% else %}5 free screenings/month{% endif %}</div><a href="/plans" class="sidebar-footer-link">Review plan &rarr;</a></div>
+  </aside>
+  <div class="content">
+    <nav>
+      <div class="nav-left"><button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle menu">&#9776;</button></div>
+      <div class="nav-right"><a href="/agent" class="btn-new">Ask Agent</a><a href="/resume-builder" class="btn-new">Build Resume</a><a href="/screen" class="btn-new">+ New Screening</a><div class="user-profile"><div class="user-avatar">{% if user.avatar_url %}<img src="{{ user.avatar_url }}" alt="{{ user.name }}">{% else %}{{ (user.name or user.email)[:2] | upper }}{% endif %}</div><span class="user-name">{{ user.name or user.email.split('@')[0] }}</span></div><a href="/auth/logout" class="btn-logout">Sign out</a></div>
+    </nav>
 
 <main>
   <div class="page-header">
@@ -478,6 +489,9 @@ textarea{min-height:140px;resize:vertical}
     </div>
   </div>
 </main>
+  </div>
+</div>
+<div class="backdrop" id="backdrop"></div>
 
 <script>
 let selectedFiles = [];
