@@ -63,6 +63,22 @@ def ensure_db_columns():
     tables = set(insp.get_table_names())
 
     column_specs = {
+        "users": {
+            "workspace": "VARCHAR(30) DEFAULT 'APPLICANT' NOT NULL",
+        },
+        "jobs": {
+            "location": "VARCHAR(255)",
+            "employment_type": "VARCHAR(50)",
+            "salary_range": "VARCHAR(120)",
+            "required_skills": "JSON",
+            "preferred_skills": "JSON",
+            "experience_years": "INTEGER",
+            "education": "VARCHAR(255)",
+            "application_url": "VARCHAR(1000)",
+            "application_email": "VARCHAR(255)",
+            "closing_date": "TIMESTAMP",
+            "status": "VARCHAR(30) DEFAULT 'OPEN' NOT NULL",
+        },
         "screenings": {
             "total_files": "INTEGER DEFAULT 0",
             "processed_candidates": "INTEGER DEFAULT 0",

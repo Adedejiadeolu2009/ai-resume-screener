@@ -322,8 +322,11 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
     <!-- Main Content -->
     <main>
       <div class="welcome">
+        <div style="display:inline-flex;align-items:center;gap:8px;margin-bottom:8px;color:var(--gold);font-size:10px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;">
+          {% if user.workspace == 'STUDENT' %}Student space{% elif user.workspace == 'RECRUITER' %}Recruiter space{% else %}Applicant space{% endif %}
+        </div>
         <h1>Good to see you, {{ (user.name or 'there').split(' ')[0] }} 👋</h1>
-        <p>Your career workspace combines resume analysis, opportunity matching, skill gaps, and application preparation.</p>
+        <p>{% if user.workspace == 'RECRUITER' %}Publish vacancies, screen candidates, and build a stronger shortlist with evidence.{% elif user.workspace == 'STUDENT' %}Build your foundation, understand your strengths, and move toward your next opportunity.{% else %}Analyze your resume, discover better-fit roles, close skill gaps, and prepare stronger applications.{% endif %}</p>
       </div>
 
       <!-- Premium Banner -->

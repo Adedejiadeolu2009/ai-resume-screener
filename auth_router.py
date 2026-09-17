@@ -129,6 +129,7 @@ async def register(
     name: str = Form(...),
     email: str = Form(...),
     password: str = Form(...),
+    workspace: str = Form(default="APPLICANT"),
     csrf_token: str = Form(...),
     db: Session = Depends(get_db),
     request: Request = None,
@@ -162,11 +163,16 @@ async def register(
     except ValueError:
         return JSONResponse({"error": "Password too long for the hashing backend. Trim to 72 bytes."}, status_code=400)
 
+    workspace = (workspace or "APPLICANT").strip().upper()
+    if workspace not in {"STUDENT", "APPLICANT", "RECRUITER"}:
+        workspace = "APPLICANT"
+
     user = models.User(
         email=email.lower().strip(),
         name=name.strip(),
         hashed_password=hashed,
         provider="email",
+        workspace=workspace,
         last_login=datetime.utcnow()
     )
     db.add(user)

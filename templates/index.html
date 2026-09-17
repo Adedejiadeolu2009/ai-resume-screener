@@ -199,6 +199,12 @@ textarea{min-height:140px;resize:vertical}
 .pfi-scan{background:var(--gold-bg);border:1px solid var(--border-lit);animation:spin 1s linear infinite}
 .pfi-done{background:var(--teal-bg);color:var(--teal)}
 
+/* ── Vacancy studio ── */
+.vacancy-studio{margin-bottom:24px;background:linear-gradient(145deg,rgba(201,168,76,.075),rgba(19,21,28,.92) 42%);border:1px solid var(--border-lit);border-radius:var(--radius);overflow:hidden;box-shadow:0 18px 60px rgba(0,0,0,.18)}
+.vacancy-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding:20px 24px;border-bottom:1px solid var(--border)}.vacancy-kicker{color:var(--gold);font-size:10px;font-weight:800;letter-spacing:1.8px;text-transform:uppercase}.vacancy-title{margin-top:5px;color:var(--text);font:400 25px var(--ff-serif)}.vacancy-sub{margin-top:4px;color:var(--muted);font-size:12px;line-height:1.5}.vacancy-mark{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:rgba(45,212,191,.1);border:1px solid rgba(45,212,191,.3);color:var(--teal);font-size:20px;flex:0 0 42px}.vacancy-body{padding:20px 24px}.vacancy-fields{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.vacancy-field-wide{grid-column:span 2}.vacancy-field label{display:block;margin-bottom:7px;color:var(--hint);font-size:10px;font-weight:800;letter-spacing:1.3px;text-transform:uppercase}.vacancy-field input,.vacancy-field textarea{width:100%;background:var(--input);border:1px solid var(--border);border-radius:7px;color:var(--text);font:13px var(--ff-sans);outline:none;padding:10px 12px}.vacancy-field textarea{min-height:88px;resize:vertical;line-height:1.5}.vacancy-field input:focus,.vacancy-field textarea:focus{border-color:var(--border-lit);box-shadow:0 0 0 3px var(--gold-bg)}.vacancy-actions{display:flex;align-items:center;gap:12px;margin-top:16px}.vacancy-submit{padding:10px 16px;border:0;border-radius:7px;background:linear-gradient(135deg,var(--gold),#A07820);color:var(--bg);font:700 12px var(--ff-sans);cursor:pointer}.vacancy-submit:disabled{opacity:.55;cursor:not-allowed}.vacancy-status{color:var(--muted);font-size:12px}.vacancy-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}.vacancy-chip{display:flex;align-items:center;gap:9px;padding:8px 10px;background:rgba(255,255,255,.025);border:1px solid var(--border);border-radius:7px;color:var(--muted);font-size:11px}.vacancy-chip strong{color:var(--text);font-size:12px}.vacancy-match{padding:5px 8px;border:1px solid rgba(45,212,191,.25);border-radius:5px;background:var(--teal-bg);color:var(--teal);font:700 10px var(--ff-sans);cursor:pointer}.vacancy-match:hover{border-color:var(--teal)}.vacancy-empty{color:var(--hint);font-size:12px}
+@media(max-width:960px){.vacancy-fields{grid-template-columns:repeat(2,minmax(0,1fr))}.vacancy-field-wide{grid-column:span 2}}
+@media(max-width:600px){.vacancy-head,.vacancy-body{padding:16px}.vacancy-fields{grid-template-columns:1fr}.vacancy-field-wide{grid-column:span 1}.vacancy-actions{align-items:flex-start;flex-direction:column}.vacancy-submit{width:100%}}
+
 /* Results */
 .results-wrap{display:none;flex-direction:column;gap:0}
 .results-wrap.on{display:flex}
@@ -379,6 +385,26 @@ textarea{min-height:140px;resize:vertical}
       <div class="step-label">AI Results</div>
     </div>
   </div>
+
+  <section class="vacancy-studio" aria-label="Publish a vacancy">
+    <div class="vacancy-head">
+      <div><div class="vacancy-kicker">Recruiter tools</div><div class="vacancy-title">Publish a vacancy for better-fit talent</div><div class="vacancy-sub">Save the role once, then reuse its requirements for screening and candidate matching.</div></div>
+      <div class="vacancy-mark" aria-hidden="true">+</div>
+    </div>
+    <div class="vacancy-body">
+      <div class="vacancy-fields">
+        <div class="vacancy-field"><label for="vacancyTitle">Role title *</label><input id="vacancyTitle" type="text" placeholder="e.g. Product Designer"></div>
+        <div class="vacancy-field"><label for="vacancyCompany">Company *</label><input id="vacancyCompany" type="text" placeholder="e.g. Acme Labs"></div>
+        <div class="vacancy-field"><label for="vacancyLocation">Location</label><input id="vacancyLocation" type="text" placeholder="Lagos / Remote"></div>
+        <div class="vacancy-field"><label for="vacancyType">Employment type</label><input id="vacancyType" type="text" placeholder="Full-time"></div>
+        <div class="vacancy-field vacancy-field-wide"><label for="vacancyDescription">Role description *</label><textarea id="vacancyDescription" placeholder="Responsibilities, requirements, and the evidence you want to see."></textarea></div>
+        <div class="vacancy-field"><label for="vacancyRequired">Required skills</label><input id="vacancyRequired" type="text" placeholder="Python, SQL, AWS"></div>
+        <div class="vacancy-field"><label for="vacancyPreferred">Preferred skills</label><input id="vacancyPreferred" type="text" placeholder="Leadership, fintech"></div>
+      </div>
+      <div class="vacancy-actions"><button class="vacancy-submit" id="publishVacancyBtn" type="button" onclick="publishVacancy()">Publish vacancy</button><span class="vacancy-status" id="vacancyStatus">Your open roles will appear here.</span></div>
+      <div class="vacancy-list" id="vacancyList"><span class="vacancy-empty">Loading saved vacancies...</span></div>
+    </div>
+  </section>
 
   <div class="screen-grid">
     <!-- ── Left: Form ── -->
@@ -566,6 +592,56 @@ function updateSteps() {
     : 'Upload at least one resume';
   document.getElementById('btnIcon').textContent = ready ? '✦' : '⬤';
 }
+
+function vacancyInputList(id) {
+  return document.getElementById(id).value.split(',').map(value => value.trim()).filter(Boolean);
+}
+
+async function loadVacancies() {
+  const list = document.getElementById('vacancyList');
+  try {
+    const response = await fetch('/api/recruiter/vacancies');
+    const data = await response.json();
+    if (!response.ok || data.success === false) throw new Error(data.error || 'Could not load vacancies.');
+    const vacancies = data.vacancies || [];
+    list.innerHTML = vacancies.length ? vacancies.map(job => `<div class="vacancy-chip"><span><strong>${job.title}</strong><br>${job.company || 'Company'}${job.location ? ` · ${job.location}` : ''}</span><button class="vacancy-match" type="button" onclick="matchSavedVacancy(${job.id})">Match resume</button></div>`).join('') : '<span class="vacancy-empty">No saved vacancies yet. Publish your first role above.</span>';
+  } catch (error) {
+    list.innerHTML = '<span class="vacancy-empty">Saved vacancies will appear after your first role is published.</span>';
+  }
+}
+
+async function publishVacancy() {
+  const title = document.getElementById('vacancyTitle').value.trim();
+  const company = document.getElementById('vacancyCompany').value.trim();
+  const description = document.getElementById('vacancyDescription').value.trim();
+  const status = document.getElementById('vacancyStatus');
+  const button = document.getElementById('publishVacancyBtn');
+  if (!title || !company || description.length < 20) { status.textContent = 'Add a title, company, and at least 20 characters of role detail.'; return; }
+  button.disabled = true; status.textContent = 'Publishing role...';
+  try {
+    const response = await fetch('/api/recruiter/vacancies', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ title, company, description, location:document.getElementById('vacancyLocation').value.trim(), employment_type:document.getElementById('vacancyType').value.trim(), required_skills:vacancyInputList('vacancyRequired'), preferred_skills:vacancyInputList('vacancyPreferred') }) });
+    const data = await response.json();
+    if (!response.ok || data.success === false) throw new Error(data.error || 'Could not publish vacancy.');
+    status.textContent = 'Vacancy published. You can match resumes against it now.';
+    ['vacancyTitle','vacancyCompany','vacancyLocation','vacancyType','vacancyDescription','vacancyRequired','vacancyPreferred'].forEach(id => { document.getElementById(id).value = ''; });
+    loadVacancies();
+  } catch (error) { status.textContent = error.message || 'Could not publish vacancy.'; }
+  finally { button.disabled = false; }
+}
+
+async function matchSavedVacancy(jobId) {
+  const status = document.getElementById('vacancyStatus');
+  status.textContent = 'Comparing your resume with the vacancy...';
+  try {
+    const response = await fetch(`/api/jobs/${jobId}/match`, { method:'POST' });
+    const data = await response.json();
+    if (!response.ok || data.success === false) throw new Error(data.error || 'Could not calculate the match.');
+    const score = data.match && (data.match.match_score ?? data.match.score);
+    status.textContent = score != null ? `Resume match: ${score}/100 for ${data.vacancy.title}.` : `Match ready for ${data.vacancy.title}.`;
+  } catch (error) { status.textContent = error.message || 'Could not calculate the match.'; }
+}
+
+loadVacancies();
 
 // ── Submit ─────────────────────────────────────────────────────────────────
 const msgs = ['Reading candidate experience...','Evaluating technical skills...','Comparing against job requirements...','Generating AI insights...','Ranking all candidates...'];

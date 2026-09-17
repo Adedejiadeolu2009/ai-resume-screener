@@ -22,23 +22,25 @@ class User(Base):
     """
     __tablename__ = "users"
 
-    id            = Column(Integer, primary_key=True, index=True)
-    email         = Column(String(255), unique=True, index=True, nullable=False)
-    name          = Column(String(255), nullable=True)
-    avatar_url    = Column(String(512), nullable=True)      # Profile pic from Google/Apple
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String(255), unique=True, index=True, nullable=False)
+    name = Column(String(255), nullable=True)
+    # Profile pic from Google/Apple
+    avatar_url = Column(String(512), nullable=True)
 
     # Password auth — None for Google/Apple users (they don't need a password)
     hashed_password = Column(String(255), nullable=True)
 
     # Which login method did they use? "email", "google", or "apple"
-    provider      = Column(String(50), default="email", nullable=False)
+    provider = Column(String(50), default="email", nullable=False)
     # The unique ID from Google or Apple (so we can find them on future logins)
-    provider_id   = Column(String(255), nullable=True, index=True)
+    provider_id = Column(String(255), nullable=True, index=True)
 
-    is_active     = Column(Boolean, default=True)
-    created_at    = Column(DateTime, default=datetime.utcnow)
-    last_login    = Column(DateTime, nullable=True)
-    is_admin      = Column(Boolean, default=False)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    last_login = Column(DateTime, nullable=True)
+    is_admin = Column(Boolean, default=False)
+    workspace = Column(String(30), default="APPLICANT", nullable=False)
 
     # Premium tier — FREE, PRO, or ENTERPRISE
     tier = Column(String(20), default="FREE", nullable=False)
@@ -47,11 +49,16 @@ class User(Base):
     usage_reset_date = Column(DateTime, nullable=True)
 
     # One user → many jobs
-    jobs      = relationship("Job", back_populates="owner", cascade="all, delete-orphan")
-    screenings = relationship("Screening", back_populates="user", cascade="all, delete-orphan")
-    payments = relationship("Payment", back_populates="user", cascade="all, delete-orphan")
-    career_profile = relationship("CareerProfile", back_populates="user", uselist=False, cascade="all, delete-orphan")
-    job_matches = relationship("JobMatch", back_populates="user", cascade="all, delete-orphan")
+    jobs = relationship("Job", back_populates="owner",
+                        cascade="all, delete-orphan")
+    screenings = relationship(
+        "Screening", back_populates="user", cascade="all, delete-orphan")
+    payments = relationship(
+        "Payment", back_populates="user", cascade="all, delete-orphan")
+    career_profile = relationship(
+        "CareerProfile", back_populates="user", uselist=False, cascade="all, delete-orphan")
+    job_matches = relationship(
+        "JobMatch", back_populates="user", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<User {self.email}>"
@@ -63,16 +70,28 @@ class Job(Base):
     """
     __tablename__ = "jobs"
 
-    id          = Column(Integer, primary_key=True, index=True)
-    user_id     = Column(Integer, ForeignKey("users.id"), nullable=False)
-    title       = Column(String(255), nullable=False)
-    company     = Column(String(255), nullable=True)
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    title = Column(String(255), nullable=False)
+    company = Column(String(255), nullable=True)
     description = Column(Text, nullable=False)
-    created_at  = Column(DateTime, default=datetime.utcnow)
+    location = Column(String(255), nullable=True)
+    employment_type = Column(String(50), nullable=True)
+    salary_range = Column(String(120), nullable=True)
+    required_skills = Column(JSON, nullable=True)
+    preferred_skills = Column(JSON, nullable=True)
+    experience_years = Column(Integer, nullable=True)
+    education = Column(String(255), nullable=True)
+    application_url = Column(String(1000), nullable=True)
+    application_email = Column(String(255), nullable=True)
+    closing_date = Column(DateTime, nullable=True)
+    status = Column(String(30), default="OPEN", nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
 
     # Relationships
-    owner      = relationship("User", back_populates="jobs")
-    screenings = relationship("Screening", back_populates="job", cascade="all, delete-orphan")
+    owner = relationship("User", back_populates="jobs")
+    screenings = relationship(
+        "Screening", back_populates="job", cascade="all, delete-orphan")
 
     @property
     def total_candidates(self):
@@ -87,20 +106,21 @@ class Screening(Base):
     """
     __tablename__ = "screenings"
 
-    id               = Column(Integer, primary_key=True, index=True)
-    user_id          = Column(Integer, ForeignKey("users.id"), nullable=False)
-    job_id           = Column(Integer, ForeignKey("jobs.id"), nullable=False)
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    job_id = Column(Integer, ForeignKey("jobs.id"), nullable=False)
     total_candidates = Column(Integer, default=0)
-    total_files      = Column(Integer, default=0)
+    total_files = Column(Integer, default=0)
     processed_candidates = Column(Integer, default=0)
-    status           = Column(String(50), default="QUEUED", nullable=False)
-    error_message    = Column(Text, nullable=True)
-    created_at       = Column(DateTime, default=datetime.utcnow)
+    status = Column(String(50), default="QUEUED", nullable=False)
+    error_message = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
 
     # Relationships
-    user       = relationship("User", back_populates="screenings")
-    job        = relationship("Job", back_populates="screenings")
-    candidates = relationship("Candidate", back_populates="screening", cascade="all, delete-orphan")
+    user = relationship("User", back_populates="screenings")
+    job = relationship("Job", back_populates="screenings")
+    candidates = relationship(
+        "Candidate", back_populates="screening", cascade="all, delete-orphan")
 
 
 class Candidate(Base):
@@ -110,20 +130,22 @@ class Candidate(Base):
     """
     __tablename__ = "candidates"
 
-    id             = Column(Integer, primary_key=True, index=True)
-    screening_id   = Column(Integer, ForeignKey("screenings.id"), nullable=False)
-    filename       = Column(String(255), nullable=False)
+    id = Column(Integer, primary_key=True, index=True)
+    screening_id = Column(Integer, ForeignKey("screenings.id"), nullable=False)
+    filename = Column(String(255), nullable=False)
     candidate_name = Column(String(255), nullable=True)
-    overall_score  = Column(Integer, nullable=True)            # 0–100
-    recommendation = Column(String(50), nullable=True)         # "Strong Hire", "Hire", etc.
-    status         = Column(String(50), default="QUEUED", nullable=False)
-    error_message  = Column(Text, nullable=True)
+    overall_score = Column(Integer, nullable=True)            # 0–100
+    # "Strong Hire", "Hire", etc.
+    recommendation = Column(String(50), nullable=True)
+    status = Column(String(50), default="QUEUED", nullable=False)
+    error_message = Column(Text, nullable=True)
     # Base64 file content — Celery messages are JSON, so raw bytes can't be
     # passed as a task argument. The file is stashed here when the Candidate
     # row is created; the worker reads it back by candidate_id.
     file_content_b64 = Column(Text, nullable=True)
-    result_json    = Column(JSON, nullable=True)               # The complete AI analysis
-    created_at     = Column(DateTime, default=datetime.utcnow)
+    # The complete AI analysis
+    result_json = Column(JSON, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
 
     screening = relationship("Screening", back_populates="candidates")
 
@@ -136,7 +158,8 @@ class CareerProfile(Base):
     __tablename__ = "career_profiles"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), unique=True, nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"),
+                     unique=True, nullable=False)
     target_role = Column(String(255), nullable=True)
     resume_text = Column(Text, nullable=True)
     resume_filename = Column(String(255), nullable=True)
@@ -184,7 +207,8 @@ class Payment(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     paystack_ref = Column(String(255), unique=True, nullable=False, index=True)
     amount = Column(Integer, nullable=False)  # whole NGN
-    status = Column(String(50), default="pending")  # "pending", "success", "failed"
+    # "pending", "success", "failed"
+    status = Column(String(50), default="pending")
     plan = Column(String(50), default="PRO")
     created_at = Column(DateTime, default=datetime.utcnow)
     verified_at = Column(DateTime, nullable=True)
@@ -199,7 +223,8 @@ class PaymentAudit(Base):
     id = Column(Integer, primary_key=True, index=True)
     payment_id = Column(Integer, ForeignKey("payments.id"), nullable=False)
     admin_email = Column(String(255), nullable=True)
-    action = Column(String(100), nullable=False)  # 'confirmed', 'declined', 'recorded'
+    # 'confirmed', 'declined', 'recorded'
+    action = Column(String(100), nullable=False)
     notes = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 

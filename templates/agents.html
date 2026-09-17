@@ -37,6 +37,10 @@
     .ctx-status { font-size: 11px; color: var(--hint); margin-top: 6px; }
     .ctx-status.saved { color: var(--teal); }
     .btn-sm { padding: 7px 11px; font-size: 12px; }
+    .opportunity-panel { padding: 16px; }
+    .opportunity-head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:10px; }
+    .opportunity-title { color:var(--text); font:600 17px var(--serif); }.opportunity-sub { margin-top:3px; color:var(--hint); font-size:11px; line-height:1.45; }
+    .opportunity-list { display:grid; gap:8px; }.opportunity-item { padding:10px; border:1px solid var(--border); border-radius:8px; background:rgba(255,255,255,.025); }.opportunity-item strong { display:block; color:var(--text); font-size:12px; }.opportunity-item span { display:block; margin-top:3px; color:var(--hint); font-size:11px; }.opportunity-item button { margin-top:8px; padding:6px 9px; border:1px solid rgba(45,212,191,.25); border-radius:6px; background:var(--teal-bg); color:var(--teal); font:700 10px var(--sans); cursor:pointer; }.opportunity-item button:hover { border-color:var(--teal); }.opportunity-status { color:var(--hint); font-size:11px; line-height:1.45; }
 
     /* ── Chat panel ──────────────────────────────────────────────── */
     .chat-panel { display: flex; flex-direction: column; height: 640px; padding: 0; overflow: hidden; }
@@ -48,7 +52,11 @@
     }
     .chip:hover { color: var(--text); border-color: rgba(201,168,76,.4); }
 
-    .msg { max-width: 82%; }
+    .agent-intro { display:flex; align-items:center; gap:12px; margin-bottom:16px; padding:0 4px; }
+    .agent-avatar { width:42px; height:42px; border-radius:13px; display:grid; place-items:center; flex:0 0 42px; color:var(--bg); font:700 20px var(--serif); background:radial-gradient(circle at 32% 28%,var(--gold-light),var(--gold) 42%,var(--gold-dark) 100%); border:1px solid rgba(232,213,163,.55); box-shadow:0 0 26px rgba(201,168,76,.16); position:relative; }
+    .agent-avatar::after { content:''; position:absolute; right:-3px; bottom:-3px; width:10px; height:10px; border-radius:50%; background:var(--teal); border:2px solid var(--panel); box-shadow:0 0 10px rgba(45,212,191,.45); }
+    .agent-intro-copy strong { display:block; color:var(--text); font:600 19px var(--serif); }.agent-intro-copy span { display:block; margin-top:2px; color:var(--hint); font-size:11px; letter-spacing:.4px; }
+    .msg { max-width:82%; }
     .msg.user { align-self: flex-end; }
     .msg.assistant { align-self: flex-start; }
     .msg-bubble { padding: 12px 15px; border-radius: 14px; font-size: 13.5px; line-height: 1.55; }
@@ -101,10 +109,10 @@
     .sidebar-brand-name { font:600 20px var(--serif); }.sidebar-brand-name span { color:var(--gold); }
     .sidebar-nav { display:grid; gap:4px; margin-top:22px; }.sidebar-nav a { display:flex; align-items:center; padding:11px 12px; border:1px solid transparent; border-radius:8px; color:var(--muted); font-size:13px; text-decoration:none; transition:background .2s,color .2s,border-color .2s; }.sidebar-nav a:hover { background:rgba(255,255,255,.04); color:var(--text); }.sidebar-nav a.active { background:rgba(201,168,76,.1); border-color:rgba(201,168,76,.35); color:var(--gold); }
     .sidebar-footer { margin-top:auto; padding:14px 12px; border:1px solid var(--border); border-radius:10px; background:linear-gradient(145deg,rgba(201,168,76,.08),rgba(45,212,191,.025)); }.sidebar-footer-title { font:600 16px var(--serif); color:var(--gold-light); }.sidebar-footer-desc { margin-top:3px; color:var(--hint); font-size:11px; line-height:1.4; }.sidebar-footer-link { display:inline-block; margin-top:12px; color:var(--gold); font-size:12px; font-weight:700; text-decoration:none; }
-    .content { min-width:0; flex:1; }.content > nav { height:68px; padding:14px 32px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border); background:rgba(10,11,14,.78); position:sticky; top:0; z-index:100; backdrop-filter:blur(18px); }.hamburger-btn { display:none; background:none; border:0; color:var(--text); font-size:22px; cursor:pointer; }.content .aptura-nav { display:none; }.nav-right { display:flex; align-items:center; gap:10px; }.btn-new { display:inline-flex; align-items:center; min-height:34px; padding:8px 11px; border:1px solid var(--border); border-radius:7px; color:var(--muted); font-size:11px; font-weight:700; text-decoration:none; white-space:nowrap; }.btn-new:hover { border-color:rgba(201,168,76,.35); color:var(--gold); }.user-profile { display:flex; align-items:center; gap:8px; margin-left:4px; }.user-avatar { width:28px; height:28px; border-radius:50%; display:grid; place-items:center; overflow:hidden; background:rgba(201,168,76,.1); border:1px solid rgba(201,168,76,.35); color:var(--gold); font-size:10px; font-weight:700; }.user-avatar img { width:100%; height:100%; object-fit:cover; }.user-name { color:var(--muted); font-size:12px; }.content > main { max-width:1100px; padding:32px 28px 80px; }
+    .content { min-width:0; flex:1; }.content > nav { height:68px; padding:14px 32px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border); background:rgba(10,11,14,.78); position:sticky; top:0; z-index:100; backdrop-filter:blur(18px); }.hamburger-btn { display:none; background:none; border:0; color:var(--text); font-size:22px; cursor:pointer; }.content .aptura-nav { display:none; }.nav-right { display:flex; align-items:center; gap:10px; }.btn-new { display:inline-flex; align-items:center; min-height:34px; padding:8px 11px; border:1px solid var(--border); border-radius:7px; color:var(--muted); font-size:11px; font-weight:700; text-decoration:none; white-space:nowrap; }.btn-new:hover { border-color:rgba(201,168,76,.35); color:var(--gold); }.user-profile { display:flex; align-items:center; gap:8px; margin-left:4px; }.user-avatar { width:28px; height:28px; border-radius:50%; display:grid; place-items:center; overflow:hidden; background:rgba(201,168,76,.1); border:1px solid rgba(201,168,76,.35); color:var(--gold); font-size:10px; font-weight:700; }.user-avatar img { width:100%; height:100%; object-fit:cover; }.user-name { color:var(--muted); font-size:12px; }.content > main { max-width:1160px; padding:28px 32px 56px; }
     .context-kicker { display:flex; align-items:center; gap:9px; margin-bottom:8px; color:var(--gold); font-size:10px; font-weight:800; letter-spacing:1.8px; text-transform:uppercase; }.context-kicker::before { content:''; width:24px; height:1px; background:var(--gold); opacity:.7; }
     @media(max-width:900px) { .sidebar { position:fixed; left:0; top:0; z-index:300; transform:translateX(-100%); transition:transform .25s ease; box-shadow:20px 0 70px rgba(0,0,0,.35); }.sidebar.open { transform:translateX(0); }.hamburger-btn { display:block; }.content > nav { padding:14px 18px; }.user-name { display:none; }.btn-new { padding:7px 8px; font-size:10px; }.content > main { padding:26px 18px 48px; } }
-    @media(max-width:600px) { .content .nav-right .btn-new:nth-child(1), .user-profile { display:none; }.content > main { padding:22px 14px 50px; }.chat-panel { height:calc(100vh - 150px); min-height:560px; }.ctx-row { flex-wrap:wrap; }.ctx-row input { min-width:150px; } }
+    @media(max-width:600px) { .content .nav-right .btn-new:nth-child(1), .user-profile { display:none; }.content > main { padding:22px 14px 40px; }.chat-panel { height:calc(100vh - 150px); min-height:560px; }.ctx-row { flex-wrap:wrap; }.ctx-row input { min-width:150px; } }
   </style>
 </head>
 <body>
@@ -187,13 +195,18 @@
           <input type="text" id="ctx-skills" placeholder="e.g. Python, AWS, System design" />
         </div>
       </div>
+      <div class="panel opportunity-panel">
+        <div class="opportunity-head"><div><div class="opportunity-title">Open opportunities</div><div class="opportunity-sub">Explore roles published by companies and compare them with your saved resume.</div></div><span style="color:var(--teal);font-size:16px;" aria-hidden="true">&#9673;</span></div>
+        <div class="opportunity-list" id="opportunity-list"><div class="opportunity-status">Loading opportunities...</div></div>
+      </div>
     </div>
 
     <div class="col-main">
       <div class="panel chat-panel">
         <div class="chat-thread" id="chat-thread">
+          <div class="agent-intro"><div class="agent-avatar" aria-label="Aptura Agent avatar">A</div><div class="agent-intro-copy"><strong>Aptura Agent</strong><span>Resume intelligence, without the guesswork</span></div></div>
           <div class="msg assistant">
-            <div class="msg-bubble">Hi{{ ' ' + user.name if user.name else '' }} — I'm your Aptura career agent. Fill in your resume on the left (or paste it right here), then ask me anything: analyze your resume, compare it to a job, find skill gaps, build a plan, or write a cover letter.</div>
+            <div class="msg-bubble">Hi{{ ' ' + user.name if user.name else '' }} - I'm your Aptura career agent. Add your resume on the left, then ask me to analyze it, compare it with a role, find skill gaps, build a plan, or prepare a cover letter.</div>
           </div>
         </div>
         <div class="chips">
@@ -226,6 +239,31 @@
       backdrop.addEventListener('click', () => { sidebar.classList.remove('open'); backdrop.style.display = 'none'; });
       document.querySelectorAll('.sidebar-nav a').forEach((link) => link.addEventListener('click', () => { sidebar.classList.remove('open'); backdrop.style.display = 'none'; }));
     }
+
+    async function loadOpenOpportunities() {
+      const list = document.getElementById('opportunity-list');
+      try {
+        const response = await fetch('/api/jobs/open');
+        const data = await response.json();
+        if (!response.ok || data.success === false) throw new Error(data.error || 'Unable to load roles.');
+        const jobs = data.vacancies || [];
+        list.innerHTML = jobs.length ? jobs.slice(0, 6).map(job => `<div class="opportunity-item"><strong>${job.title}</strong><span>${job.company || 'Company'}${job.location ? ` · ${job.location}` : ''}</span><button type="button" onclick="matchOpportunity(${job.id}, this)">Match my resume</button></div>`).join('') : '<div class="opportunity-status">No open roles yet. Check back soon.</div>';
+      } catch (error) { list.innerHTML = '<div class="opportunity-status">Open roles will appear here when companies publish them.</div>'; }
+    }
+
+    async function matchOpportunity(jobId, button) {
+      button.disabled = true;
+      button.textContent = 'Comparing...';
+      try {
+        const response = await fetch(`/api/jobs/${jobId}/match`, { method:'POST' });
+        const data = await response.json();
+        if (!response.ok || data.success === false) throw new Error(data.error || 'Match unavailable.');
+        const score = data.match && (data.match.match_score ?? data.match.score);
+        button.textContent = score != null ? `Match ${score}/100` : 'Match ready';
+      } catch (error) { button.textContent = 'Try again'; button.disabled = false; }
+    }
+
+    loadOpenOpportunities();
   </script>
 {% include "_webmcp.html" %}
 </body>

@@ -66,6 +66,7 @@
   }
 
   function ensureChrome() {
+    if (!state.available) return;
     injectStyles();
     let badge = $("#webmcpBadge");
     if (!badge) {
@@ -75,11 +76,9 @@
       const navRight = $(".nav-right") || $("nav") || document.body;
       navRight.insertBefore(badge, navRight.firstChild);
     }
-    badge.textContent = state.available ? "Agent Ready" : "Agent Offline";
-    badge.classList.toggle("ready", state.available);
-    badge.title = state.available
-      ? "WebMCP tools are registered for compatible AI agents."
-      : "This browser does not expose a compatible document.modelContext API.";
+    badge.textContent = "Agent Ready";
+    badge.classList.add("ready");
+    badge.title = "WebMCP tools are registered for compatible AI agents.";
 
     if (!$("#webmcpPanel")) {
       const panel = document.createElement("aside");

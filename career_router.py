@@ -76,6 +76,21 @@ class ShortlistInput(BaseModel):
     notes: str | None = Field(default=None, max_length=2000)
 
 
+class VacancyInput(BaseModel):
+    title: str = Field(..., min_length=2, max_length=255)
+    company: str = Field(..., min_length=2, max_length=255)
+    description: str = Field(..., min_length=20, max_length=30000)
+    location: str | None = Field(default="", max_length=255)
+    employment_type: str | None = Field(default="", max_length=50)
+    salary_range: str | None = Field(default="", max_length=120)
+    required_skills: list[str] = Field(default_factory=list, max_length=60)
+    preferred_skills: list[str] = Field(default_factory=list, max_length=60)
+    experience_years: int | None = Field(default=None, ge=0, le=60)
+    education: str | None = Field(default="", max_length=255)
+    application_url: str | None = Field(default="", max_length=1000)
+    application_email: str | None = Field(default="", max_length=255)
+
+
 def _json_success(data: dict[str, Any]) -> JSONResponse:
     return JSONResponse({"success": True, **data})
 
@@ -119,6 +134,111 @@ async def recruiter_page(request: Request, db: Session = Depends(get_db), curren
     import main as _main
 
     return await _main.screen_page(request, db, current_user)
+
+
+def _vacancy_payload(job: models.Job) -> dict[str, Any]:
+    return {
+        "id": job.id,
+        "title": job.title,
+        "company": job.company or "",
+        "description": job.description,
+        "location": job.location or "",
+        "employment_type": job.employment_type or "",
+        "salary_range": job.salary_range or "",
+        "required_skills": job.required_skills or [],
+        "preferred_skills": job.preferred_skills or [],
+        "experience_years": job.experience_years,
+        "education": job.education or "",
+        "application_url": job.application_url or "",
+        "application_email": job.application_email or "",
+        "status": job.status or "OPEN",
+        "created_at": job.created_at.isoformat() if job.created_at else None,
+    }
+
+
+@router.get("/api/recruiter/vacancies")
+async def list_recruiter_vacancies(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    jobs = (
+        db.query(models.Job)
+        .filter(models.Job.user_id == current_user.id)
+        .order_by(models.Job.created_at.desc())
+        .limit(100)
+        .all()
+    )
+    return _json_success({"vacancies": [_vacancy_payload(job) for job in jobs]})
+
+
+@router.post("/api/recruiter/vacancies")
+async def create_recruiter_vacancy(
+    payload: VacancyInput,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    job = models.Job(
+        user_id=current_user.id,
+        title=payload.title.strip(),
+        company=payload.company.strip(),
+        description=payload.description.strip(),
+        location=(payload.location or "").strip(),
+        employment_type=(payload.employment_type or "").strip(),
+        salary_range=(payload.salary_range or "").strip(),
+        required_skills=[skill.strip()
+                         for skill in payload.required_skills if skill.strip()],
+        preferred_skills=[skill.strip()
+                          for skill in payload.preferred_skills if skill.strip()],
+        experience_years=payload.experience_years,
+        education=(payload.education or "").strip(),
+        application_url=(payload.application_url or "").strip(),
+        application_email=(payload.application_email or "").strip(),
+        status="OPEN",
+    )
+    db.add(job)
+    db.commit()
+    db.refresh(job)
+    return _json_success({"vacancy": _vacancy_payload(job), "activity": ["Vacancy published"]})
+
+
+@router.get("/api/jobs/open")
+async def list_open_vacancies(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    jobs = (
+        db.query(models.Job)
+        .filter(models.Job.status == "OPEN")
+        .order_by(models.Job.created_at.desc())
+        .limit(100)
+        .all()
+    )
+    return _json_success({"vacancies": [_vacancy_payload(job) for job in jobs]})
+
+
+@router.post("/api/jobs/{job_id}/match")
+async def match_saved_vacancy(
+    job_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    job = db.query(models.Job).filter(models.Job.id == job_id,
+                                      models.Job.status == "OPEN").first()
+    if not job:
+        raise HTTPException(404, "Open vacancy not found.")
+    try:
+        result = career.match_resume_to_job(
+            db,
+            current_user,
+            job.title,
+            job.company or "",
+            job.description,
+            job.required_skills or [],
+            None,
+        )
+        return _json_success({"vacancy": _vacancy_payload(job), "match": result, "activity": ["Vacancy requirements loaded", "Resume compared", "Match calculated"]})
+    except Exception as exc:
+        return _safe_error(exc)
 
 
 @router.get("/api/career/profile")
