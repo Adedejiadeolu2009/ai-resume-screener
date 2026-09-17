@@ -111,6 +111,67 @@ main { flex: 1; max-width: 1280px; width: 100%; margin: 0 auto; padding: 32px 28
 .welcome h1 { font: 300 36px var(--ff-serif); margin-bottom: 4px; }
 .welcome p { font: 300 14px var(--ff-sans); color: var(--muted); }
 
+.workspace-hero {
+  position: relative; overflow: hidden;
+  display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(160px, 0.9fr);
+  gap: 16px; align-items: center;
+  padding: 28px 28px 20px; margin-bottom: 28px;
+  border: 1px solid var(--border); border-radius: 18px;
+  background: linear-gradient(135deg, rgba(201,168,76,0.1), rgba(45,212,191,0.06));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+}
+.workspace-hero::before {
+  content: ''; position: absolute; inset: 0 auto 0 0; width: 8px; background: linear-gradient(180deg, var(--gold), var(--teal));
+}
+.workspace-hero[data-workspace="STUDENT"] { background: linear-gradient(135deg, rgba(201,168,76,0.12), rgba(45,212,191,0.08)); }
+.workspace-hero[data-workspace="APPLICANT"] { background: linear-gradient(135deg, rgba(96,165,250,0.12), rgba(201,168,76,0.08)); }
+.workspace-hero[data-workspace="RECRUITER"] { background: linear-gradient(135deg, rgba(45,212,191,0.12), rgba(201,168,76,0.08)); }
+
+.workspace-copy { position: relative; z-index: 1; }
+.workspace-kicker {
+  display: inline-flex; align-items: center; gap: 8px; margin-bottom: 12px;
+  color: var(--gold); font: 700 10px var(--ff-sans); letter-spacing: 1.6px; text-transform: uppercase;
+}
+.workspace-kicker::before {
+  content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 14px rgba(201,168,76,0.6);
+}
+.workspace-hero h1 {
+  font: 400 42px/1.1 var(--ff-serif); margin: 0 0 10px; letter-spacing: -0.04em;
+}
+.workspace-hero p { margin: 0; max-width: 640px; color: var(--muted); font: 400 14px/1.7 var(--ff-sans); }
+.workspace-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 22px; }
+.workspace-action {
+  display: inline-flex; align-items: center; justify-content: center; padding: 10px 16px; border-radius: 10px;
+  font: 700 12px var(--ff-sans); text-decoration: none; transition: transform 0.2s, box-shadow 0.2s; border: 1px solid transparent;
+}
+.workspace-action.primary {
+  background: linear-gradient(135deg, var(--gold), #A07820); color: #0A0B0E; box-shadow: 0 10px 24px rgba(201,168,76,0.22);
+}
+.workspace-action.secondary {
+  background: rgba(255,255,255,0.02); border-color: rgba(255,255,255,0.08); color: var(--text);
+}
+.workspace-action:hover { transform: translateY(-2px); }
+
+.workspace-avatar {
+  position: relative; z-index: 1; display: flex; align-items: center; justify-content: center;
+  min-height: 150px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(10,11,14,0.35); color: var(--gold);
+  font-size: clamp(64px, 6vw, 88px); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
+}
+
+.workspace-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-bottom: 32px; }
+.workspace-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px 18px 16px; min-height: 140px;
+}
+.workspace-card-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.workspace-card-title { font: 700 11px var(--ff-sans); text-transform: uppercase; letter-spacing: 1.3px; color: var(--hint); }
+.workspace-card-pill { display: inline-flex; align-items: center; justify-content: center; min-width: 32px; height: 32px; border-radius: 10px; background: rgba(201,168,76,0.08); border: 1px solid rgba(201,168,76,0.18); color: var(--gold); font-weight: 700; }
+.workspace-card h3 { font: 400 24px var(--ff-serif); margin-bottom: 6px; }
+.workspace-card p { color: var(--muted); font: 400 13px/1.6 var(--ff-sans); }
+
+.workspace-card:nth-child(2) .workspace-card-pill { background: rgba(45,212,191,0.08); border-color: rgba(45,212,191,0.22); color: var(--teal); }
+.workspace-card:nth-child(3) .workspace-card-pill { background: rgba(59,130,246,0.08); border-color: rgba(59,130,246,0.2); color: #7dd3fc; }
+
 /* Premium Banner */
 .premium-banner { 
   background: linear-gradient(135deg, rgba(201,168,76,0.12), rgba(45,212,191,0.08)); 
@@ -329,90 +390,103 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
         <p>{% if user.workspace == 'RECRUITER' %}Publish vacancies, screen candidates, and build a stronger shortlist with evidence.{% elif user.workspace == 'STUDENT' %}Build your foundation, understand your strengths, and move toward your next opportunity.{% else %}Analyze your resume, discover better-fit roles, close skill gaps, and prepare stronger applications.{% endif %}</p>
       </div>
 
-      <!-- Premium Banner -->
-      <div class="premium-banner">
-        <div class="premium-info">
-          <div class="premium-icon">{% if tier == 'PRO' or tier == 'ENTERPRISE' %}👑{% else %}⚡{% endif %}</div>
-          <div class="premium-text">
-            <h3>{% if tier == 'PRO' or tier == 'ENTERPRISE' %}Premium Account{% else %}Free Plan{% endif %}</h3>
-            <p>{% if tier == 'PRO' or tier == 'ENTERPRISE' %}{% if premium_until %}Expires {{ premium_until.strftime('%b %d, %Y') }}{% else %}Active{% endif %}{% else %}5 free screenings per month{% endif %}</p>
+      {% set ws = user.workspace or 'APPLICANT' %}
+      <section class="workspace-hero" data-workspace="{{ ws }}">
+        <div class="workspace-copy">
+          <div class="workspace-kicker">
+            {% if ws == 'STUDENT' %}Student space{% elif ws == 'RECRUITER' %}Recruiter space{% else %}Applicant space{% endif %}
+          </div>
+          <h1>
+            {% if ws == 'STUDENT' %}Build your next chapter.{% elif ws == 'RECRUITER' %}Your hiring engine is online.{% else %}Your opportunities are waiting.{% endif %}
+          </h1>
+          <p>
+            {% if ws == 'STUDENT' %}Explore the skills, roles, and gaps that will move you from learning into a stronger career path with Aptura guidance.{% elif ws == 'RECRUITER' %}Publish open roles, review candidate quality, and move fast from screening to shortlist with AI-backed decisions.{% else %}Track your resume health, discover better-fit opportunities, and act on the right jobs with clarity and momentum.{% endif %}
+          </p>
+          <div class="workspace-actions">
+            {% if ws == 'STUDENT' %}
+              <a class="workspace-action primary" href="/agent">Plan my next move</a>
+              <a class="workspace-action secondary" href="/resume-builder">Build resume</a>
+            {% elif ws == 'RECRUITER' %}
+              <a class="workspace-action primary" href="/recruiter">Open vacancy studio</a>
+              <a class="workspace-action secondary" href="/screen">Run new screening</a>
+            {% else %}
+              <a class="workspace-action primary" href="/agent">Match my resume</a>
+              <a class="workspace-action secondary" href="/screen">Review screening</a>
+            {% endif %}
           </div>
         </div>
-
-        <div class="premium-usage">
-          <div class="usage-bar">
-            <div class="usage-fill" id="usageFill" style="width: 0%;"></div>
-          </div>
-          <div class="usage-text">{{ screenings_used }}/{% if tier == 'PRO' or tier == 'ENTERPRISE' %}100{% else %}5{% endif %}</div>
+        <div class="workspace-avatar" aria-label="workspace avatar">
+          {% if ws == 'STUDENT' %}🎓{% elif ws == 'RECRUITER' %}🧑‍💼{% else %}💼{% endif %}
         </div>
+      </section>
 
-        {% if tier == 'PRO' or tier == 'ENTERPRISE' %}
-          <span class="premium-badge">✓ Active</span>
+      <div class="workspace-grid">
+        {% if ws == 'STUDENT' %}
+          <div class="workspace-card">
+            <div class="workspace-card-header"><span class="workspace-card-title">Career score</span><span class="workspace-card-pill">AI</span></div>
+            <h3>{% if career_readiness.overall is not none %}{{ career_readiness.overall }}{% else %}--{% endif %}</h3>
+            <p>Your readiness snapshot for the next role and the strongest skill gaps to prioritize.</p>
+          </div>
+          <div class="workspace-card">
+            <div class="workspace-card-header"><span class="workspace-card-title">Skill gaps</span><span class="workspace-card-pill">⚑</span></div>
+            <h3>{{ top_skill_gaps | length }}</h3>
+            <p>Areas to sharpen before you apply, with practical guidance from the Aptura agent.</p>
+          </div>
+          <div class="workspace-card">
+            <div class="workspace-card-header"><span class="workspace-card-title">Progress</span><span class="workspace-card-pill">↗</span></div>
+            <h3>{{ total_screenings or 0 }}</h3>
+            <p>Saved screening sessions and resume checks that show how your profile is improving.</p>
+          </div>
+        {% elif ws == 'RECRUITER' %}
+          <div class="workspace-card">
+            <div class="workspace-card-header"><span class="workspace-card-title">Open roles</span><span class="workspace-card-pill">◎</span></div>
+            <h3>{{ total_screenings or 0 }}</h3>
+            <p>Active hiring moments and reviews feeding your candidate pipeline in real time.</p>
+          </div>
+          <div class="workspace-card">
+            <div class="workspace-card-header"><span class="workspace-card-title">Candidates</span><span class="workspace-card-pill">★</span></div>
+            <h3>{{ total_candidates or 0 }}</h3>
+            <p>Profiles reviewed across the positions you’ve screened or published.</p>
+          </div>
+          <div class="workspace-card">
+            <div class="workspace-card-header"><span class="workspace-card-title">Strong hires</span><span class="workspace-card-pill">✓</span></div>
+            <h3>{{ strong_hires or 0 }}</h3>
+            <p>High-confidence candidates already surfaced as your strongest match opportunities.</p>
+          </div>
         {% else %}
-          <a href="/plans" class="premium-btn">Upgrade Now</a>
-        {% endif %}
-      </div>
-
-      <section class="premium-banner">
-        <div class="premium-info">
-          <div class="premium-icon">AI</div>
-          <div class="premium-text">
-            <h3>Aptura Agent is ready</h3>
-            <p>Ask the agent to analyze your resume, match jobs, find skill gaps, tailor improvements, and prepare cover letters. WebMCP adds direct tool access for compatible AI-agent browsers.</p>
+          <div class="workspace-card">
+            <div class="workspace-card-header"><span class="workspace-card-title">Resume health</span><span class="workspace-card-pill">◌</span></div>
+            <h3>{% if career_readiness.resume is not none %}{{ career_readiness.resume }}{% else %}--{% endif %}</h3>
+            <p>Your fit score based on your resume strength, role focus, and overall readiness.</p>
           </div>
-        </div>
-        <a href="/agent" class="premium-btn">Ask Aptura Agent</a>
-      </section>
-
-      <section class="readiness-panel" aria-label="Career snapshot">
-        <div class="readiness-score">
-          <div class="label">Recent Job Match</div>
-          <div class="value">{% if latest_match %}{{ latest_match.match_score or '--' }}{% else %}--{% endif %}</div>
-          <div class="method">{% if latest_match %}{{ latest_match.job_title }}{% else %}Paste a job description in Aptura Agent to calculate a match score.{% endif %}</div>
-        </div>
-        <div class="readiness-grid">
-          <div class="readiness-item"><strong>Resume Health</strong><span>{% if career_readiness.resume is not none %}{{ career_readiness.resume }}{% else %}--{% endif %}</span></div>
-          <div class="readiness-item"><strong>Target Role</strong><span style="font-size:16px;line-height:1.2">{{ career_profile.target_role if career_profile and career_profile.target_role else 'Set' }}</span></div>
-          <div class="readiness-item"><strong>Top Skill Gaps</strong><span>{{ top_skill_gaps | length }}</span></div>
-          <div class="readiness-item"><strong>Applications</strong><span>--</span></div>
-        </div>
-      </section>
-
-      <!-- Stats Grid -->
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-label">Total Screenings</div>
-          <div class="stat-number">{{ total_screenings }}</div>
-          <div class="stat-sub">All time</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Candidates Reviewed</div>
-          <div class="stat-number">{{ total_candidates }}</div>
-          <div class="stat-sub">Across all positions</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Average Top Score</div>
-          <div class="stat-number">{{ avg_score }}</div>
-          <div class="stat-sub">Out of 100</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Strong Hires Found</div>
-          <div class="stat-number">{{ strong_hires }}</div>
-          <div class="stat-sub">Highly recommended</div>
-        </div>
+          <div class="workspace-card">
+            <div class="workspace-card-header"><span class="workspace-card-title">Best fit</span><span class="workspace-card-pill">◎</span></div>
+            <h3>{% if latest_match %}{{ latest_match.match_score or '--' }}{% else %}--{% endif %}</h3>
+            <p>Latest role match against your profile, ready to guide application and tailoring.</p>
+          </div>
+          <div class="workspace-card">
+            <div class="workspace-card-header"><span class="workspace-card-title">Applications</span><span class="workspace-card-pill">•</span></div>
+            <h3>{{ total_screenings or 0 }}</h3>
+            <p>Role-targeted evaluations helping you narrow the right jobs and improve your pitch.</p>
+          </div>
+        {% endif %}
       </div>
 
       <section class="readiness-panel" aria-label="Career readiness score">
         <div class="readiness-score">
-          <div class="label">Career Readiness</div>
+          <div class="label">
+            {% if ws == 'STUDENT' %}Learning momentum{% elif ws == 'RECRUITER' %}Hiring signal{% else %}Career readiness{% endif %}
+          </div>
           <div class="value">{% if career_readiness.overall is not none %}{{ career_readiness.overall }}{% else %}--{% endif %}</div>
-          <div class="method">{{ career_readiness.methodology }}</div>
+          <div class="method">
+            {% if ws == 'STUDENT' %}Focused on growth priorities, skill gaps, and action-oriented next steps.{% elif ws == 'RECRUITER' %}A quick pulse on candidate quality and the strongest roles and hires in your pipeline.{% else %}{{ career_readiness.methodology }}{% endif %}
+          </div>
         </div>
         <div class="readiness-grid">
           <div class="readiness-item"><strong>Resume</strong><span>{% if career_readiness.resume is not none %}{{ career_readiness.resume }}{% else %}--{% endif %}</span></div>
           <div class="readiness-item"><strong>Skills</strong><span>{% if career_readiness.skills is not none %}{{ career_readiness.skills }}{% else %}--{% endif %}</span></div>
           <div class="readiness-item"><strong>Experience</strong><span>{% if career_readiness.experience is not none %}{{ career_readiness.experience }}{% else %}--{% endif %}</span></div>
-          <div class="readiness-item"><strong>Application</strong><span>{% if career_readiness.application is not none %}{{ career_readiness.application }}{% else %}--{% endif %}</span></div>
+          <div class="readiness-item"><strong>Goal</strong><span>{% if career_profile and career_profile.target_role %}{{ career_profile.target_role[:12] }}{% else %}Set{% endif %}</span></div>
         </div>
       </section>
 

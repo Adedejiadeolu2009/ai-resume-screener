@@ -66,16 +66,21 @@
   }
 
   function ensureChrome() {
-    if (!state.available) return;
-    injectStyles();
-    let badge = $("#webmcpBadge");
-    if (!badge) {
-      badge = document.createElement("div");
-      badge.id = "webmcpBadge";
-      badge.className = "webmcp-badge";
-      const navRight = $(".nav-right") || $("nav") || document.body;
-      navRight.insertBefore(badge, navRight.firstChild);
-    }
+      if (!state.available) return;
+      const navRight = document.querySelector(".nav-right") || document.querySelector("nav") || document.body;
+      const existingBadge = document.getElementById("webmcpBadge");
+      if (!navRight || !existingBadge) {
+        if (existingBadge) existingBadge.remove();
+        return;
+      }
+      injectStyles();
+      let badge = existingBadge;
+      if (!badge) {
+        badge = document.createElement("div");
+        badge.id = "webmcpBadge";
+        badge.className = "webmcp-badge";
+        navRight.insertBefore(badge, navRight.firstChild);
+      }
     badge.textContent = "Agent Ready";
     badge.classList.add("ready");
     badge.title = "WebMCP tools are registered for compatible AI agents.";
