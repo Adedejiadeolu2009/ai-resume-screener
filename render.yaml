@@ -12,7 +12,7 @@ services:
       - key: APP_ENV
         value: production
       - key: APP_BASE_URL
-        value: https://aptura-ai.onrender.com
+        value: https://aptura.com.ng
       - key: ALLOWED_HOSTS
         value: aptura-ai.onrender.com,*.onrender.com
       - key: SECRET_KEY

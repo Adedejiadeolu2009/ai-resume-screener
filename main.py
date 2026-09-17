@@ -324,8 +324,11 @@ app.include_router(career_router.router)
 @app.get("/sitemap.xml")
 async def sitemap_xml():
     sitemap_path = BASE_DIR / "templates" / "sitemap.xml"
+    sitemap = sitemap_path.read_text(encoding="utf-8")
+    # Keep sitemap URLs on the same canonical host as robots.txt and OAuth links.
+    sitemap = sitemap.replace("https://aptura.com.ng", APP_BASE_URL)
     return _Response(
-        content=sitemap_path.read_text(encoding="utf-8"),
+        content=sitemap,
         media_type="application/xml",
     )
 
