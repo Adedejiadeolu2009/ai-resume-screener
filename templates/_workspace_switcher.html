@@ -1,0 +1,34 @@
+<div class="workspace-switcher" data-workspace-switcher>
+  <button class="workspace-toggle" type="button" aria-haspopup="menu" aria-expanded="false">
+    <span class="workspace-dot" aria-hidden="true"></span>
+    <span>{{ workspace_meta.short_label }}</span>
+    <span aria-hidden="true">v</span>
+  </button>
+  <div class="workspace-menu" role="menu">
+    {% for option in workspace_options %}
+      {% if option.enabled %}
+      <form class="workspace-form" method="post" action="/api/workspace/switch">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="role" value="{{ option.key }}">
+        <button type="submit" class="workspace-menu-item {% if option.active %}active{% endif %}" role="menuitem">
+          <span>
+            <strong>{{ option.short_label }}</strong>
+            <small>{% if option.active %}Current workspace{% else %}Switch workspace{% endif %}</small>
+          </span>
+        </button>
+      </form>
+      {% else %}
+      <form class="workspace-form" method="post" action="/api/workspace/activate">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="role" value="{{ option.key }}">
+        <button type="submit" class="workspace-menu-item muted" role="menuitem">
+          <span>
+            <strong>{{ option.short_label }}</strong>
+            <small>{% if option.key == 'student' %}Explore Student Workspace{% else %}{{ option.activation_label }}{% endif %}</small>
+          </span>
+        </button>
+      </form>
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>

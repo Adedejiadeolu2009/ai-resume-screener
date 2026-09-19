@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 import models
 import career_services as career
 import security as auth
+import workspace as workspace_utils
 from database import get_db
 from resume_builder_router import PROMPT as RESUME_BUILDER_PROMPT
 from resume_builder_router import _chat_json
@@ -206,6 +207,7 @@ async def get_resume_score(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(auth.get_current_user),
 ):
+    workspace_utils.require_role(current_user, workspace_utils.ROLE_RECRUITER)
     candidate = _latest_candidate(db, current_user.id)
     if not candidate or not candidate.result_json:
         raise HTTPException(404, "No scored resume was found for the current user.")
@@ -296,6 +298,7 @@ async def analyze_skill_gap(
 
 @router.post("/analyze-job")
 async def analyze_job(payload: AnalyzeJobInput, current_user: models.User = Depends(auth.get_current_user)):
+    workspace_utils.require_role(current_user, workspace_utils.ROLE_RECRUITER)
     try:
         prompt = f"""Return ONLY valid JSON.
 {{"job_title":"{payload.job_title}","role_summary":"<summary>","requirements":["<requirement>"],"required_skills":["<skill>"],"preferred_skills":["<skill>"],"screening_notes":["<note>"]}}
@@ -331,6 +334,7 @@ def _candidate_payload(candidate: models.Candidate) -> dict[str, Any]:
 
 @router.post("/rank-candidates")
 async def rank_candidates(payload: ScreeningIdInput, db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
+    workspace_utils.require_role(current_user, workspace_utils.ROLE_RECRUITER)
     screening = _owned_screening(db, current_user.id, payload.screening_id)
     ranked = sorted([_candidate_payload(c) for c in screening.candidates if c.result_json], key=lambda c: c.get("match_score") or 0, reverse=True)
     return {"success": True, "screening_id": screening.id, "ranked_candidates": ranked, "note": "AI recommendation only. Aptura does not make autonomous hiring decisions."}
@@ -338,6 +342,7 @@ async def rank_candidates(payload: ScreeningIdInput, db: Session = Depends(get_d
 
 @router.post("/compare-candidates")
 async def compare_candidates(payload: CompareCandidatesInput, db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
+    workspace_utils.require_role(current_user, workspace_utils.ROLE_RECRUITER)
     screening = _owned_screening(db, current_user.id, payload.screening_id)
     allowed = set(payload.candidate_ids or [])
     candidates = [c for c in screening.candidates if c.result_json and (not allowed or c.id in allowed)]
@@ -347,6 +352,7 @@ async def compare_candidates(payload: CompareCandidatesInput, db: Session = Depe
 
 @router.post("/shortlist-candidate")
 async def shortlist_candidate(payload: ShortlistCandidateInput, db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
+    workspace_utils.require_role(current_user, workspace_utils.ROLE_RECRUITER)
     screening = _owned_screening(db, current_user.id, payload.screening_id)
     candidate = next((c for c in screening.candidates if c.id == payload.candidate_id), None)
     if not candidate:

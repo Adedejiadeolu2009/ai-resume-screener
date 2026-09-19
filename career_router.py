@@ -1,7 +1,7 @@
 from typing import Any
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 import admin_router
 import career_services as career
 import models
+import workspace as workspace_utils
 from database import get_db
 from security import get_current_user
 
@@ -133,6 +134,11 @@ async def job_match_page(request: Request, db: Session = Depends(get_db), curren
 async def recruiter_page(request: Request, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     import main as _main
 
+    if workspace_utils.needs_role_onboarding(current_user):
+        return RedirectResponse("/onboarding/role")
+    if workspace_utils.ROLE_RECRUITER not in workspace_utils.available_roles(current_user):
+        return RedirectResponse("/dashboard?workspace_error=unauthorized")
+    workspace_utils.switch_role(db, current_user, workspace_utils.ROLE_RECRUITER)
     return await _main.screen_page(request, db, current_user)
 
 
@@ -161,6 +167,7 @@ async def list_recruiter_vacancies(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
 ):
+    workspace_utils.require_role(current_user, workspace_utils.ROLE_RECRUITER)
     jobs = (
         db.query(models.Job)
         .filter(models.Job.user_id == current_user.id)
@@ -177,6 +184,7 @@ async def create_recruiter_vacancy(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
 ):
+    workspace_utils.require_role(current_user, workspace_utils.ROLE_RECRUITER)
     job = models.Job(
         user_id=current_user.id,
         title=payload.title.strip(),
@@ -407,6 +415,7 @@ async def agent_chat(payload: AgentInput, db: Session = Depends(get_db), current
 
 @router.post("/api/recruiter/shortlist")
 async def shortlist_candidate(payload: ShortlistInput, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    workspace_utils.require_role(current_user, workspace_utils.ROLE_RECRUITER)
     screening = (
         db.query(models.Screening)
         .filter(models.Screening.id == payload.screening_id, models.Screening.user_id == current_user.id)

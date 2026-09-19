@@ -179,7 +179,7 @@ async def register(
     db.commit()
     db.refresh(user)
 
-    response = JSONResponse({"success": True, "redirect": "/dashboard"})
+    response = JSONResponse({"success": True, "redirect": "/workspace"})
     return set_auth_cookie(response, user)
 
 
@@ -209,7 +209,7 @@ async def login(
     user.last_login = datetime.utcnow()
     db.commit()
 
-    response = JSONResponse({"success": True, "redirect": "/dashboard"})
+    response = JSONResponse({"success": True, "redirect": "/workspace"})
     return set_auth_cookie(response, user)
 
 
@@ -339,7 +339,7 @@ async def google_callback(request: Request, db: Session = Depends(get_db)):
         provider_id=user_info["sub"],
         avatar_url=user_info.get("picture")
     )
-    response = RedirectResponse("/dashboard", status_code=302)
+    response = RedirectResponse("/workspace", status_code=302)
     return set_auth_cookie(response, user)
 
 
@@ -387,7 +387,7 @@ async def github_callback(request: Request, db: Session = Depends(get_db)):
         provider_id=str(profile["id"]),
         avatar_url=profile.get("avatar_url")
     )
-    response = RedirectResponse("/dashboard", status_code=302)
+    response = RedirectResponse("/workspace", status_code=302)
     return set_auth_cookie(response, user)
 
 

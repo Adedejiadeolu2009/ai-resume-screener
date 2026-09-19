@@ -25,7 +25,7 @@ from sqlalchemy import func, inspect, text
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
-from fastapi import FastAPI, Request, Depends
+from fastapi import FastAPI, Request, Depends, Form
 from dotenv import load_dotenv
 import uvicorn
 import os
@@ -51,6 +51,7 @@ else:
     logger.warning(".env file not found at: %s", ENV_PATH)
 
 import models  # noqa: F401
+import workspace as workspace_utils
 
 # Create all DB tables on startup (safe to run every time — never deletes data)
 # With Supabase PostgreSQL, schema management is handled cleanly by SQLAlchemy.
@@ -65,6 +66,11 @@ def ensure_db_columns():
     column_specs = {
         "users": {
             "workspace": "VARCHAR(30) DEFAULT 'APPLICANT' NOT NULL",
+            "primary_role": "VARCHAR(30)",
+            "active_workspace": "VARCHAR(30)",
+            "available_roles": "JSON",
+            "workspace_preferences": "JSON",
+            "onboarding_completed": "BOOLEAN DEFAULT FALSE NOT NULL",
         },
         "jobs": {
             "location": "VARCHAR(255)",
@@ -270,6 +276,16 @@ def screening_quota(user: models.User) -> dict:
     return {"tier": tier, "limit": limit, "used": used, "remaining": max(limit - used, 0)}
 
 
+def workspace_template_context(user: models.User) -> dict:
+    active = workspace_utils.active_role(user) or workspace_utils.ROLE_CANDIDATE
+    return {
+        "workspace_role": active,
+        "workspace_meta": workspace_utils.dashboard_meta_for(active),
+        "workspace_options": workspace_utils.role_options(user),
+        "onboarding_progress": workspace_utils.onboarding_progress(user, active),
+    }
+
+
 def build_career_readiness(profile: models.CareerProfile | None) -> dict:
     """
     Readiness for the SIGNED-IN USER'S OWN resume, sourced from their career
@@ -370,6 +386,31 @@ async def terms_page(request: Request):
     return templates.TemplateResponse(request=request, name="terms.html", context={})
 
 
+@app.get("/job-seekers", response_class=HTMLResponse)
+async def job_seekers_page(request: Request):
+    return templates.TemplateResponse(request=request, name="job_seekers.html", context={})
+
+
+@app.get("/employers", response_class=HTMLResponse)
+async def employers_page(request: Request):
+    return templates.TemplateResponse(request=request, name="employers.html", context={})
+
+
+@app.get("/trust", response_class=HTMLResponse)
+async def trust_page(request: Request):
+    return templates.TemplateResponse(request=request, name="trust.html", context={})
+
+
+@app.get("/resources", response_class=HTMLResponse)
+async def resources_page(request: Request):
+    return templates.TemplateResponse(request=request, name="resources.html", context={})
+
+
+@app.get("/developers", response_class=HTMLResponse)
+async def developers_page(request: Request):
+    return templates.TemplateResponse(request=request, name="developers.html", context={})
+
+
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request):
     if request.cookies.get("access_token"):
@@ -384,7 +425,7 @@ async def root(request: Request):
 @app.get("/login", response_class=HTMLResponse)
 async def login_page(request: Request):
     if request.cookies.get("access_token"):
-        return RedirectResponse("/dashboard")
+        return RedirectResponse("/workspace")
     error = request.query_params.get("error", "")
     return templates.TemplateResponse(
         request=request,
@@ -393,12 +434,163 @@ async def login_page(request: Request):
     )
 
 
+@app.get("/workspace")
+async def workspace_redirect(current_user: models.User = Depends(get_current_user)):
+    if workspace_utils.needs_role_onboarding(current_user):
+        return RedirectResponse("/onboarding/role")
+    return RedirectResponse(workspace_utils.dashboard_path_for(
+        workspace_utils.active_role(current_user)
+    ))
+
+
+@app.get("/onboarding/role", response_class=HTMLResponse)
+async def role_onboarding_page(request: Request, current_user: models.User = Depends(get_current_user)):
+    if not workspace_utils.needs_role_onboarding(current_user):
+        return RedirectResponse("/workspace")
+    return templates.TemplateResponse(
+        request=request,
+        name="role_selection.html",
+        context={
+            "user": current_user,
+            "roles": workspace_utils.ROLE_META,
+            "csrf_token": get_csrf_token(request),
+            "workspace_options": [
+                {"key": key, **meta}
+                for key, meta in workspace_utils.ROLE_META.items()
+            ],
+        },
+    )
+
+
+@app.post("/onboarding/role")
+async def save_role_onboarding(
+    request: Request,
+    role: str = Form(...),
+    csrf_token: str = Form(...),
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    require_csrf(request, csrf_token)
+    try:
+        workspace_utils.apply_primary_role(db, current_user, role)
+    except ValueError:
+        return templates.TemplateResponse(
+            request=request,
+            name="role_selection.html",
+            status_code=400,
+            context={
+                "user": current_user,
+                "roles": workspace_utils.ROLE_META,
+                "csrf_token": get_csrf_token(request),
+                "workspace_options": [
+                    {"key": key, **meta}
+                    for key, meta in workspace_utils.ROLE_META.items()
+                ],
+                "error": "Choose a valid Aptura workspace.",
+            },
+        )
+    return RedirectResponse(workspace_utils.dashboard_path_for(role), status_code=303)
+
+
+@app.post("/api/workspace/switch")
+async def switch_workspace(
+    request: Request,
+    role: str = Form(...),
+    csrf_token: str = Form(...),
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    require_csrf(request, csrf_token)
+    try:
+        workspace_utils.switch_role(db, current_user, role)
+    except PermissionError:
+        return JSONResponse(
+            status_code=403,
+            content={"success": False, "error": "Activate this workspace before switching to it."},
+        )
+    return JSONResponse({"success": True, "redirect": workspace_utils.dashboard_path_for(role)})
+
+
+@app.post("/api/workspace/activate")
+async def activate_workspace(
+    request: Request,
+    role: str = Form(...),
+    csrf_token: str = Form(...),
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    require_csrf(request, csrf_token)
+    try:
+        workspace_utils.activate_role(db, current_user, role)
+    except ValueError:
+        return JSONResponse(status_code=400, content={"success": False, "error": "Invalid workspace."})
+    return JSONResponse({"success": True, "redirect": workspace_utils.dashboard_path_for(role)})
+
+
+@app.post("/api/workspace/onboarding-progress")
+async def save_workspace_onboarding_progress(
+    request: Request,
+    role: str = Form(default=""),
+    completed_steps: list[str] = Form(default=[]),
+    skipped_steps: list[str] = Form(default=[]),
+    is_skipped: bool = Form(default=False),
+    csrf_token: str = Form(...),
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    require_csrf(request, csrf_token)
+    active = workspace_utils.normalize_role(role) or workspace_utils.active_role(current_user)
+    if not active or active not in workspace_utils.available_roles(current_user):
+        return JSONResponse(status_code=403, content={"success": False, "error": "Workspace is not active for this account."})
+    workspace_utils.save_onboarding_progress(
+        db,
+        current_user,
+        active,
+        completed_steps=completed_steps,
+        skipped_steps=skipped_steps,
+        is_skipped=is_skipped,
+    )
+    return JSONResponse({"success": True, "progress": workspace_utils.onboarding_progress(current_user, active)})
+
+
+@app.get("/student/dashboard", response_class=HTMLResponse)
+async def student_dashboard_page(request: Request, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    if workspace_utils.needs_role_onboarding(current_user):
+        return RedirectResponse("/onboarding/role")
+    if "student" not in workspace_utils.available_roles(current_user):
+        return RedirectResponse("/dashboard?workspace_error=unauthorized")
+    workspace_utils.switch_role(db, current_user, "student")
+    return await dashboard_page(request, db, current_user)
+
+
+@app.get("/candidate/dashboard", response_class=HTMLResponse)
+async def candidate_dashboard_page(request: Request, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    if workspace_utils.needs_role_onboarding(current_user):
+        return RedirectResponse("/onboarding/role")
+    if "candidate" not in workspace_utils.available_roles(current_user):
+        return RedirectResponse("/dashboard?workspace_error=unauthorized")
+    workspace_utils.switch_role(db, current_user, "candidate")
+    return await dashboard_page(request, db, current_user)
+
+
+@app.get("/recruiter/dashboard", response_class=HTMLResponse)
+async def recruiter_dashboard_page(request: Request, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    if workspace_utils.needs_role_onboarding(current_user):
+        return RedirectResponse("/onboarding/role")
+    if "recruiter" not in workspace_utils.available_roles(current_user):
+        return RedirectResponse("/dashboard?workspace_error=unauthorized")
+    workspace_utils.switch_role(db, current_user, "recruiter")
+    return await dashboard_page(request, db, current_user)
+
+
 @app.get("/dashboard", response_class=HTMLResponse)
 async def dashboard_page(request: Request, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     csrf_token = get_csrf_token(request)
 
     if not request.cookies.get("access_token"):
         return RedirectResponse("/login")
+    if workspace_utils.needs_role_onboarding(current_user):
+        return RedirectResponse("/onboarding/role")
 
     total_screenings = db.query(models.Screening).filter(
         models.Screening.user_id == current_user.id
@@ -480,6 +672,8 @@ async def dashboard_page(request: Request, db: Session = Depends(get_db), curren
             "screenings": screenings_data,
             "is_admin": admin_router.is_admin(current_user),
             "csrf_token": csrf_token,
+            "workspace_error": request.query_params.get("workspace_error"),
+            **workspace_template_context(current_user),
         }
     )
 
@@ -488,6 +682,10 @@ async def dashboard_page(request: Request, db: Session = Depends(get_db), curren
 async def screen_page(request: Request, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     if not request.cookies.get("access_token"):
         return RedirectResponse("/login")
+    if workspace_utils.needs_role_onboarding(current_user):
+        return RedirectResponse("/onboarding/role")
+    if not workspace_utils.has_role(current_user, workspace_utils.ROLE_RECRUITER):
+        return RedirectResponse("/dashboard?workspace_error=unauthorized")
 
     session_id = request.query_params.get("session")
     past_result = None
@@ -543,6 +741,10 @@ async def resume_builder_page(request: Request, current_user: models.User = Depe
 async def analytics_page(request: Request, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     if not request.cookies.get("access_token"):
         return RedirectResponse("/login")
+    if workspace_utils.needs_role_onboarding(current_user):
+        return RedirectResponse("/onboarding/role")
+    if not workspace_utils.has_role(current_user, workspace_utils.ROLE_RECRUITER):
+        return RedirectResponse("/dashboard?workspace_error=unauthorized")
 
     total_screenings = db.query(models.Screening).filter(
         models.Screening.user_id == current_user.id

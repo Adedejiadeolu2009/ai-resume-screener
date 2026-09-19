@@ -26,6 +26,7 @@ from sqlalchemy.orm import Session
 
 import security as auth
 import models
+import workspace as workspace_utils
 from database import get_db
 
 logger = logging.getLogger(__name__)
@@ -305,6 +306,7 @@ async def screen_resumes(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(auth.get_current_user),
 ):
+    workspace_utils.require_role(current_user, workspace_utils.ROLE_RECRUITER)
     if not job_description.strip():
         raise HTTPException(400, "Job description is required.")
     if not files or all(f.filename == "" for f in files):
@@ -402,6 +404,7 @@ async def get_history(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(auth.get_current_user)
 ):
+    workspace_utils.require_role(current_user, workspace_utils.ROLE_RECRUITER)
     screenings = (
         db.query(models.Screening)
         .filter(models.Screening.user_id == current_user.id)
@@ -432,6 +435,7 @@ async def get_screening(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(auth.get_current_user)
 ):
+    workspace_utils.require_role(current_user, workspace_utils.ROLE_RECRUITER)
     screening = db.query(models.Screening).filter(
         models.Screening.id == screening_id,
         models.Screening.user_id == current_user.id

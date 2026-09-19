@@ -104,6 +104,32 @@ nav {
 }
 .btn-logout:hover { border-color: var(--red); color: var(--red); }
 
+.workspace-switcher { position: relative; }
+.workspace-toggle {
+  min-height: 38px; display: inline-flex; align-items: center; gap: 8px;
+  border: 1px solid var(--border); border-radius: 9px; padding: 8px 11px;
+  background: rgba(255,255,255,0.03); color: var(--text); cursor: pointer;
+  font: 700 12px var(--ff-sans);
+}
+.workspace-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 14px rgba(201,168,76,0.55); }
+.workspace-menu {
+  display: none; position: absolute; right: 0; top: calc(100% + 8px); width: 246px; z-index: 200;
+  background: rgba(19,21,28,0.98); border: 1px solid var(--border); border-radius: 12px;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.34); padding: 8px;
+}
+.workspace-switcher.open .workspace-menu { display: block; }
+.workspace-form { margin: 0; }
+.workspace-menu-item {
+  width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  border: 0; border-radius: 9px; background: transparent; color: var(--text); cursor: pointer;
+  padding: 10px; text-align: left; transition: background 0.2s;
+}
+.workspace-menu-item:hover, .workspace-menu-item:focus-visible { background: rgba(255,255,255,0.045); outline: none; }
+.workspace-menu-item.active { background: rgba(201,168,76,0.11); }
+.workspace-menu-item.muted { color: var(--muted); }
+.workspace-menu-item strong { display: block; font: 700 13px var(--ff-sans); }
+.workspace-menu-item small { display: block; margin-top: 3px; color: var(--hint); font: 500 11px var(--ff-sans); }
+
 /* Main Content */
 main { flex: 1; max-width: 1280px; width: 100%; margin: 0 auto; padding: 32px 28px 60px; position: relative; z-index: 1; }
 
@@ -156,7 +182,8 @@ main { flex: 1; max-width: 1280px; width: 100%; margin: 0 auto; padding: 32px 28
   position: relative; z-index: 1; display: flex; align-items: center; justify-content: center;
   min-height: 150px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.08);
   background: rgba(10,11,14,0.35); color: var(--gold);
-  font-size: clamp(64px, 6vw, 88px); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
+  font: 700 clamp(38px, 5vw, 58px) var(--ff-serif); letter-spacing: 0;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
 }
 
 .workspace-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-bottom: 32px; }
@@ -171,6 +198,43 @@ main { flex: 1; max-width: 1280px; width: 100%; margin: 0 auto; padding: 32px 28
 
 .workspace-card:nth-child(2) .workspace-card-pill { background: rgba(45,212,191,0.08); border-color: rgba(45,212,191,0.22); color: var(--teal); }
 .workspace-card:nth-child(3) .workspace-card-pill { background: rgba(59,130,246,0.08); border-color: rgba(59,130,246,0.2); color: #7dd3fc; }
+
+.workspace-alert {
+  margin: -8px 0 24px; padding: 13px 15px; border-radius: 10px;
+  border: 1px solid rgba(248,113,113,0.24); background: rgba(248,113,113,0.08);
+  color: #FCA5A5; font: 500 13px/1.5 var(--ff-sans);
+}
+
+.onboarding-strip {
+  display: flex; align-items: center; justify-content: space-between; gap: 18px; flex-wrap: wrap;
+  margin: -8px 0 24px; padding: 16px 18px; border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px; background: rgba(255,255,255,0.025);
+}
+.onboarding-strip strong { display: block; font: 700 13px var(--ff-sans); margin-bottom: 4px; }
+.onboarding-strip span { color: var(--muted); font: 400 12px/1.5 var(--ff-sans); }
+.onboarding-steps { display: flex; gap: 8px; flex-wrap: wrap; }
+.onboarding-step {
+  border: 1px solid rgba(201,168,76,0.18); background: rgba(201,168,76,0.08); color: var(--gold-light);
+  border-radius: 999px; padding: 7px 9px; font-size: 11px; font-weight: 700; cursor: pointer;
+}
+.onboarding-step.completed { border-color: rgba(45,212,191,0.35); background: rgba(45,212,191,0.1); color: var(--teal); }
+.onboarding-skip { border: 1px solid var(--border); background: transparent; color: var(--muted); border-radius: 999px; padding: 7px 10px; font: 700 11px var(--ff-sans); cursor: pointer; }
+.onboarding-skip:hover { color: var(--text); border-color: rgba(255,255,255,0.16); }
+
+.passport-panel {
+  background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 20px;
+  margin-bottom: 32px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.035);
+}
+.passport-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 18px; }
+.passport-kicker { color: var(--gold); font: 800 10px var(--ff-sans); letter-spacing: 1.4px; text-transform: uppercase; margin-bottom: 7px; }
+.passport-head h2 { font: 400 28px var(--ff-serif); margin-bottom: 5px; }
+.passport-head p { color: var(--muted); font: 400 13px/1.6 var(--ff-sans); max-width: 640px; }
+.passport-link { flex-shrink: 0; border: 1px solid var(--border-lit); background: var(--gold-bg); color: var(--gold); text-decoration: none; border-radius: 9px; padding: 9px 12px; font: 800 12px var(--ff-sans); }
+.passport-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.passport-item { background: var(--elev); border: 1px solid var(--border); border-radius: 10px; padding: 14px; min-height: 104px; }
+.passport-item span { display: block; color: var(--hint); font: 800 10px var(--ff-sans); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; }
+.passport-item strong { display: block; color: var(--text); font: 500 22px var(--ff-serif); margin-bottom: 6px; }
+.passport-item small { color: var(--muted); font: 400 11px/1.4 var(--ff-sans); }
 
 /* Premium Banner */
 .premium-banner { 
@@ -285,6 +349,7 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
   .nav-right .btn-new { display: none; }
   main { padding: 24px 16px 60px; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 24px; }
+  .passport-grid { grid-template-columns: repeat(2, 1fr); }
   .readiness-panel { grid-template-columns: 1fr; }
   .readiness-grid { grid-template-columns: repeat(2, 1fr); }
   .welcome h1 { font-size: 28px; }
@@ -310,6 +375,8 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
   .premium-banner { padding: 14px 12px; }
   .welcome h1 { font-size: 20px; }
   .stats-grid { grid-template-columns: 1fr; gap: 10px; }
+  .passport-head { flex-direction: column; }
+  .passport-grid { grid-template-columns: 1fr; }
   .readiness-grid { grid-template-columns: 1fr; }
   .section-header { flex-direction: column; align-items: flex-start; gap: 8px; }
   thead th:nth-child(n+4), tbody td:nth-child(n+4) { display: none; }
@@ -334,18 +401,15 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
     </div>
 
     <nav class="sidebar-nav">
-      <a href="/agent">Aptura Agent</a>
-      <a href="/recruiter">Recruiter Workspace</a>
-      <a href="/dashboard" class="active">🏠 Dashboard</a>
-      <a href="/screen">📄 Screenings</a>
-      <a href="/resume-builder">📝 Resume Builder</a>
-      <a href="/plans">💎 Plans & Upgrade</a>
-      <a href="/analytics">📊 Analytics</a>
+      {% for item in workspace_meta.nav %}
+      <a href="{{ item[1] }}" class="{% if loop.first %}active{% endif %}">{{ item[0] }}</a>
+      {% endfor %}
+      <a href="/plans">Plans & Upgrade</a>
       {% if is_admin %}
-      <a href="/admin">🛡️ Admin</a>
+      <a href="/admin">Admin</a>
       {% endif %}
-      <a href="/contact">📧 Support</a>
-      <a href="/settings">⚙️ Settings</a>
+      <a href="/contact">Support</a>
+      <a href="/settings">Settings</a>
     </nav>
 
     <div class="sidebar-footer">
@@ -363,9 +427,8 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
         <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle menu">☰</button>
       </div>
       <div class="nav-right">
-        <a href="/agent" class="btn-new">Ask Aptura Agent</a>
-        <a href="/resume-builder" class="btn-new">Build Resume</a>
-        <a href="/screen" class="btn-new">+ New Screening</a>
+        {% include "_workspace_switcher.html" %}
+        <a href="{{ workspace_meta.primary_action_href }}" class="btn-new">{{ workspace_meta.primary_action }}</a>
         <div class="user-profile">
           <div class="user-avatar">
             {% if user.avatar_url %}
@@ -384,17 +447,21 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
     <main>
       <div class="welcome">
         <div style="display:inline-flex;align-items:center;gap:8px;margin-bottom:8px;color:var(--gold);font-size:10px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;">
-          {% if user.workspace == 'STUDENT' %}Student space{% elif user.workspace == 'RECRUITER' %}Recruiter space{% else %}Applicant space{% endif %}
+          {{ workspace_meta.short_label }} workspace
         </div>
-        <h1>Good to see you, {{ (user.name or 'there').split(' ')[0] }} 👋</h1>
-        <p>{% if user.workspace == 'RECRUITER' %}Publish vacancies, screen candidates, and build a stronger shortlist with evidence.{% elif user.workspace == 'STUDENT' %}Build your foundation, understand your strengths, and move toward your next opportunity.{% else %}Analyze your resume, discover better-fit roles, close skill gaps, and prepare stronger applications.{% endif %}</p>
+        <h1>Good to see you, {{ (user.name or 'there').split(' ')[0] }}</h1>
+        <p>{{ workspace_meta.description }}</p>
       </div>
 
-      {% set ws = user.workspace or 'APPLICANT' %}
+      {% if workspace_error == 'unauthorized' %}
+      <div class="workspace-alert" role="alert">That workspace is not active for this Aptura identity yet. Add it from the workspace switcher when you are ready.</div>
+      {% endif %}
+
+      {% set ws = workspace_meta.legacy_workspace %}
       <section class="workspace-hero" data-workspace="{{ ws }}">
         <div class="workspace-copy">
           <div class="workspace-kicker">
-            {% if ws == 'STUDENT' %}Student space{% elif ws == 'RECRUITER' %}Recruiter space{% else %}Applicant space{% endif %}
+            {{ workspace_meta.short_label }} workspace
           </div>
           <h1>
             {% if ws == 'STUDENT' %}Build your next chapter.{% elif ws == 'RECRUITER' %}Your hiring engine is online.{% else %}Your opportunities are waiting.{% endif %}
@@ -403,20 +470,25 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
             {% if ws == 'STUDENT' %}Explore the skills, roles, and gaps that will move you from learning into a stronger career path with Aptura guidance.{% elif ws == 'RECRUITER' %}Publish open roles, review candidate quality, and move fast from screening to shortlist with AI-backed decisions.{% else %}Track your resume health, discover better-fit opportunities, and act on the right jobs with clarity and momentum.{% endif %}
           </p>
           <div class="workspace-actions">
-            {% if ws == 'STUDENT' %}
-              <a class="workspace-action primary" href="/agent">Plan my next move</a>
-              <a class="workspace-action secondary" href="/resume-builder">Build resume</a>
-            {% elif ws == 'RECRUITER' %}
-              <a class="workspace-action primary" href="/recruiter">Open vacancy studio</a>
-              <a class="workspace-action secondary" href="/screen">Run new screening</a>
-            {% else %}
-              <a class="workspace-action primary" href="/agent">Match my resume</a>
-              <a class="workspace-action secondary" href="/screen">Review screening</a>
-            {% endif %}
+            <a class="workspace-action primary" href="{{ workspace_meta.primary_action_href }}">{{ workspace_meta.primary_action }}</a>
+            <a class="workspace-action secondary" href="{{ workspace_meta.secondary_action_href }}">{{ workspace_meta.secondary_action }}</a>
           </div>
         </div>
         <div class="workspace-avatar" aria-label="workspace avatar">
-          {% if ws == 'STUDENT' %}🎓{% elif ws == 'RECRUITER' %}🧑‍💼{% else %}💼{% endif %}
+          {% if workspace_role == 'student' %}ST{% elif workspace_role == 'recruiter' %}HR{% else %}CV{% endif %}
+        </div>
+      </section>
+
+      <section class="onboarding-strip" aria-label="Workspace setup checklist">
+        <div>
+          <strong>{{ workspace_meta.short_label }} setup</strong>
+          <span>{% if onboarding_progress.is_skipped %}Optional setup skipped for now. You can still complete steps anytime.{% else %}Complete these when useful. Optional details should never block the rest of Aptura.{% endif %}</span>
+        </div>
+        <div class="onboarding-steps" data-onboarding-steps data-role="{{ workspace_role }}">
+          {% for step in workspace_meta.onboarding_steps %}
+          <button type="button" class="onboarding-step {% if step in onboarding_progress.completed_steps %}completed{% endif %}" data-step="{{ step }}">{{ step }}</button>
+          {% endfor %}
+          <button type="button" class="onboarding-skip" data-skip-onboarding>{% if onboarding_progress.is_skipped %}Skipped{% else %}Skip for now{% endif %}</button>
         </div>
       </section>
 
@@ -471,6 +543,8 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
           </div>
         {% endif %}
       </div>
+
+      {% include "_career_passport.html" %}
 
       <section class="readiness-panel" aria-label="Career readiness score">
         <div class="readiness-score">
@@ -585,6 +659,85 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
       backdrop.style.display = 'none';
     }
   });
+
+  const workspaceSwitcher = document.querySelector('[data-workspace-switcher]');
+  if (workspaceSwitcher) {
+    const toggle = workspaceSwitcher.querySelector('.workspace-toggle');
+    const forms = workspaceSwitcher.querySelectorAll('.workspace-form');
+    toggle.addEventListener('click', function() {
+      const isOpen = workspaceSwitcher.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', String(isOpen));
+    });
+    document.addEventListener('click', function(e) {
+      if (!workspaceSwitcher.contains(e.target)) {
+        workspaceSwitcher.classList.remove('open');
+        toggle.setAttribute('aria-expanded', 'false');
+      }
+    });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        workspaceSwitcher.classList.remove('open');
+        toggle.setAttribute('aria-expanded', 'false');
+      }
+    });
+    forms.forEach(form => {
+      form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const button = form.querySelector('button');
+        button.disabled = true;
+        try {
+          const res = await fetch(form.action, { method: 'POST', body: new FormData(form) });
+          const data = await res.json();
+          if (!res.ok || !data.success) throw new Error(data.error || 'Could not update workspace.');
+          window.location.href = data.redirect || '/workspace';
+        } catch (err) {
+          button.disabled = false;
+          alert(err.message || 'Network error. Please try again.');
+        }
+      });
+    });
+  }
+
+  const onboardingSteps = document.querySelector('[data-onboarding-steps]');
+  if (onboardingSteps) {
+    const csrfToken = '{{ csrf_token }}';
+    const role = onboardingSteps.dataset.role;
+    async function saveOnboarding(skip = false) {
+      const form = new FormData();
+      form.append('csrf_token', csrfToken);
+      form.append('role', role);
+      form.append('is_skipped', skip ? 'true' : 'false');
+      onboardingSteps.querySelectorAll('.onboarding-step.completed').forEach(btn => {
+        form.append('completed_steps', btn.dataset.step);
+      });
+      const res = await fetch('/api/workspace/onboarding-progress', { method: 'POST', body: form });
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.error || 'Could not save setup progress.');
+      return data;
+    }
+    onboardingSteps.querySelectorAll('.onboarding-step').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        btn.classList.toggle('completed');
+        try {
+          await saveOnboarding(false);
+        } catch (err) {
+          btn.classList.toggle('completed');
+          alert(err.message || 'Network error. Please try again.');
+        }
+      });
+    });
+    const skipBtn = onboardingSteps.querySelector('[data-skip-onboarding]');
+    if (skipBtn) {
+      skipBtn.addEventListener('click', async () => {
+        try {
+          await saveOnboarding(true);
+          skipBtn.textContent = 'Skipped';
+        } catch (err) {
+          alert(err.message || 'Network error. Please try again.');
+        }
+      });
+    }
+  }
 
   // Close sidebar when a link is clicked
   document.querySelectorAll('.sidebar-nav a').forEach(link => {

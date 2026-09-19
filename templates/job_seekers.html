@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>For Job Seekers | Aptura Career Passport</title>
+  <meta name="description" content="Analyse your CV, understand role fit, find skill gaps, and build an evidence-backed Aptura Career Passport.">
+  <link rel="canonical" href="https://aptura.com.ng/job-seekers">
+  <link rel="stylesheet" href="/static/aptura-public.css">
+</head>
+<body>
+{% include "_public_nav.html" %}
+<main id="main" class="page">
+  <section class="hero">
+    <div class="hero-copy">
+      <div class="eyebrow">For Job Seekers</div>
+      <h1>Know where you stand before you apply.</h1>
+      <p class="lead">Aptura turns your CV into a practical view of readiness, role fit, skill evidence, missing skills, evidence gaps, resume improvements, interview readiness, and application materials.</p>
+      <div class="hero-actions"><a class="btn btn-primary" href="/login">Analyse my CV</a><a class="btn" href="#passport">Build my Career Passport</a></div>
+    </div>
+    <div class="screen">
+      <div class="screen-top"><div class="dots"><i></i><i></i><i></i></div><span>career readiness</span></div>
+      <div class="screen-body grid">
+        <article class="card"><h3>Role Fit</h3><p>Product Operations Associate</p><div class="metric"><span>Fit</span><span class="meter"><i style="--w:78%"></i></span></div></article>
+        <article class="card"><h3>Evidence Gaps</h3><p>No portfolio link. Metrics need clearer proof.</p></article>
+        <article class="card"><h3>Next Action</h3><p>Add measurable outcomes and tailor summary to the role.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section id="passport" class="section section-alt">
+    <div class="section-head">
+      <h2>Aptura Career Passport</h2>
+      <p>A verified digital evidence record. Not every skill is verified; Aptura separates self-reported, document, assessment, institution, and employer signals.</p>
+    </div>
+    <div class="passport">
+      <div class="skill-record"><div><strong>Python</strong><small>4 years. Portfolio linked. Evidence detected.</small></div><span class="status doc">Document verified</span></div>
+      <div class="skill-record"><div><strong>Product Management</strong><small>3 years. Employer and project evidence available.</small></div><span class="status employer">Employer verified</span></div>
+      <div class="skill-record"><div><strong>Data Analysis</strong><small>Self reported. Assessment recommended.</small></div><span class="status self">Self reported</span></div>
+      <div class="skill-record"><div><strong>Interview Readiness</strong><small>Role questions generated from CV and job context.</small></div><span class="status assessment">Assessment verified</span></div>
+    </div>
+    <div class="actions"><a class="btn btn-primary" href="/login">See my skill gaps</a><a class="btn" href="/pricing">View candidate pricing</a></div>
+  </section>
+
+  <section class="section">
+    <div class="grid grid-4">
+      <article class="card"><h3>Career Readiness</h3><p>Understand what your profile can support today.</p></article>
+      <article class="card"><h3>Missing Skills</h3><p>See practical gaps against target roles.</p></article>
+      <article class="card"><h3>Resume Improvements</h3><p>Improve clarity without inventing evidence.</p></article>
+      <article class="card"><h3>Application Package</h3><p>Prepare cover letters and interview answers grounded in your data.</p></article>
+    </div>
+  </section>
+</main>
+{% include "_public_footer.html" %}
+{% include "_webmcp.html" %}
+</body>
+</html>

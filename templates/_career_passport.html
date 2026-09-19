@@ -1,0 +1,32 @@
+<section class="passport-panel" aria-label="Aptura Career Passport">
+  <div class="passport-head">
+    <div>
+      <div class="passport-kicker">Aptura Career Passport</div>
+      <h2>{{ user.name or user.email.split('@')[0] }}</h2>
+      <p>{{ career_profile.target_role if career_profile and career_profile.target_role else workspace_meta.description }}</p>
+    </div>
+    <a href="/agent" class="passport-link">Open Passport</a>
+  </div>
+  <div class="passport-grid">
+    <div class="passport-item">
+      <span>Identity</span>
+      <strong>{% if user.name %}Started{% else %}Missing name{% endif %}</strong>
+      <small>Self-reported</small>
+    </div>
+    <div class="passport-item">
+      <span>Resume</span>
+      <strong>{% if career_profile and career_profile.resume_text %}Added{% else %}Not added{% endif %}</strong>
+      <small>{% if career_profile and career_profile.resume_text %}Document supplied{% else %}Self-reported pending{% endif %}</small>
+    </div>
+    <div class="passport-item">
+      <span>Skills</span>
+      <strong>{{ top_skill_gaps | length }} gaps</strong>
+      <small>AI recommendation</small>
+    </div>
+    <div class="passport-item">
+      <span>Verification</span>
+      <strong>Pending</strong>
+      <small>No verified evidence yet</small>
+    </div>
+  </div>
+</section>

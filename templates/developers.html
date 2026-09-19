@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Developers | Aptura Talent Graph</title>
+  <meta name="description" content="Aptura developer architecture: public API, MCP server, WebMCP tools, strict schemas, authentication, and human-approved actions.">
+  <link rel="canonical" href="https://aptura.com.ng/developers">
+  <link rel="stylesheet" href="/static/aptura-public.css">
+</head>
+<body>
+{% include "_public_nav.html" %}
+<main id="main" class="page">
+  <section class="hero">
+    <div class="hero-copy">
+      <div class="eyebrow">Talent Graph</div>
+      <h1>Career intelligence for people, employers, and AI agents.</h1>
+      <p class="lead">Aptura exposes talent intelligence through three layers: public or authorised API, MCP server for AI systems, and WebMCP tools for browser-based agents.</p>
+      <div class="hero-actions"><a class="btn btn-primary" href="/login">Get API access</a><a class="btn" href="/trust">Review approval rules</a></div>
+    </div>
+    <div class="screen"><div class="screen-top"><div class="dots"><i></i><i></i><i></i></div><span>read -> propose -> act</span></div><div class="screen-body grid">
+      <article class="card"><h3>Read tools</h3><p>searchTalent, getCandidateProfile, getSkillEvidence, matchCandidateToRole, analyseResume, getCareerReadiness, getSkillGap.</p></article>
+      <article class="card"><h3>Proposal tools</h3><p>draftResumeChange, draftCoverLetter, draftCandidateMessage, proposeProfileUpdate.</p></article>
+      <article class="card"><h3>Action tools</h3><p>publishJob, inviteCandidate, submitApplication, sendMessage. Auth and confirmation required.</p></article>
+    </div></div>
+  </section>
+  <section class="section section-alt">
+    <div class="section-head"><h2>Strict source separation.</h2><p>Third-party job descriptions, candidate content, and external text are untrusted input. Responses should separate user-authored, AI-generated, verified, and third-party data.</p></div>
+    <div class="grid grid-3">
+      <article class="card"><h3>Authentication</h3><p>Action tools require proper authentication, authorisation, and rate limits.</p></article>
+      <article class="card"><h3>Audit logs</h3><p>Human approvals, rejections, and AI recommendations should be recorded.</p></article>
+      <article class="card"><h3>Structured JSON</h3><p>Tools should return predictable schemas rather than loose text blobs.</p></article>
+    </div>
+  </section>
+</main>
+{% include "_public_footer.html" %}
+{% include "_webmcp.html" %}
+</body>
+</html>

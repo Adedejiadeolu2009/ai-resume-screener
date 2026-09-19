@@ -259,14 +259,6 @@ body::after {
         <div class="field"><label>Full name</label><input type="text" id="rg-name" placeholder="Your full name" autocomplete="name"></div>
         <div class="field"><label>Email address</label><input type="email" id="rg-email" placeholder="you@example.com" autocomplete="email"></div>
         <div class="field"><label>Password</label><input type="password" id="rg-pass" placeholder="At least 8 characters" autocomplete="new-password"></div>
-        <div class="space-picker">
-          <span class="space-picker-label">Choose your Aptura space</span>
-          <div class="space-options" role="radiogroup" aria-label="Choose your Aptura space">
-            <label class="space-option"><input type="radio" name="workspace" value="STUDENT"><span class="space-card"><span class="space-avatar">👨‍🎓</span><span class="space-name">Student</span><span class="space-hint">Learn &amp; grow</span></span></label>
-            <label class="space-option"><input type="radio" name="workspace" value="APPLICANT" checked><span class="space-card"><span class="space-avatar">👨‍💼</span><span class="space-name">Applicant</span><span class="space-hint">Build your career</span></span></label>
-            <label class="space-option"><input type="radio" name="workspace" value="RECRUITER"><span class="space-card"><span class="space-avatar">🧑‍💻</span><span class="space-name">Recruiter</span><span class="space-hint">Find great talent</span></span></label>
-          </div>
-        </div>
         <div id="rg-error" style="color:var(--red);font-size:13px;margin-bottom:10px;display:none"></div>
         <button class="btn-submit" onclick="doRegister()">Create Account</button>
         <div class="toggle-text">Already have an account? <span class="toggle-link" onclick="showSignin()">Sign in</span></div>
@@ -359,7 +351,7 @@ async function doRegister() {
   if (!name || !email || !pass) { errEl.textContent = 'Please fill in all fields.'; errEl.style.display = 'block'; return; }
   const form = new FormData();
   form.append('name', name); form.append('email', email); form.append('password', pass);
-  form.append('workspace', document.querySelector('input[name="workspace"]:checked')?.value || 'APPLICANT');
+  form.append('workspace', 'APPLICANT');
   form.append('csrf_token', '{{ csrf_token }}');
   try {
     const res  = await fetch('/auth/register', { method: 'POST', body: form });

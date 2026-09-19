@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Choose Workspace - Aptura AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/premium-animations.css">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0A0B0E; --card: #13151C; --elev: #1A1D27;
+  --border: rgba(255,255,255,0.08); --border-lit: rgba(201,168,76,0.38);
+  --gold: #C9A84C; --gold-light: #E8D5A3; --gold-bg: rgba(201,168,76,0.11);
+  --teal: #2DD4BF; --blue: #60A5FA; --red: #F87171;
+  --text: #F0EDE6; --muted: #A8A39B; --hint: #6F6A61;
+  --ff-serif: 'Cormorant Garamond', Georgia, serif;
+  --ff-sans: 'Outfit', system-ui, sans-serif;
+}
+body {
+  min-height: 100vh; background: var(--bg); color: var(--text); font-family: var(--ff-sans);
+}
+body::before {
+  content: ""; position: fixed; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 55% 48% at 15% 0%, rgba(201,168,76,0.09), transparent 62%),
+    radial-gradient(ellipse 45% 35% at 88% 88%, rgba(45,212,191,0.06), transparent 58%),
+    linear-gradient(180deg, rgba(255,255,255,0.025), transparent 36%);
+}
+.shell { position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column; }
+.topbar { display: flex; justify-content: space-between; align-items: center; padding: 28px clamp(18px, 5vw, 64px); }
+.brand { display: flex; align-items: center; gap: 12px; }
+.brand-mark { width: 38px; height: 38px; border-radius: 9px; display: grid; place-items: center; background: linear-gradient(135deg, var(--gold), #8B6914); color: #0A0B0E; font: 700 17px var(--ff-serif); }
+.brand-name { font: 600 20px var(--ff-serif); }
+.brand-name span { color: var(--gold); }
+.account { color: var(--muted); font-size: 13px; }
+.content { width: min(1160px, calc(100% - 32px)); margin: auto; padding: 24px 0 56px; }
+.intro { max-width: 760px; margin-bottom: 28px; }
+.eyebrow { color: var(--gold); font: 800 11px var(--ff-sans); letter-spacing: 2.2px; text-transform: uppercase; margin-bottom: 12px; }
+h1 { font: 400 clamp(42px, 7vw, 74px)/0.98 var(--ff-serif); letter-spacing: -0.02em; margin-bottom: 16px; }
+.sub { color: var(--muted); font: 300 17px/1.7 var(--ff-sans); max-width: 620px; }
+.error { margin: 22px 0; border: 1px solid rgba(248,113,113,0.25); background: rgba(248,113,113,0.08); color: #FCA5A5; border-radius: 10px; padding: 12px 14px; font-size: 13px; }
+.roles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 28px; }
+.role-card { position: relative; min-height: 326px; cursor: pointer; }
+.role-card input { position: absolute; inset: 0; opacity: 0; }
+.role-inner {
+  position: relative; height: 100%; display: flex; flex-direction: column; gap: 18px;
+  padding: 24px; border: 1px solid var(--border); border-radius: 16px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.018));
+  box-shadow: 0 24px 60px rgba(0,0,0,0.22);
+  transition: transform 0.22s ease, border-color 0.22s ease, background 0.22s ease;
+}
+.role-card:hover .role-inner { transform: translateY(-4px); border-color: var(--border-lit); background: linear-gradient(180deg, rgba(201,168,76,0.10), rgba(255,255,255,0.022)); }
+.role-card input:focus-visible + .role-inner { outline: 3px solid rgba(45,212,191,0.36); outline-offset: 3px; }
+.role-card input:checked + .role-inner { border-color: var(--gold); background: linear-gradient(145deg, rgba(201,168,76,0.15), rgba(45,212,191,0.05)); box-shadow: 0 0 0 1px rgba(201,168,76,0.18) inset, 0 28px 70px rgba(0,0,0,0.28); }
+.role-card input:checked + .role-inner::after { content: "Selected"; position: absolute; top: 18px; right: 18px; color: #0A0B0E; background: var(--gold); border-radius: 999px; padding: 6px 10px; font-size: 11px; font-weight: 800; }
+.icon { width: 64px; height: 64px; display: grid; place-items: center; border-radius: 16px; border: 1px solid rgba(255,255,255,0.10); background: rgba(10,11,14,0.44); color: var(--gold); font: 700 20px var(--ff-serif); }
+.role-card[data-role="student"] .icon { color: var(--teal); }
+.role-card[data-role="candidate"] .icon { color: var(--blue); }
+.role-card[data-role="recruiter"] .icon { color: var(--gold); }
+.title { font: 500 28px/1.06 var(--ff-serif); max-width: 250px; }
+.desc { color: var(--muted); font-size: 14px; line-height: 1.65; min-height: 70px; }
+.steps { margin-top: auto; display: flex; flex-wrap: wrap; gap: 8px; }
+.step { color: var(--hint); border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.025); border-radius: 999px; padding: 6px 9px; font-size: 11px; }
+.actions { display: flex; align-items: center; gap: 16px; margin-top: 24px; flex-wrap: wrap; }
+.submit {
+  border: 0; border-radius: 10px; padding: 14px 20px; min-width: 230px; cursor: pointer;
+  background: linear-gradient(135deg, var(--gold), #A07820); color: #0A0B0E;
+  font: 800 12px var(--ff-sans); letter-spacing: 1.5px; text-transform: uppercase;
+  box-shadow: 0 14px 36px rgba(201,168,76,0.24); transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.submit:hover { transform: translateY(-2px); box-shadow: 0 18px 46px rgba(201,168,76,0.34); }
+.submit[disabled] { opacity: 0.72; cursor: wait; transform: none; }
+.hint { color: var(--hint); font-size: 13px; }
+.status { display: none; color: var(--teal); font-size: 13px; }
+.saving .status { display: inline; }
+@media (max-width: 900px) {
+  .roles { grid-template-columns: 1fr; }
+  .role-card { min-height: auto; }
+  .role-inner { min-height: 250px; }
+  .account { display: none; }
+}
+@media (max-width: 520px) {
+  .topbar { padding: 20px 16px; }
+  .content { width: min(100% - 24px, 1160px); padding-top: 8px; }
+  .role-inner { padding: 20px; border-radius: 14px; }
+  .submit { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">A</div>
+      <div class="brand-name">Ap<span>tura</span> AI</div>
+    </div>
+    <div class="account">{{ user.email }}</div>
+  </header>
+
+  <main class="content">
+    <section class="intro" aria-labelledby="role-title">
+      <div class="eyebrow">Workspace setup</div>
+      <h1 id="role-title">How are you using Aptura?</h1>
+      <p class="sub">Choose the workspace that best fits you. You can change this later.</p>
+    </section>
+
+    {% if error %}
+    <div class="error" role="alert">{{ error }}</div>
+    {% endif %}
+
+    <form method="post" action="/onboarding/role" id="roleForm">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <div class="roles" role="radiogroup" aria-label="Choose how you are using Aptura">
+        {% for role in workspace_options %}
+        <label class="role-card" data-role="{{ role.key }}">
+          <input type="radio" name="role" value="{{ role.key }}" {% if loop.index == 2 %}checked{% endif %}>
+          <span class="role-inner">
+            <span class="icon" aria-hidden="true">{% if role.key == 'student' %}ST{% elif role.key == 'candidate' %}CV{% else %}HR{% endif %}</span>
+            <span class="title">{{ role.label }}</span>
+            <span class="desc">{{ role.description }}</span>
+            <span class="steps" aria-label="Short onboarding steps">
+              {% for step in role.onboarding_steps[:3] %}
+              <span class="step">{{ step }}</span>
+              {% endfor %}
+            </span>
+          </span>
+        </label>
+        {% endfor %}
+      </div>
+
+      <div class="actions">
+        <button class="submit" type="submit" id="submitBtn">Enter workspace</button>
+        <span class="status" id="statusText" role="status" aria-live="polite">Setting up your workspace...</span>
+        <span class="hint">One Aptura identity, workspace-specific tools.</span>
+      </div>
+    </form>
+  </main>
+</div>
+
+<script>
+const form = document.getElementById('roleForm');
+const submitBtn = document.getElementById('submitBtn');
+const statusText = document.getElementById('statusText');
+const setupLabels = {
+  {% for role in workspace_options %}
+  "{{ role.key }}": "{{ role.setup_label }}"{% if not loop.last %},{% endif %}
+  {% endfor %}
+};
+form.addEventListener('submit', () => {
+  const selected = form.querySelector('input[name="role"]:checked');
+  document.body.classList.add('saving');
+  submitBtn.disabled = true;
+  statusText.textContent = setupLabels[selected?.value] || 'Setting up your workspace...';
+});
+</script>
+</body>
+</html>

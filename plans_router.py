@@ -33,31 +33,16 @@ def require_csrf(request: Request, csrf_token: str | None) -> None:
 
 
 @router.get("/plans", response_class=HTMLResponse)
+@router.get("/pricing", response_class=HTMLResponse)
 async def plans_page(
     request: Request,
-    db: Session = Depends(get_db),
-    current_user: models.User = Depends(get_current_user),
 ):
-    # Keep it simple: show instructions based on your configured tier.
-    tier = (current_user.tier or "FREE").upper()
-
     return templates.TemplateResponse(
         request=request,
         name="plans.html",
         context={
-            "user": current_user,
-            "tier": tier,
             "pro_amount": os.getenv("PRO_AMOUNT_NGN", "2500"),
             "enterprise_amount": os.getenv("ENTERPRISE_AMOUNT_NGN", "7500"),
-            "transfer_instructions": os.getenv(
-                "MANUAL_TRANSFER_INSTRUCTIONS",
-                "Send the bank transfer amount to the account on this page and then contact admin to activate your plan."
-            ),
-            "bank_name": os.getenv("MANUAL_TRANSFER_BANK_NAME", ""),
-            "account_name": os.getenv("MANUAL_TRANSFER_ACCOUNT_NAME", ""),
-            # NOTE: do not hardcode account number in code; keep it in env.
-            "account_number": os.getenv("MANUAL_TRANSFER_ACCOUNT_NUMBER", ""),
-            "csrf_token": get_csrf_token(request),
         },
     )
 

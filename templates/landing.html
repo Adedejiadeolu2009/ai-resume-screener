@@ -1,114 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Aptura AI Career Platform | Resume Analysis, Job Matching & Skill Gaps</title>
-<meta name="description" content="Aptura is an AI career building platform for resume analysis, resume building, opportunity matching, skill gap analysis, cover letters, and agent-assisted career planning.">
-<link rel="canonical" href="https://aptura.com.ng/">
-<meta property="og:title" content="Aptura AI Career Platform">
-<meta property="og:description" content="Build your profile, improve your resume, match opportunities, close skill gaps, and prepare applications with Aptura.">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://aptura.com.ng/">
-<meta property="og:site_name" content="Aptura AI">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Aptura AI Career Platform">
-<meta name="twitter:description" content="AI career tools for resume analysis, job matching, skill gaps, cover letters, and human-approved agent workflows.">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/static/premium-animations.css">
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#0A0B0E;--panel:#13151C;--elev:#1A1D27;--line:rgba(255,255,255,.08);--line-lit:rgba(201,168,76,.35);--gold:#C9A84C;--gold-soft:#E8D5A3;--teal:#2DD4BF;--green:#4ADE80;--text:#F0EDE6;--muted:#9A9691;--hint:#5A5750;--serif:'Cormorant Garamond',Georgia,serif;--sans:'Outfit',system-ui,sans-serif}
-html{scroll-behavior:smooth}
-body{min-height:100vh;background:var(--bg);color:var(--text);font-family:var(--sans);overflow-x:hidden}
-body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 80% 58% at 12% 0%,rgba(201,168,76,.09),transparent 62%),radial-gradient(ellipse 46% 38% at 85% 18%,rgba(45,212,191,.07),transparent 58%),linear-gradient(180deg,rgba(255,255,255,.02),transparent 38%)}
-body::after{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);background-size:56px 56px;mask-image:linear-gradient(to bottom,#000,transparent 80%)}
-.shell{position:relative;z-index:1}
-nav{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:16px clamp(18px,4vw,48px);border-bottom:1px solid var(--line);background:rgba(10,11,14,.72);backdrop-filter:blur(18px)}
-.brand{display:flex;align-items:center;gap:12px;color:var(--text);text-decoration:none}.brand-mark{width:38px;height:38px;border-radius:8px;background:linear-gradient(135deg,var(--gold),#8B6914);display:grid;place-items:center;color:#0A0B0E;font:700 17px var(--serif);box-shadow:0 14px 34px rgba(201,168,76,.22)}.brand-name{font:600 19px var(--serif)}.brand-name span{color:var(--gold)}
-.nav-links{display:flex;align-items:center;gap:18px;flex-wrap:wrap}.nav-links a{color:var(--muted);text-decoration:none;font:600 13px var(--sans)}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:10px 15px;border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.03);color:var(--text)!important;text-decoration:none;font:700 13px var(--sans);white-space:nowrap}.btn-primary{border:none;background:linear-gradient(135deg,var(--gold),#A07820);color:#0A0B0E!important;box-shadow:0 10px 30px rgba(201,168,76,.24)}
-.hero{min-height:calc(100vh - 73px);display:grid;grid-template-columns:minmax(0,1.02fr) minmax(360px,.98fr);gap:38px;align-items:center;padding:clamp(34px,6vw,72px) clamp(18px,5vw,64px) 38px}.hero-copy{max-width:760px}.eyebrow{display:inline-flex;align-items:center;gap:10px;margin-bottom:18px;color:var(--gold);font:800 11px var(--sans);letter-spacing:2px;text-transform:uppercase}.eyebrow::before{content:"";width:28px;height:1px;background:var(--gold);opacity:.55}
-h1{font:400 clamp(46px,7vw,86px)/.92 var(--serif);letter-spacing:0;max-width:820px}.hero h1 em{color:var(--gold-soft);font-style:italic}.lead{max-width:620px;margin-top:22px;color:var(--muted);font:300 17px/1.75 var(--sans)}.hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
-.trust-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;max-width:650px;margin-top:34px}.proof-card{padding:15px;border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.025)}.proof-card strong{display:block;color:var(--text);font:600 25px var(--serif)}.proof-card span{color:var(--hint);font-size:12px;line-height:1.45}
-.visual-panel{position:relative;min-height:560px;border:1px solid var(--line);border-radius:8px;background:linear-gradient(155deg,rgba(19,21,28,.96),rgba(10,11,14,.92));overflow:hidden;box-shadow:0 34px 100px rgba(0,0,0,.34)}.visual-panel::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 65% 44% at 26% 4%,rgba(201,168,76,.18),transparent 58%),linear-gradient(120deg,transparent,rgba(255,255,255,.04),transparent);pointer-events:none}
-.command-bar{position:absolute;left:22px;right:22px;top:22px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:8px;background:rgba(10,11,14,.76);backdrop-filter:blur(14px)}.dots{display:flex;gap:6px}.dots i{width:8px;height:8px;border-radius:50%;background:var(--line-lit)}.dots i:nth-child(2){background:rgba(45,212,191,.45)}.dots i:nth-child(3){background:rgba(74,222,128,.45)}.command-bar span{color:var(--muted);font-size:12px}
-.rank-stack{position:absolute;inset:92px 22px 24px;display:grid;gap:14px;align-content:start}.candidate{display:grid;grid-template-columns:44px 1fr 74px;gap:14px;align-items:center;padding:16px;border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.035);box-shadow:0 18px 55px rgba(0,0,0,.22)}.candidate:nth-child(1){border-color:var(--line-lit);background:rgba(201,168,76,.07)}.avatar{width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,rgba(201,168,76,.28),rgba(45,212,191,.18));display:grid;place-items:center;color:var(--gold);font-weight:800}.candidate h3{font-size:14px;margin-bottom:7px}.bars{display:grid;gap:5px}.bar{height:5px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}.bar i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--gold),var(--teal));animation:bar-fill 1.4s cubic-bezier(.16,1,.3,1) both}.score{display:grid;place-items:center;width:58px;height:58px;border:1px solid rgba(45,212,191,.28);border-radius:50%;color:var(--teal);font:700 18px var(--serif)}
-.workflow{padding:54px clamp(18px,5vw,64px);border-top:1px solid var(--line);background:rgba(255,255,255,.015)}.section-head{display:flex;align-items:end;justify-content:space-between;gap:22px;margin-bottom:22px}.section-head h2{font:500 clamp(32px,4vw,48px)/1 var(--serif)}.section-head p{max-width:520px;color:var(--muted);line-height:1.65}.workflow-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-.workflow-step{position:relative;min-height:210px;padding:20px;border:1px solid var(--line);border-radius:8px;background:var(--panel);overflow:hidden}.workflow-step::before{content:attr(data-step);position:absolute;right:18px;top:10px;color:rgba(255,255,255,.06);font:600 62px var(--serif)}.workflow-step h3{position:relative;margin-top:44px;font-size:16px}.workflow-step p{position:relative;margin-top:10px;color:var(--muted);font-size:13px;line-height:1.6}.step-icon{position:relative;width:38px;height:38px;border-radius:8px;display:grid;place-items:center;background:rgba(201,168,76,.1);border:1px solid var(--line-lit);color:var(--gold);font-weight:800}
-.features{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:54px clamp(18px,5vw,64px)}.landing-card{border:1px solid var(--line);border-radius:8px;background:var(--panel);padding:24px}.landing-card h3{font:600 24px var(--serif);margin-bottom:10px}.landing-card p{color:var(--muted);line-height:1.7}.feature-list{display:grid;gap:10px;margin-top:18px}.feature-list div{display:flex;gap:10px;align-items:flex-start;color:var(--muted);font-size:14px}.feature-list span{display:grid;place-items:center;width:20px;height:20px;border-radius:6px;background:rgba(45,212,191,.12);border:1px solid rgba(45,212,191,.25);color:var(--teal);font-size:12px;font-weight:800;flex-shrink:0}
-.cta-band{margin:0 clamp(18px,5vw,64px) 54px;padding:34px;border:1px solid rgba(201,168,76,.22);border-radius:8px;background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(45,212,191,.05));display:flex;align-items:center;justify-content:space-between;gap:20px}.cta-band h2{font:500 34px var(--serif);margin-bottom:6px}.cta-band p{color:var(--muted)}footer{padding:24px clamp(18px,5vw,64px);border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;color:var(--hint);font-size:12px}
-@keyframes bar-fill{from{width:0}to{width:var(--w)}}@media(prefers-reduced-motion:no-preference){.candidate{animation:float-card 7s ease-in-out infinite}.candidate:nth-child(2){animation-delay:.6s}.candidate:nth-child(3){animation-delay:1.2s}.candidate:nth-child(4){animation-delay:1.8s}@keyframes float-card{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}}@media(max-width:980px){.hero{grid-template-columns:1fr;min-height:auto}.visual-panel{min-height:500px}.workflow-grid,.features{grid-template-columns:1fr 1fr}.nav-links a:not(.btn){display:none}}@media(max-width:680px){nav{align-items:flex-start;padding:14px 16px}.nav-links{justify-content:flex-end;gap:8px}.nav-links .btn{min-height:36px;padding:9px 11px;font-size:12px}.hero{padding-top:28px}.trust-row,.workflow-grid,.features{grid-template-columns:1fr}.visual-panel{min-height:470px}.candidate{grid-template-columns:38px 1fr 58px;padding:12px}.score{width:48px;height:48px}.cta-band{display:block;padding:24px}.cta-band .btn{margin-top:18px;width:100%}.section-head{display:block}.section-head p{margin-top:12px}}@media(max-width:420px){h1{font-size:42px}.hero-actions .btn{width:100%}.command-bar{left:14px;right:14px}.rank-stack{inset:86px 14px 18px}.candidate{gap:10px}.candidate h3{font-size:13px}}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aptura | Career Intelligence for Nigeria and Africa</title>
+  <meta name="description" content="Aptura turns CVs and applications into evidence-backed career and hiring intelligence for job seekers, employers, and AI agents.">
+  <link rel="canonical" href="https://aptura.com.ng/">
+  <meta property="og:title" content="Aptura Career Intelligence">
+  <meta property="og:description" content="Turn your CV into career intelligence. Turn applications into evidence-backed shortlists.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://aptura.com.ng/">
+  <meta property="og:site_name" content="Aptura">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Aptura Career Intelligence">
+  <meta name="twitter:description" content="Career intelligence for people, employers, and AI agents.">
+  <link rel="stylesheet" href="/static/aptura-public.css">
 </head>
 <body>
-<div class="shell">
-  <nav>
-    <a class="brand" href="/">
-      <div class="brand-mark">A</div>
-      <div class="brand-name">Ap<span>tura</span> AI</div>
-    </a>
-    <div class="nav-links">
-      <a href="#workflow">Workflow</a>
-      <a href="/resume-builder">Resume Builder</a>
-      <a href="/about">About</a>
-      <a href="/plans">Plans</a>
-      <a class="btn" href="/login">Sign in</a>
-      <a class="btn btn-primary" href="/login">Get started</a>
-    </div>
-  </nav>
-
+{% include "_public_nav.html" %}
+<main id="main" class="page">
   <section class="hero">
     <div class="hero-copy">
-      <div class="eyebrow">AI career and talent platform</div>
-      <h1>Build the career you want. <em>Find the talent you need.</em></h1>
-      <p class="lead">Aptura helps individuals build stronger careers and helps companies discover better-fit talent through resume intelligence, readiness scoring, job matching, skill-gap analysis, application preparation, and lightweight candidate screening.</p>
-      <div class="hero-actions"><a class="btn btn-primary" href="/login">Start Building</a><a class="btn" href="/login">Evaluate Talent</a><a class="btn" href="#workflow">See Workflows</a></div>
-      <div class="trust-row">
-        <div class="proof-card"><strong>Individuals</strong><span>Build, analyze, match, improve, apply, and track</span></div>
-        <div class="proof-card"><strong>Companies</strong><span>Define roles, screen, rank, compare, and shortlist</span></div>
-        <div class="proof-card"><strong>Agents</strong><span>WebMCP support for compatible AI-agent browsers</span></div>
+      <div class="eyebrow">Career Intelligence</div>
+      <h1>Your CV is more than a document. <span class="hero-line">Turn it into career intelligence.</span></h1>
+      <p class="lead">Aptura understands your experience, maps your skills, identifies gaps, and helps you become easier for the right employers and the next generation of AI hiring systems to understand.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="/login">Analyse my CV</a>
+        <a class="btn" href="/employers">I'm hiring</a>
+      </div>
+      <div class="hero-proof">
+        <div class="proof"><strong>Career Passport</strong><span>Structured career identity based on skills, experience, and evidence.</span></div>
+        <div class="proof"><strong>Hiring Inbox</strong><span>Applications become ranked, explainable candidate intelligence.</span></div>
+        <div class="proof"><strong>Talent Graph</strong><span>Permissioned talent data for APIs, MCP, and WebMCP tools.</span></div>
       </div>
     </div>
-
-    <div class="visual-panel" aria-label="Animated candidate ranking preview">
-      <div class="command-bar"><div class="dots"><i></i><i></i><i></i></div><span>screening: product-designer-role</span></div>
-      <div class="rank-stack">
-        <div class="candidate"><div class="avatar">01</div><div><h3>Senior Talent Match</h3><div class="bars"><div class="bar"><i style="--w:92%"></i></div><div class="bar"><i style="--w:76%"></i></div></div></div><div class="score">94</div></div>
-        <div class="candidate"><div class="avatar">02</div><div><h3>Technical Fit Review</h3><div class="bars"><div class="bar"><i style="--w:84%"></i></div><div class="bar"><i style="--w:68%"></i></div></div></div><div class="score">88</div></div>
-        <div class="candidate"><div class="avatar">03</div><div><h3>Interview Signals</h3><div class="bars"><div class="bar"><i style="--w:78%"></i></div><div class="bar"><i style="--w:62%"></i></div></div></div><div class="score">82</div></div>
-        <div class="candidate"><div class="avatar">04</div><div><h3>Risk and Gap Flags</h3><div class="bars"><div class="bar"><i style="--w:66%"></i></div><div class="bar"><i style="--w:54%"></i></div></div></div><div class="score">74</div></div>
+    <div class="screen" aria-label="Resume converted into structured intelligence">
+      <div class="screen-top"><div class="dots"><i></i><i></i><i></i></div><span>sample_cv.pdf -> intelligence</span></div>
+      <div class="screen-body">
+        <div class="pipeline">
+          <div class="pipeline-row"><span class="pill">CV</span><span class="arrow">&darr;</span><div class="intel-card"><strong>Anonymised resume</strong><span>Operations associate, Lagos. 4 years experience.</span></div></div>
+          <div class="pipeline-row"><span class="pill">Experience</span><span class="arrow">&darr;</span><div class="intel-card"><strong>Work history extracted</strong><span>Customer operations, vendor coordination, reporting.</span></div></div>
+          <div class="pipeline-row"><span class="pill">Skills</span><span class="arrow">&darr;</span><div class="intel-card"><strong>Skills mapped</strong><span>Excel, stakeholder updates, process improvement.</span></div></div>
+          <div class="pipeline-row"><span class="pill">Evidence</span><span class="arrow">&darr;</span><div class="intel-card"><strong>Evidence checked</strong><span>Document verified resume content. Portfolio not linked.</span></div></div>
+          <div class="pipeline-row"><span class="pill">Role Fit</span><span class="arrow">&darr;</span><div class="intel-card"><strong>Fit explained</strong><span>Good match for operations coordinator roles.</span></div></div>
+          <div class="pipeline-row"><span class="pill">Gaps</span><span class="arrow">&darr;</span><div class="intel-card"><strong>Missing signals</strong><span>No CRM tool named. Metrics need clearer outcomes.</span></div></div>
+          <div class="pipeline-row"><span class="pill">Next Action</span><span class="arrow">&check;</span><div class="intel-card"><strong>Improve and apply</strong><span>Add proof, tailor CV, prepare interview examples.</span></div></div>
+        </div>
       </div>
     </div>
   </section>
 
-  <section class="workflow" id="workflow">
-    <div class="section-head"><h2>One platform, two workflows</h2><p>Individuals move from resume to readiness, matching, improvement, application materials, and tracking. Recruiters move from role definition to screening, ranking, comparison, and shortlist review.</p></div>
-    <div class="workflow-grid">
-      <div class="workflow-step" data-step="01"><div class="step-icon">CV</div><h3>Resume intelligence</h3><p>Analyze strengths, weaknesses, ATS readiness, and career readiness from real resume evidence.</p></div>
-      <div class="workflow-step" data-step="02"><div class="step-icon">JM</div><h3>Job matching</h3><p>Compare a resume with a target job description and identify matching skills, missing skills, and improvement actions.</p></div>
-      <div class="workflow-step" data-step="03"><div class="step-icon">AI</div><h3>AI career agent</h3><p>Use Aptura Agent to orchestrate resume analysis, skill-gap discovery, resume tailoring, and cover letter generation.</p></div>
-      <div class="workflow-step" data-step="04"><div class="step-icon">HR</div><h3>Talent screening</h3><p>Recruiters can screen, rank, compare, and shortlist candidates with AI recommendations and human review.</p></div>
+  <section id="product" class="section section-alt">
+    <div class="section-head">
+      <h2>Show the work behind the score.</h2>
+      <p>Aptura is not just a resume scorer, ATS, job board, or chatbot. It is the intelligence layer connecting career evidence and hiring decisions.</p>
+    </div>
+    <div class="grid grid-3">
+      <article class="card"><h3>Resume intelligence</h3><p>Understand strengths, weak signals, role fit, missing skills, and the next practical action.</p><div class="metric"><span>Career readiness</span><span class="meter"><i style="--w:72%"></i></span></div></article>
+      <article class="card"><h3>Evidence-backed shortlists</h3><p>Rank candidates with match explanations, gaps, verification states, and interview prompts for human review.</p><div class="metric"><span>Human decision</span><span class="meter"><i style="--w:100%"></i></span></div></article>
+      <article class="card"><h3>Agent-ready infrastructure</h3><p>Expose read, proposal, and action tools through API, MCP, and WebMCP with authentication and approval.</p><div class="metric"><span>Silent changes</span><span class="meter"><i style="--w:0%"></i></span></div></article>
     </div>
   </section>
 
-  <section class="features">
-    <div class="landing-card"><h3>Career readiness and job matching</h3><p>Use Aptura to understand how ready your resume is for a target role, where your strengths show clearly, and which skill gaps need attention.</p><div class="feature-list"><div><span>✓</span> AI resume analysis and scoring</div><div><span>✓</span> User-provided job description matching</div><div><span>✓</span> Transparent skill gap recommendations</div></div></div>
-    <div class="landing-card"><h3>Agent-native, human-approved work</h3><p>Compatible AI agents can discover Aptura's WebMCP tools directly from the page, call real platform workflows, and return proposed changes for review.</p><div class="feature-list"><div><span>✓</span> Analyze resumes and retrieve scores</div><div><span>✓</span> Generate cover letters and improvements</div><div><span>✓</span> No silent resume or profile overwrites</div></div></div>
+  <section class="section">
+    <div class="section-head">
+      <h2>Know where you stand before you apply.</h2>
+      <p>Job seekers get a clearer view of readiness, evidence gaps, role fit, and the application package they should build next.</p>
+    </div>
+    <div class="grid grid-4">
+      <article class="card"><h3>Career Readiness</h3><p>See what your CV currently communicates and where it feels thin.</p></article>
+      <article class="card"><h3>Role Fit</h3><p>Compare your evidence against a real job description before applying.</p></article>
+      <article class="card"><h3>Resume Improvements</h3><p>Get suggestions grounded in your current CV, not invented achievements.</p></article>
+      <article class="card"><h3>Interview Readiness</h3><p>Prepare answers around strengths, gaps, and role-specific questions.</p></article>
+    </div>
+    <div class="actions"><a class="btn btn-primary" href="/login">Analyse my CV</a><a class="btn" href="/job-seekers">Build my Career Passport</a></div>
   </section>
 
-  <section class="features">
-    <div class="landing-card"><h3>For individuals</h3><p>Build your career with AI: improve your resume, calculate readiness, match jobs, close skill gaps, generate application materials, and prepare for interviews.</p><div class="feature-list"><div><span>OK</span> Resume intelligence and scoring</div><div><span>OK</span> Job matching and skill-gap analysis</div><div><span>OK</span> Human-approved resume improvements</div></div></div>
-    <div class="landing-card"><h3>For companies</h3><p>Find and evaluate talent with AI: define a role, screen candidate resumes, rank results, compare evidence, and shortlist candidates for human review.</p><div class="feature-list"><div><span>OK</span> Structured candidate screening</div><div><span>OK</span> AI match scores and explanations</div><div><span>OK</span> Lightweight recruiter workspace</div></div></div>
-    <div class="landing-card"><h3>Built for agent-powered work</h3><p>Aptura works normally in every browser. In compatible AI-agent browsers, WebMCP lets agents access Aptura tools directly and reliably.</p><div class="feature-list"><div><span>OK</span> Resume and job match tools</div><div><span>OK</span> Cover letter and skill-gap tools</div><div><span>OK</span> No silent resume or profile overwrites</div></div></div>
-    <div class="landing-card"><h3>Application preparation</h3><p>Generate cover letters, interview preparation suggestions, and practical improvement plans grounded in the user's resume and target role.</p><div class="feature-list"><div><span>OK</span> Interview readiness guidance</div><div><span>OK</span> Prioritized career milestones</div><div><span>OK</span> Transparent missing-evidence notes</div></div></div>
+  <section class="section section-alt">
+    <div class="section-head">
+      <h2>Stop hiring from a pile of PDFs.</h2>
+      <p>Aptura helps teams move from job description to applications, evidence, verification, shortlist, and interview without making AI the final decision-maker.</p>
+    </div>
+    <div class="screen">
+      <div class="screen-top"><div class="dots"><i></i><i></i><i></i></div><span>recruiter workspace demo</span></div>
+      <div class="screen-body dash">
+        <div class="candidate-card"><div class="rank">91</div><div><h3>Candidate A</h3><div class="tags"><span class="tag">Evidence: strong</span><span class="tag">Gap: CRM metrics</span><span class="tag">Employer verified: pending</span></div></div><div class="decision"><strong>AI recommendation</strong><span>Human review required</span></div></div>
+        <div class="candidate-card"><div class="rank">84</div><div><h3>Candidate B</h3><div class="tags"><span class="tag">Relevant experience: 3 years</span><span class="tag">Assessment verified</span><span class="tag">Interview question ready</span></div></div><div class="decision"><strong>Shortlist maybe</strong><span>Human decision</span></div></div>
+        <div class="candidate-card"><div class="rank">76</div><div><h3>Candidate C</h3><div class="tags"><span class="tag">Skill evidence: mixed</span><span class="tag">Gap: reporting tools</span><span class="tag">Explanation available</span></div></div><div class="decision"><strong>Review gaps</strong><span>Do not auto-reject</span></div></div>
+      </div>
+    </div>
+    <div class="actions"><a class="btn btn-primary" href="/employers">Screen candidates</a><a class="btn" href="/login">Compare applicants</a></div>
   </section>
 
-  <section class="cta-band"><div><h2>Start with your next role or open role.</h2><p>Sign in to build a stronger career profile or evaluate candidates with AI recommendations and human control.</p></div><a class="btn btn-primary" href="/login">Try Aptura</a></section>
-  <footer><span>© 2026 Aptura AI</span><span>AI career platform for resume analysis, job matching, skill gap analysis, and application preparation.</span></footer>
-</div>
+  <section class="section">
+    <div class="demo">
+      <div class="demo-panel">
+        <div class="eyebrow">Interactive demo</div>
+        <h2>Try a sample role fit check.</h2>
+        <p class="lead">This demo uses anonymised sample data. Real analysis runs only on user-provided resumes and job descriptions.</p>
+        <label for="demo-role">Sample job title</label>
+        <select id="demo-role" data-demo-role>
+          <option>Product Manager</option>
+          <option>Data Analyst</option>
+          <option>Customer Support Lead</option>
+        </select>
+      </div>
+      <div class="demo-panel demo-output"><div class="demo-list" data-demo-output></div></div>
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="grid grid-2">
+      <article class="copilot"><h3>Aptura Copilot</h3><p>On candidate pages, ask why you match a role. On resume pages, ask what is weakening your CV. On employer pages, ask why a candidate ranked here.</p></article>
+      <article class="card"><h3>Aptura can recommend. You decide.</h3><p>Recommendations show evidence, gaps, and explanations. Profile changes and hiring actions require human approval.</p><div class="actions"><a class="btn" href="/trust">Review trust controls</a></div></article>
+    </div>
+  </section>
+
+  <section class="cta-band">
+    <div><h2>Make talent understandable.</h2><p>Start with a CV, a role, or a hiring workflow.</p></div>
+    <a class="btn btn-primary" href="/login">Get started</a>
+  </section>
+</main>
+{% include "_public_footer.html" %}
+<script src="/static/aptura-public.js" defer></script>
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Aptura AI","applicationCategory":"BusinessApplication","operatingSystem":"Web","description":"AI career building platform for resume analysis, resume building, opportunity matching, skill gap analysis, cover letter generation, and agent-assisted career workflows.","url":"https://aptura.com.ng/","offers":{"@type":"Offer","price":"0","priceCurrency":"NGN"}}
+{"@context":"https://schema.org","@graph":[{"@type":"Organization","name":"Aptura","url":"https://aptura.com.ng/"},{"@type":"SoftwareApplication","name":"Aptura","applicationCategory":"BusinessApplication","operatingSystem":"Web","url":"https://aptura.com.ng/","description":"Career intelligence and talent infrastructure platform for resume analysis, skill matching, candidate screening, and human-approved AI workflows.","offers":{"@type":"Offer","price":"0","priceCurrency":"NGN"}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Is Aptura an AI CV builder?","acceptedAnswer":{"@type":"Answer","text":"Aptura includes resume improvement tools, but its broader role is career intelligence: mapping skills, evidence, gaps, role fit, and hiring decisions."}},{"@type":"Question","name":"Does AI make hiring decisions in Aptura?","acceptedAnswer":{"@type":"Answer","text":"No. Aptura provides recommendations and explanations for human review and human decision-making."}}]}]}
 </script>
+{% include "_webmcp.html" %}
 </body>
 </html>

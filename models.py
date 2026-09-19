@@ -41,6 +41,11 @@ class User(Base):
     last_login = Column(DateTime, nullable=True)
     is_admin = Column(Boolean, default=False)
     workspace = Column(String(30), default="APPLICANT", nullable=False)
+    primary_role = Column(String(30), nullable=True)
+    active_workspace = Column(String(30), nullable=True)
+    available_roles = Column(JSON, nullable=True)
+    workspace_preferences = Column(JSON, nullable=True)
+    onboarding_completed = Column(Boolean, default=False, nullable=False)
 
     # Premium tier — FREE, PRO, or ENTERPRISE
     tier = Column(String(20), default="FREE", nullable=False)
