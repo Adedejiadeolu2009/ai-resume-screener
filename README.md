@@ -14,6 +14,8 @@ The current application is a production-style FastAPI and Jinja web app. It keep
 
 The current implementation supports resume analysis, resume building, career readiness scoring from existing screening results, job-description matching, skill gap analysis, proposed resume improvements, and cover letter generation. It does not implement a persistent career profile, job-board scraping, application tracking, automated outreach, or silent modification of user data.
 
+The product sequence for expanding Aptura is documented in [PRODUCT_ROADMAP.md](PRODUCT_ROADMAP.md): evidence layer first, recruiter automation second, lightweight verified job discovery third, and broader marketplace expansion only after the first three prove repeat usage.
+
 ## WebMCP
 
 WebMCP lets a web page expose real site capabilities as tools that compatible AI agents can discover and invoke in the browser. Aptura uses WebMCP so an agent can work with the user's authenticated Aptura session instead of relying on a separate chatbot or duplicated logic.
@@ -23,30 +25,34 @@ The browser integration lives in `static/js/webmcp.js` and uses:
 ```js
 const modelContext = document.modelContext || navigator.modelContext;
 
-await modelContext.registerTool({
-  name: "analyze_resume",
-  title: "Analyze Resume",
-  description: "Analyze the current user's resume or supplied resume text with Aptura's resume screening logic.",
-  inputSchema: {
-    type: "object",
-    properties: {
-      resume_text: { type: "string" },
-      jobDescription: { type: "string" },
-      candidateName: { type: "string" }
+await modelContext.registerTool(
+  {
+    name: "analyze_resume",
+    title: "Analyze Resume",
+    description:
+      "Analyze the current user's resume or supplied resume text with Aptura's resume screening logic.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        resume_text: { type: "string" },
+        jobDescription: { type: "string" },
+        candidateName: { type: "string" },
+      },
+      additionalProperties: false,
     },
-    additionalProperties: false
+    annotations: { readOnlyHint: true, untrustedContentHint: true },
+    execute: async (input = {}) => {
+      const response = await fetch("/api/webmcp/analyze-resume", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(input),
+      });
+      return response.json();
+    },
   },
-  annotations: { readOnlyHint: true, untrustedContentHint: true },
-  execute: async (input = {}) => {
-    const response = await fetch("/api/webmcp/analyze-resume", {
-      method: "POST",
-      credentials: "same-origin",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(input)
-    });
-    return response.json();
-  }
-}, { signal: controller.signal });
+  { signal: controller.signal },
+);
 ```
 
 Registration is feature-detected. `document.modelContext` is the canonical WebMCP API; the browser script keeps `navigator.modelContext` only as a deprecated compatibility fallback. Browsers without a compatible `registerTool` API continue to run Aptura normally and show an offline agent status.
