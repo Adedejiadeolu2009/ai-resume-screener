@@ -32,6 +32,18 @@ def require_csrf(request: Request, csrf_token: str | None) -> None:
         raise HTTPException(status_code=403, detail="CSRF validation failed")
 
 
+def configured_plan_amount(plan: str) -> int:
+    amounts = {
+        "PRO": int(os.getenv("PRO_AMOUNT_NGN", "2500")),
+        "ENTERPRISE": int(os.getenv("ENTERPRISE_AMOUNT_NGN", "7500")),
+    }
+    normalized = (plan or "").strip().upper()
+    if normalized not in amounts:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=400, detail="Choose a valid plan.")
+    return amounts[normalized]
+
+
 @router.get("/plans", response_class=HTMLResponse)
 @router.get("/pricing", response_class=HTMLResponse)
 async def plans_page(
@@ -52,28 +64,47 @@ async def create_request_get(request: Request, current_user: models.User = Depen
     return templates.TemplateResponse(
         request=request,
         name="create_request.html",
-        context={"created": False, "csrf_token": get_csrf_token(request)},
+        context={
+            "created": False,
+            "csrf_token": get_csrf_token(request),
+            "pro_amount": os.getenv("PRO_AMOUNT_NGN", "2500"),
+            "enterprise_amount": os.getenv("ENTERPRISE_AMOUNT_NGN", "7500"),
+        },
     )
 
 
 @router.post("/create-request", response_class=HTMLResponse)
 async def create_request_post(request: Request, plan: str = Form(...), amount: int = Form(...), csrf_token: str = Form(...), db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     require_csrf(request, csrf_token)
+    expected_amount = configured_plan_amount(plan)
+    if amount != expected_amount:
+        from fastapi import HTTPException
+        raise HTTPException(
+            status_code=400, detail="The selected plan amount is invalid.")
+    normalized_plan = plan.strip().upper()
     # generate a unique reference
     ref = f"manual_{current_user.id}_{int(datetime.utcnow().timestamp())}_{uuid.uuid4().hex[:6]}"
     p = models.Payment(
         user_id=current_user.id,
         paystack_ref=ref,
-        amount=amount or 0,
+        amount=expected_amount,
         status="pending",
-        plan=plan.upper() if plan else "PRO",
+        plan=normalized_plan,
     )
     db.add(p)
     db.commit()
     return templates.TemplateResponse(
         request=request,
         name="create_request.html",
-        context={"created": True, "ref": ref, "plan": p.plan, "amount": amount, "csrf_token": get_csrf_token(request)},
+        context={
+            "created": True,
+            "ref": ref,
+            "plan": p.plan,
+            "amount": expected_amount,
+            "csrf_token": get_csrf_token(request),
+            "pro_amount": os.getenv("PRO_AMOUNT_NGN", "2500"),
+            "enterprise_amount": os.getenv("ENTERPRISE_AMOUNT_NGN", "7500"),
+        },
     )
 
 

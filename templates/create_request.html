@@ -1,42 +1,52 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Create Payment Request — Aptura AI</title>
-  <style>body{font-family:Arial,Helvetica,sans-serif;margin:0;padding:24px;background:#fafafa;color:#111}header{display:flex;justify-content:space-between;align-items:center}a{color:#2b6cb0;text-decoration:none}form{max-width:700px;margin-top:20px}input,select{display:block;padding:10px;margin:8px 0;width:100%;box-sizing:border-box}</style>
+  <title>Upgrade Plan | Aptura</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/aptura-theme.css">
+  <style>
+    body { min-height: 100vh; background: radial-gradient(ellipse 70% 50% at 10% 0%, rgba(201,168,76,.08), transparent 60%), var(--bg); }
+    .upgrade-shell { max-width: 760px; margin: 0 auto; padding: 48px 20px 72px; }
+    .upgrade-nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 48px; }
+    .brand { display: inline-flex; align-items: center; gap: 10px; color: var(--text); font: 600 22px var(--serif); }
+    .brand-mark { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 8px; background: linear-gradient(135deg, var(--gold), var(--gold-dark)); color: var(--bg); font-size: 16px; }
+    .upgrade-links { display: flex; gap: 14px; color: var(--muted); font-size: 12px; font-weight: 700; }
+    .upgrade-links a:hover { color: var(--gold); }
+    .upgrade-kicker { color: var(--gold); font-size: 10px; font-weight: 800; letter-spacing: 1.8px; text-transform: uppercase; }
+    h1 { margin: 10px 0; font: 500 44px/1 var(--serif); }
+    .intro { max-width: 560px; color: var(--muted); line-height: 1.7; }
+    .upgrade-panel { margin-top: 28px; }
+    .upgrade-panel h2 { margin: 0 0 6px; font: 500 25px var(--serif); }
+    .upgrade-panel p { color: var(--muted); font-size: 13px; line-height: 1.6; }
+    .plan-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 22px 0; }
+    .plan-option { position: relative; display: block; padding: 16px; border: 1px solid var(--border); border-radius: 10px; background: rgba(255,255,255,.025); cursor: pointer; }
+    .plan-option:has(input:checked) { border-color: var(--border-lit); background: var(--gold-bg); }
+    .plan-option input { position: absolute; opacity: 0; }
+    .plan-option strong { display: block; color: var(--text); font-size: 14px; }
+    .plan-option span { display: block; margin-top: 6px; color: var(--gold-light); font-weight: 700; }
+    .plan-option small { display: block; margin-top: 8px; color: var(--hint); line-height: 1.45; }
+    .amount-field { margin: 18px 0; }
+    .amount-field input { max-width: 260px; }
+    .notice { margin-top: 20px; padding: 14px; border-left: 2px solid var(--teal); background: var(--teal-bg); color: var(--muted); font-size: 12px; line-height: 1.6; }
+    .success { border-color: rgba(45,212,191,.28); }
+    .reference { display: inline-block; margin: 10px 0; padding: 9px 11px; background: var(--elev); border: 1px solid var(--border); border-radius: 7px; color: var(--gold-light); font-weight: 800; letter-spacing: .4px; }
+    @media (max-width: 600px) { .upgrade-nav { align-items: flex-start; }.upgrade-links { flex-direction: column; align-items: flex-end; gap: 6px; } h1 { font-size: 38px; }.plan-grid { grid-template-columns: 1fr; } }
+  </style>
 </head>
 <body>
-  <header>
-    <h1>Create Payment Request</h1>
-    <nav><a href="/plans">Plans</a> · <a href="/dashboard">Dashboard</a></nav>
-  </header>
-  <main>
-    <p>Generate a unique reference to include with your bank transfer. Use this reference as the transfer description so we can match your payment.</p>
-
+  <main class="upgrade-shell">
+    <nav class="upgrade-nav" aria-label="Upgrade navigation"><a class="brand" href="/dashboard"><span class="brand-mark">A</span><span>Aptura</span></a><div class="upgrade-links"><a href="/plans">Plans</a><a href="/dashboard">Dashboard</a></div></nav>
+    <div class="upgrade-kicker">Secure manual activation</div>
+    <h1>Upgrade your Aptura workspace.</h1>
+    <p class="intro">Choose a plan, generate your payment reference, and include it in your bank transfer description. Your plan is activated only after an Aptura administrator verifies the transfer.</p>
     {% if created %}
-      <div style="padding:12px;border:1px solid #ccc;background:#f6f6f6;margin-bottom:16px">
-        <strong>Reference:</strong> {{ ref }}<br/>
-        <strong>Plan:</strong> {{ plan }}<br/>
-        <strong>Amount:</strong> {{ amount }} NGN<br/>
-        <p>Copy the reference exactly into your bank transfer description and complete the transfer. After payment, we will activate your plan once the transfer is verified.</p>
-      </div>
+    <section class="panel upgrade-panel success" aria-live="polite"><h2>Reference created</h2><p>Use this exact reference in your bank transfer description.</p><div class="reference">{{ ref }}</div><p><strong>Plan:</strong> {{ plan }}<br><strong>Amount:</strong> NGN {{ amount }}</p><div class="notice">After payment, keep this reference. Aptura will activate your plan after the transfer is verified.</div><p><a class="btn btn-primary" href="/plans/status?ref={{ ref }}">Check payment status</a></p></section>
+    {% else %}
+    <section class="panel upgrade-panel"><h2>Choose your plan</h2><p>Prices are configured by Aptura and validated on the server.</p><form method="post" action="/create-request"><div class="plan-grid"><label class="plan-option"><input type="radio" name="plan" value="PRO" data-amount="{{ pro_amount }}" checked><strong>PRO</strong><span>NGN {{ pro_amount }} / month</span><small>More resume analyses, skill gaps, cover letters, and matching.</small></label><label class="plan-option"><input type="radio" name="plan" value="ENTERPRISE" data-amount="{{ enterprise_amount }}"><strong>ENTERPRISE</strong><span>NGN {{ enterprise_amount }} / month</span><small>Recruiter screening and expanded team workflows.</small></label></div><div class="amount-field"><label for="amount">Amount (NGN)</label><input name="amount" id="amount" type="number" value="{{ pro_amount }}" min="1" required readonly></div><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><button class="btn btn-primary" type="submit">Generate payment reference</button></form></section>
     {% endif %}
-
-    <form method="post" action="/create-request">
-      <label for="plan">Plan</label>
-      <select name="plan" id="plan">
-        <option value="PRO">PRO</option>
-        <option value="ENTERPRISE">ENTERPRISE</option>
-      </select>
-
-      <label for="amount">Amount (NGN)</label>
-      <input name="amount" id="amount" type="number" required />
-      <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
-
-      <button type="submit">Generate Reference</button>
-    </form>
   </main>
-{% include "_webmcp.html" %}
+  <script>document.querySelectorAll('input[name="plan"]').forEach((option) => option.addEventListener('change', () => { document.getElementById('amount').value = option.dataset.amount; }));</script>
 </body>
 </html>
