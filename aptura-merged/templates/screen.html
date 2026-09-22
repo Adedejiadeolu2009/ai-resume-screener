@@ -148,6 +148,7 @@
         <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle menu">☰</button>
       </div>
       <div class="nav-right">
+        <span class="lane-pill recruiter">Recruiter</span>
         <span class="quota-pill {% if quota.limit is none %}unlimited{% elif quota.remaining <= 1 %}low{% endif %}" id="quota-pill">
           {% if quota.limit is none %}Enterprise · Unlimited screenings{% else %}{{ quota.remaining }} of {{ quota.limit }} screenings left this month{% endif %}
         </span>
@@ -159,8 +160,8 @@
     <main>
     <section id="setup-panel">
       <div class="page-head">
-        <h1>Screen resumes</h1>
-        <p>Paste the job, drop the resumes. Aptura reads each one and ranks them live as it goes.</p>
+        <h1>Recruiter resume screening</h1>
+        <p>Paste the job, drop candidate resumes, and Aptura ranks each applicant with structured fit evidence.</p>
       </div>
 
       <form id="screening-form" class="panel">

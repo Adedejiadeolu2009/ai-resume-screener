@@ -149,7 +149,6 @@ main { flex: 1; max-width: 1280px; width: 100%; margin: 0 auto; padding: 32px 28
 .workspace-hero::before {
   content: ''; position: absolute; inset: 0 auto 0 0; width: 8px; background: linear-gradient(180deg, var(--gold), var(--teal));
 }
-.workspace-hero[data-workspace="STUDENT"] { background: linear-gradient(135deg, rgba(201,168,76,0.12), rgba(45,212,191,0.08)); }
 .workspace-hero[data-workspace="APPLICANT"] { background: linear-gradient(135deg, rgba(96,165,250,0.12), rgba(201,168,76,0.08)); }
 .workspace-hero[data-workspace="RECRUITER"] { background: linear-gradient(135deg, rgba(45,212,191,0.12), rgba(201,168,76,0.08)); }
 
@@ -464,10 +463,10 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
             {{ workspace_meta.short_label }} workspace
           </div>
           <h1>
-            {% if ws == 'STUDENT' %}Build your next chapter.{% elif ws == 'RECRUITER' %}Your hiring engine is online.{% else %}Your opportunities are waiting.{% endif %}
+            {% if ws == 'RECRUITER' %}Your hiring engine is online.{% else %}Your opportunities are waiting.{% endif %}
           </h1>
           <p>
-            {% if ws == 'STUDENT' %}Explore the skills, roles, and gaps that will move you from learning into a stronger career path with Aptura guidance.{% elif ws == 'RECRUITER' %}Publish open roles, review candidate quality, and move fast from screening to shortlist with AI-backed decisions.{% else %}Track your resume health, discover better-fit opportunities, and act on the right jobs with clarity and momentum.{% endif %}
+            {% if ws == 'RECRUITER' %}Publish open roles, review candidate quality, and move fast from screening to shortlist with AI-backed decisions.{% else %}Track your resume health, discover better-fit opportunities, and act on the right jobs with clarity and momentum.{% endif %}
           </p>
           <div class="workspace-actions">
             <a class="workspace-action primary" href="{{ workspace_meta.primary_action_href }}">{{ workspace_meta.primary_action }}</a>
@@ -475,7 +474,7 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
           </div>
         </div>
         <div class="workspace-avatar" aria-label="workspace avatar">
-          {% if workspace_role == 'student' %}ST{% elif workspace_role == 'recruiter' %}HR{% else %}CV{% endif %}
+          {% if workspace_role == 'recruiter' %}HR{% else %}CV{% endif %}
         </div>
       </section>
 
@@ -493,23 +492,7 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
       </section>
 
       <div class="workspace-grid">
-        {% if ws == 'STUDENT' %}
-          <div class="workspace-card">
-            <div class="workspace-card-header"><span class="workspace-card-title">Career score</span><span class="workspace-card-pill">AI</span></div>
-            <h3>{% if career_readiness.overall is not none %}{{ career_readiness.overall }}{% else %}--{% endif %}</h3>
-            <p>Your readiness snapshot for the next role and the strongest skill gaps to prioritize.</p>
-          </div>
-          <div class="workspace-card">
-            <div class="workspace-card-header"><span class="workspace-card-title">Skill gaps</span><span class="workspace-card-pill">⚑</span></div>
-            <h3>{{ top_skill_gaps | length }}</h3>
-            <p>Areas to sharpen before you apply, with practical guidance from the Aptura agent.</p>
-          </div>
-          <div class="workspace-card">
-            <div class="workspace-card-header"><span class="workspace-card-title">Progress</span><span class="workspace-card-pill">↗</span></div>
-            <h3>{{ total_screenings or 0 }}</h3>
-            <p>Saved screening sessions and resume checks that show how your profile is improving.</p>
-          </div>
-        {% elif ws == 'RECRUITER' %}
+        {% if ws == 'RECRUITER' %}
           <div class="workspace-card">
             <div class="workspace-card-header"><span class="workspace-card-title">Open roles</span><span class="workspace-card-pill">◎</span></div>
             <h3>{{ total_screenings or 0 }}</h3>
@@ -549,11 +532,11 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
       <section class="readiness-panel" aria-label="Career readiness score">
         <div class="readiness-score">
           <div class="label">
-            {% if ws == 'STUDENT' %}Learning momentum{% elif ws == 'RECRUITER' %}Hiring signal{% else %}Career readiness{% endif %}
+            {% if ws == 'RECRUITER' %}Hiring signal{% else %}Career readiness{% endif %}
           </div>
           <div class="value">{% if career_readiness.overall is not none %}{{ career_readiness.overall }}{% else %}--{% endif %}</div>
           <div class="method">
-            {% if ws == 'STUDENT' %}Focused on growth priorities, skill gaps, and action-oriented next steps.{% elif ws == 'RECRUITER' %}A quick pulse on candidate quality and the strongest roles and hires in your pipeline.{% else %}{{ career_readiness.methodology }}{% endif %}
+            {% if ws == 'RECRUITER' %}A quick pulse on candidate quality and the strongest roles and hires in your pipeline.{% else %}{{ career_readiness.methodology }}{% endif %}
           </div>
         </div>
         <div class="readiness-grid">

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Career Agent — Aptura AI</title>
+  <title>Job Candidate Agent — Aptura AI</title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/aptura-theme.css">
   <link rel="stylesheet" href="/static/premium-animations.css">
@@ -117,7 +117,8 @@
         <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle menu">☰</button>
       </div>
       <div class="nav-right">
-        <a href="/screen" class="btn-new">+ New Screening</a>
+        <span class="lane-pill candidate">Job Candidate</span>
+        <a href="/screen" class="btn-new">Recruiter Workspace</a>
         {% include "_app_user_menu.html" %}
       </div>
     </nav>
@@ -143,7 +144,7 @@
             {% if not steps %}<li>Ask the agent to find your skill gaps for a target role.</li>{% endif %}
           </ul>
         {% else %}
-          <div class="readiness-title" style="margin-bottom:8px;">Career readiness</div>
+          <div class="readiness-title" style="margin-bottom:8px;">Candidate readiness</div>
           <p class="readiness-empty">You haven't analyzed a resume yet. Add yours below, then ask the agent to analyze it — your readiness score and action list will show up here.</p>
         {% endif %}
       </div>
@@ -183,7 +184,7 @@
       <div class="panel chat-panel">
         <div class="chat-thread" id="chat-thread">
           <div class="msg assistant">
-            <div class="msg-bubble">Hi{{ ' ' + user.name if user.name else '' }} — I'm your Aptura career agent. Fill in your resume on the left (or paste it right here), then ask me anything: analyze your resume, compare it to a job, find skill gaps, build a plan, or write a cover letter.</div>
+            <div class="msg-bubble">Hi{{ ' ' + user.name if user.name else '' }} — I'm your Aptura job candidate agent. Add your resume on the left, then ask me to analyze it, compare it to a job, find skill gaps, build a plan, improve the draft, or write a cover letter.</div>
           </div>
         </div>
         <div class="chips">

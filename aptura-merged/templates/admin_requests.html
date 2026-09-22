@@ -6,22 +6,22 @@
   <title>Admin — Plan Requests</title>
   <link rel="stylesheet" href="/static/premium-animations.css">
   <style>
-    body{font-family:Arial,Helvetica,sans-serif; background:#0A0B0E; color:#F0EDE6; margin:0; padding:0;}
+    body{font-family:Arial,Helvetica,sans-serif; background:#0B0D0F; color:#F5F0E6; margin:0; padding:0;}
     .wrap{max-width:1100px; margin:0 auto; padding:24px 20px 60px;}
     nav{display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid rgba(255,255,255,.08); background:rgba(10,11,14,.85); position:sticky; top:0; z-index:50;}
     nav .brand{display:flex; gap:10px; align-items:center; font-weight:700;}
-    a{color:#C9A84C; text-decoration:none;}
-    table{width:100%; border-collapse:collapse; margin-top:18px; background:#13151C; border:1px solid rgba(255,255,255,.08); border-radius:12px; overflow:hidden;}
+    a{color:#D4AF5A; text-decoration:none;}
+    table{width:100%; border-collapse:collapse; margin-top:18px; background:#141711; border:1px solid rgba(255,255,255,.08); border-radius:12px; overflow:hidden;}
     th,td{padding:12px 12px; border-bottom:1px solid rgba(255,255,255,.06); font-size:14px;}
-    th{background:rgba(255,255,255,.03); text-align:left; color:#9A9691; font-weight:700;}
+    th{background:rgba(255,255,255,.03); text-align:left; color:#AAA296; font-weight:700;}
     tr:last-child td{border-bottom:none;}
-    .btn{display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:8px 12px; border-radius:10px; border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.03); color:#F0EDE6; cursor:pointer; font-weight:700; font-size:13px;}
-    .btn-primary{background:linear-gradient(135deg,#C9A84C,#A07820); border:none; color:#0A0B0E;}
+    .btn{display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:8px 12px; border-radius:10px; border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.03); color:#F5F0E6; cursor:pointer; font-weight:700; font-size:13px;}
+    .btn-primary{background:linear-gradient(135deg,#D4AF5A,#A07820); border:none; color:#0A0B0E;}
     .btn-danger{background:rgba(248,113,113,.12); border:1px solid rgba(248,113,113,.35);}
-    .pill{display:inline-block; padding:4px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.03); color:#9A9691; font-weight:700; font-size:12px;}
-    .muted{color:#9A9691;}
+    .pill{display:inline-block; padding:4px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.03); color:#AAA296; font-weight:700; font-size:12px;}
+    .muted{color:#AAA296;}
     .grid{display:grid; grid-template-columns:1fr; gap:12px; margin-top:14px;}
-    .notice{padding:14px 14px; background:rgba(201,168,76,.08); border:1px solid rgba(201,168,76,.25); border-radius:12px; color:#9A9691; line-height:1.6; font-size:13px;}
+    .notice{padding:14px 14px; background:rgba(212,175,90,.08); border:1px solid rgba(212,175,90,.25); border-radius:12px; color:#AAA296; line-height:1.6; font-size:13px;}
   </style>
 </head>
 <body>
@@ -35,7 +35,7 @@
 
   <div class="wrap">
     {% if request.query_params.get('confirmed') %}
-      <div class="notice" style="margin-bottom:10px;background:rgba(74,222,128,.08);border-color:rgba(74,222,128,.25);color:#F0EDE6">
+      <div class="notice" style="margin-bottom:10px;background:rgba(74,222,128,.08);border-color:rgba(74,222,128,.25);color:#F5F0E6">
         Payment confirmed for <strong>{{ request.query_params.get('confirmed') }}</strong>.
         Confirmation email: <strong>{{ request.query_params.get('email') or 'unknown' }}</strong>.
       </div>

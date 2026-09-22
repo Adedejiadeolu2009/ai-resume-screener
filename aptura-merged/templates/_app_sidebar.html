@@ -5,13 +5,15 @@
     </div>
 
     <nav class="sidebar-nav">
-      <a href="/agent">🤖 Aptura Agent</a>
+      <a href="/dashboard">Dashboard</a>
+      <div class="sidebar-section-label">Recruiter</div>
       <a href="/recruiter">Recruiter Workspace</a>
-      <a href="/dashboard">🏠 Dashboard</a>
-      <a href="/screen">📄 Screenings</a>
-      <a href="/resume-builder">📝 Resume Builder</a>
+      <a href="/screen">Resume Screening</a>
+      <div class="sidebar-section-label">Job Candidate</div>
+      <a href="/agent">Career Agent</a>
+      <a href="/resume-builder">Resume Builder</a>
+      <div class="sidebar-section-label">Account</div>
       <a href="/plans">💎 Plans & Upgrade</a>
-      <a href="/analytics">📊 Analytics</a>
       {% if is_admin %}
       <a href="/admin">🛡️ Admin</a>
       {% endif %}

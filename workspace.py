@@ -6,36 +6,12 @@ from fastapi import HTTPException
 import models
 
 
-ROLE_STUDENT = "student"
 ROLE_CANDIDATE = "candidate"
 ROLE_RECRUITER = "recruiter"
 
-VALID_ROLES = {ROLE_STUDENT, ROLE_CANDIDATE, ROLE_RECRUITER}
+VALID_ROLES = {ROLE_CANDIDATE, ROLE_RECRUITER}
 
 ROLE_META = {
-    ROLE_STUDENT: {
-        "label": "Student / Early Career",
-        "short_label": "Student",
-        "legacy_workspace": "STUDENT",
-        "dashboard": "/student/dashboard",
-        "description": "Build skills, discover career paths, and prepare for opportunities.",
-        "setup_label": "Setting up your Student workspace...",
-        "primary_action": "Plan my next move",
-        "primary_action_href": "/agent",
-        "secondary_action": "Build resume",
-        "secondary_action_href": "/resume-builder",
-        "nav": [
-            ("Overview", "/student/dashboard"),
-            ("Career Passport", "/agent"),
-            ("Skills", "/agent"),
-            ("Projects", "/resume-builder"),
-            ("Opportunities", "/job-match"),
-            ("Learning", "/agent"),
-            ("Interview Prep", "/agent"),
-            ("Copilot", "/agent"),
-        ],
-        "onboarding_steps": ["Target career", "Education", "Skills", "Projects", "CV upload"],
-    },
     ROLE_CANDIDATE: {
         "label": "Candidate / Job Seeker",
         "short_label": "Candidate",
@@ -83,7 +59,8 @@ ROLE_META = {
 }
 
 LEGACY_TO_ROLE = {
-    "STUDENT": ROLE_STUDENT,
+    # Older student accounts continue as candidate accounts.
+    "STUDENT": ROLE_CANDIDATE,
     "APPLICANT": ROLE_CANDIDATE,
     "RECRUITER": ROLE_RECRUITER,
 }
@@ -108,8 +85,10 @@ def active_role(user: models.User) -> str | None:
 
 
 def available_roles(user: models.User) -> list[str]:
-    roles = user.available_roles if isinstance(user.available_roles, list) else []
-    normalized = [role for role in (normalize_role(item) for item in roles) if role]
+    roles = user.available_roles if isinstance(
+        user.available_roles, list) else []
+    normalized = [role for role in (normalize_role(item)
+                                    for item in roles) if role]
     primary = normalize_role(user.primary_role)
     if primary and primary not in normalized:
         normalized.insert(0, primary)
@@ -164,11 +143,16 @@ def require_role(user: models.User, role: str) -> None:
 
 def onboarding_progress(user: models.User, role: str | None = None) -> dict:
     active = normalize_role(role) or active_role(user) or ROLE_CANDIDATE
-    prefs = user.workspace_preferences if isinstance(user.workspace_preferences, dict) else {}
-    role_prefs = prefs.get(active) if isinstance(prefs.get(active), dict) else {}
-    progress = role_prefs.get("onboarding") if isinstance(role_prefs.get("onboarding"), dict) else {}
-    completed = progress.get("completed_steps") if isinstance(progress.get("completed_steps"), list) else []
-    skipped = progress.get("skipped_steps") if isinstance(progress.get("skipped_steps"), list) else []
+    prefs = user.workspace_preferences if isinstance(
+        user.workspace_preferences, dict) else {}
+    role_prefs = prefs.get(active) if isinstance(
+        prefs.get(active), dict) else {}
+    progress = role_prefs.get("onboarding") if isinstance(
+        role_prefs.get("onboarding"), dict) else {}
+    completed = progress.get("completed_steps") if isinstance(
+        progress.get("completed_steps"), list) else []
+    skipped = progress.get("skipped_steps") if isinstance(
+        progress.get("skipped_steps"), list) else []
     valid_steps = ROLE_META[active]["onboarding_steps"]
     return {
         "role": active,
@@ -191,8 +175,10 @@ def save_onboarding_progress(
         raise ValueError("Invalid workspace role.")
 
     valid_steps = set(ROLE_META[active]["onboarding_steps"])
-    prefs = user.workspace_preferences if isinstance(user.workspace_preferences, dict) else {}
-    role_prefs = prefs.get(active) if isinstance(prefs.get(active), dict) else {}
+    prefs = user.workspace_preferences if isinstance(
+        user.workspace_preferences, dict) else {}
+    role_prefs = prefs.get(active) if isinstance(
+        prefs.get(active), dict) else {}
     role_prefs["onboarding"] = {
         "completed_steps": [step for step in (completed_steps or []) if step in valid_steps],
         "skipped_steps": [step for step in (skipped_steps or []) if step in valid_steps],
@@ -215,7 +201,8 @@ def apply_primary_role(db: Session, user: models.User, role: str) -> models.User
     user.available_roles = [normalized]
     user.workspace = legacy_workspace_for(normalized)
     user.onboarding_completed = True
-    prefs = user.workspace_preferences if isinstance(user.workspace_preferences, dict) else {}
+    prefs = user.workspace_preferences if isinstance(
+        user.workspace_preferences, dict) else {}
     prefs.setdefault(normalized, {})
     user.workspace_preferences = prefs
     db.add(user)
@@ -234,7 +221,8 @@ def activate_role(db: Session, user: models.User, role: str) -> models.User:
     user.available_roles = roles
     user.active_workspace = normalized
     user.workspace = legacy_workspace_for(normalized)
-    prefs = user.workspace_preferences if isinstance(user.workspace_preferences, dict) else {}
+    prefs = user.workspace_preferences if isinstance(
+        user.workspace_preferences, dict) else {}
     prefs.setdefault(normalized, {})
     user.workspace_preferences = prefs
     db.add(user)

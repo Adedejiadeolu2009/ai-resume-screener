@@ -9,28 +9,28 @@
 */
 
 :root {
-  --bg: #0A0B0E;
-  --panel: #13151C;
-  --card: #13151C; /* alias — existing pages use --card, newer ones use --panel; same value */
-  --elev: #1A1D27;
-  --input: #1F2330;
+  --bg: #0B0D0F;
+  --panel: #141711;
+  --card: #141711; /* alias — existing pages use --card, newer ones use --panel; same value */
+  --elev: #1B1E18;
+  --input: #20251E;
   --border: rgba(255, 255, 255, .08);
   --border-soft: rgba(255, 255, 255, .05);
   --border-lit: rgba(201, 168, 76, .35);
 
-  --gold: #C9A84C;
-  --gold-dark: #A07820;
-  --gold-light: #E8D5A3;
-  --gold-bg: rgba(201, 168, 76, .1);
-  --teal: #2DD4BF;
-  --teal-bg: rgba(45, 212, 191, .1);
-  --green: #4ADE80;
+  --gold: #D4AF5A;
+  --gold-dark: #9B711E;
+  --gold-light: #F0D993;
+  --gold-bg: rgba(212, 175, 90, .11);
+  --teal: #38C6B2;
+  --teal-bg: rgba(56, 198, 178, .1);
+  --green: #58D68D;
   --red: #F87171;
   --amber: #FBBF24;
 
-  --text: #F0EDE6;
-  --muted: #9A9691;
-  --hint: #5A5750;
+  --text: #F5F0E6;
+  --muted: #AAA296;
+  --hint: #696258;
 
   --serif: 'Cormorant Garamond', Georgia, serif;
   --sans: 'Outfit', system-ui, -apple-system, sans-serif;
@@ -42,7 +42,24 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--sans); }
+body {
+  margin: 0; background: var(--bg); color: var(--text); font-family: var(--sans);
+  min-height: 100vh;
+}
+body::before {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(ellipse 70% 45% at 12% 0%, rgba(212, 175, 90, .055), transparent 62%),
+    radial-gradient(ellipse 54% 38% at 88% 100%, rgba(56, 198, 178, .038), transparent 58%);
+}
+body::after {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    linear-gradient(rgba(245, 240, 230, .012) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(245, 240, 230, .012) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+body > * { position: relative; z-index: 1; }
 a { color: var(--gold); text-decoration: none; }
 
 /* ── Nav ─────────────────────────────────────────────────────────── */
@@ -52,6 +69,30 @@ a { color: var(--gold); text-decoration: none; }
   background: rgba(10, 11, 14, .9); backdrop-filter: blur(6px);
   position: sticky; top: 0; z-index: 20;
 }
+
+.audience-grid {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 24px 0 32px;
+}
+.audience-card {
+  background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 20px; min-height: 174px; display: flex; flex-direction: column; gap: 14px;
+}
+.audience-card[data-audience="recruiter"] { border-top: 3px solid var(--gold); }
+.audience-card[data-audience="candidate"] { border-top: 3px solid var(--teal); }
+.audience-kicker {
+  color: var(--hint); font: 800 10px var(--sans); letter-spacing: 1.2px; text-transform: uppercase;
+}
+.audience-card h2 { margin: 0; font: 600 22px var(--serif); }
+.audience-card p { margin: 0; color: var(--muted); font: 400 13.5px/1.65 var(--sans); }
+.audience-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: auto; }
+
+.lane-pill {
+  display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px;
+  border-radius: 999px; border: 1px solid var(--border); background: rgba(255,255,255,.03);
+  color: var(--muted); font: 700 12px var(--sans);
+}
+.lane-pill.recruiter { color: var(--gold-light); border-color: rgba(212,175,90,.28); background: rgba(212,175,90,.07); }
+.lane-pill.candidate { color: var(--teal); border-color: rgba(56,198,178,.25); background: rgba(56,198,178,.07); }
 .aptura-brand { display: flex; align-items: center; gap: 12px; color: var(--text); }
 .aptura-brand .mark {
   width: 34px; height: 34px; border-radius: var(--radius-sm);
@@ -105,8 +146,8 @@ input:focus, textarea:focus, select:focus {
 .app-wrapper { display: flex; min-height: 100vh; }
 
 .sidebar {
-  width: 240px; background: linear-gradient(180deg, rgba(12,14,20,0.98), rgba(8,9,12,0.98));
-  padding: 24px 16px; border-right: 1px solid rgba(255,255,255,0.02);
+  width: 240px; background: linear-gradient(180deg, rgba(13,15,13,0.98), rgba(8,9,8,0.98));
+  padding: 24px 16px; border-right: 1px solid rgba(255,255,255,0.03);
   flex-shrink: 0; z-index: 1000; position: relative;
   display: flex; flex-direction: column;
 }
@@ -116,6 +157,10 @@ input:focus, textarea:focus, select:focus {
 .sidebar-brand-name span { color: var(--gold); }
 
 .sidebar-nav { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.sidebar-section-label {
+  color: var(--hint); font: 800 10px var(--ff-sans); letter-spacing: 1.2px; text-transform: uppercase;
+  padding: 14px 14px 6px;
+}
 .sidebar-nav a {
   display: flex; align-items: center; gap: 12px;
   padding: 12px 14px; border-radius: 10px;
@@ -123,7 +168,7 @@ input:focus, textarea:focus, select:focus {
   font: 500 13px var(--ff-sans); transition: all 0.2s;
 }
 .sidebar-nav a:hover, .sidebar-nav a.active {
-  background: linear-gradient(90deg, rgba(201,168,76,0.08), rgba(45,212,191,0.03));
+  background: linear-gradient(90deg, rgba(212,175,90,0.09), rgba(56,198,178,0.035));
   color: var(--text);
 }
 
@@ -195,4 +240,5 @@ input:focus, textarea:focus, select:focus {
 }
 @media (max-width: 480px) {
   .user-name { display: none; }
+  .audience-grid { grid-template-columns: 1fr; }
 }

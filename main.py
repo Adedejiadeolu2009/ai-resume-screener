@@ -5,6 +5,7 @@ Run with:   python main.py
 Then open:  http://localhost:8000
 """
 
+import workspace as workspace_utils
 from fastapi.exceptions import HTTPException as _HTTPException
 from fastapi.responses import Response as _Response
 from fastapi import Request as _Request
@@ -51,7 +52,6 @@ else:
     logger.warning(".env file not found at: %s", ENV_PATH)
 
 import models  # noqa: F401
-import workspace as workspace_utils
 
 # Create all DB tables on startup (safe to run every time — never deletes data)
 # With Supabase PostgreSQL, schema management is handled cleanly by SQLAlchemy.
@@ -277,7 +277,8 @@ def screening_quota(user: models.User) -> dict:
 
 
 def workspace_template_context(user: models.User) -> dict:
-    active = workspace_utils.active_role(user) or workspace_utils.ROLE_CANDIDATE
+    active = workspace_utils.active_role(
+        user) or workspace_utils.ROLE_CANDIDATE
     return {
         "workspace_role": active,
         "workspace_meta": workspace_utils.dashboard_meta_for(active),
@@ -506,7 +507,8 @@ async def switch_workspace(
     except PermissionError:
         return JSONResponse(
             status_code=403,
-            content={"success": False, "error": "Activate this workspace before switching to it."},
+            content={"success": False,
+                     "error": "Activate this workspace before switching to it."},
         )
     return JSONResponse({"success": True, "redirect": workspace_utils.dashboard_path_for(role)})
 
@@ -539,7 +541,8 @@ async def save_workspace_onboarding_progress(
     current_user: models.User = Depends(get_current_user),
 ):
     require_csrf(request, csrf_token)
-    active = workspace_utils.normalize_role(role) or workspace_utils.active_role(current_user)
+    active = workspace_utils.normalize_role(
+        role) or workspace_utils.active_role(current_user)
     if not active or active not in workspace_utils.available_roles(current_user):
         return JSONResponse(status_code=403, content={"success": False, "error": "Workspace is not active for this account."})
     workspace_utils.save_onboarding_progress(
@@ -555,12 +558,7 @@ async def save_workspace_onboarding_progress(
 
 @app.get("/student/dashboard", response_class=HTMLResponse)
 async def student_dashboard_page(request: Request, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
-    if workspace_utils.needs_role_onboarding(current_user):
-        return RedirectResponse("/onboarding/role")
-    if "student" not in workspace_utils.available_roles(current_user):
-        return RedirectResponse("/dashboard?workspace_error=unauthorized")
-    workspace_utils.switch_role(db, current_user, "student")
-    return await dashboard_page(request, db, current_user)
+    return RedirectResponse("/candidate/dashboard", status_code=307)
 
 
 @app.get("/candidate/dashboard", response_class=HTMLResponse)

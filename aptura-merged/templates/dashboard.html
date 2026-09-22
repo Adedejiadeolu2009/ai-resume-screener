@@ -9,12 +9,12 @@
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --bg: #0A0B0E; --card: #13151C; --elev: #1A1D27; --input: #1F2330;
+  --bg: #0B0D0F; --card: #141711; --elev: #1B1E18; --input: #20251E;
   --border: rgba(255,255,255,0.07); --border-lit: rgba(201,168,76,0.35);
-  --gold: #C9A84C; --gold-light: #E8D5A3; --gold-bg: rgba(201,168,76,0.1);
-  --teal: #2DD4BF; --teal-bg: rgba(45,212,191,0.1);
-  --red: #F87171; --amber: #FBBF24; --green: #4ADE80;
-  --text: #F0EDE6; --muted: #9A9691; --hint: #5A5750;
+  --gold: #D4AF5A; --gold-light: #F0D993; --gold-bg: rgba(212,175,90,0.11);
+  --teal: #38C6B2; --teal-bg: rgba(56,198,178,0.1);
+  --red: #F87171; --amber: #FBBF24; --green: #58D68D;
+  --text: #F5F0E6; --muted: #AAA296; --hint: #696258;
   --ff-serif: 'Cormorant Garamond', Georgia, serif;
   --ff-sans: 'Outfit', system-ui, sans-serif;
 }
@@ -40,6 +40,7 @@ body::before {
 .sidebar-brand-name span { color: var(--gold); }
 
 .sidebar-nav { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.sidebar-section-label { color: var(--hint); font: 800 10px var(--ff-sans); letter-spacing: 1.2px; text-transform: uppercase; padding: 14px 14px 6px; }
 .sidebar-nav a { 
   display: flex; align-items: center; gap: 12px; 
   padding: 12px 14px; border-radius: 10px; 
@@ -161,6 +162,24 @@ main { flex: 1; max-width: 1280px; width: 100%; margin: 0 auto; padding: 32px 28
   background: var(--card); border: 1px solid var(--border); border-radius: 12px;
   padding: 22px; margin-bottom: 32px; display: grid; grid-template-columns: 210px 1fr; gap: 22px;
 }
+
+.audience-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-bottom: 32px; }
+.audience-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 22px; min-height: 178px; display: flex; flex-direction: column; gap: 14px;
+}
+.audience-card[data-audience="recruiter"] { border-top: 3px solid var(--gold); }
+.audience-card[data-audience="candidate"] { border-top: 3px solid var(--teal); }
+.audience-kicker { color: var(--hint); font: 800 10px var(--ff-sans); letter-spacing: 1.2px; text-transform: uppercase; }
+.audience-card h2 { font: 600 22px var(--ff-serif); margin: 0; }
+.audience-card p { color: var(--muted); font: 400 13.5px/1.65 var(--ff-sans); margin: 0; }
+.audience-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: auto; }
+.audience-actions .btn-new { box-shadow: none; }
+.btn-secondary {
+  background: rgba(255,255,255,0.03); border: 1px solid var(--border); color: var(--text);
+  font: 700 12px var(--ff-sans); padding: 10px 18px; border-radius: 8px;
+  cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+}
 .readiness-score { display: flex; flex-direction: column; justify-content: center; }
 .readiness-score .label { font: 700 10px var(--ff-sans); text-transform: uppercase; letter-spacing: 1px; color: var(--hint); margin-bottom: 8px; }
 .readiness-score .value { font: 400 54px var(--ff-serif); color: var(--gold); line-height: 1; }
@@ -235,6 +254,7 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
   .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 24px; }
   .readiness-panel { grid-template-columns: 1fr; }
   .readiness-grid { grid-template-columns: repeat(2, 1fr); }
+  .audience-grid { grid-template-columns: 1fr; }
   .welcome h1 { font-size: 28px; }
   nav { padding: 14px 16px; }
 }
@@ -282,13 +302,15 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
     </div>
 
     <nav class="sidebar-nav">
-      <a href="/agent">Aptura Agent</a>
+      <a href="/dashboard" class="active">Dashboard</a>
+      <div class="sidebar-section-label">Recruiter</div>
       <a href="/recruiter">Recruiter Workspace</a>
-      <a href="/dashboard" class="active">🏠 Dashboard</a>
-      <a href="/screen">📄 Screenings</a>
-      <a href="/resume-builder">📝 Resume Builder</a>
+      <a href="/screen">Resume Screening</a>
+      <div class="sidebar-section-label">Job Candidate</div>
+      <a href="/agent">Career Agent</a>
+      <a href="/resume-builder">Resume Builder</a>
+      <div class="sidebar-section-label">Account</div>
       <a href="/plans">💎 Plans & Upgrade</a>
-      <a href="/analytics">📊 Analytics</a>
       {% if is_admin %}
       <a href="/admin">🛡️ Admin</a>
       {% endif %}
@@ -311,9 +333,8 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
         <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle menu">☰</button>
       </div>
       <div class="nav-right">
-        <a href="/agent" class="btn-new">Ask Aptura Agent</a>
-        <a href="/resume-builder" class="btn-new">Build Resume</a>
-        <a href="/screen" class="btn-new">+ New Screening</a>
+        <a href="/screen" class="btn-new">Recruiter</a>
+        <a href="/agent" class="btn-new">Candidate</a>
         <div class="user-profile">
           <div class="user-avatar">
             {% if user.avatar_url %}
@@ -332,8 +353,29 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
     <main>
       <div class="welcome">
         <h1>Good to see you, {{ (user.name or 'there').split(' ')[0] }} 👋</h1>
-        <p>Your career workspace combines resume analysis, opportunity matching, skill gaps, and application preparation.</p>
+        <p>Aptura is focused on two audiences for launch: recruiters screening applicants and job candidates preparing stronger applications.</p>
       </div>
+
+      <section class="audience-grid" aria-label="Aptura workspaces">
+        <article class="audience-card" data-audience="recruiter">
+          <div class="audience-kicker">Recruiter Workspace</div>
+          <h2>Rank and shortlist applicants</h2>
+          <p>Paste a job description, upload resumes, compare candidates consistently, and keep every screening session easy to revisit.</p>
+          <div class="audience-actions">
+            <a href="/screen" class="btn-new">Screen resumes</a>
+            <a href="/analytics" class="btn-secondary">View hiring analytics</a>
+          </div>
+        </article>
+        <article class="audience-card" data-audience="candidate">
+          <div class="audience-kicker">Job Candidate Workspace</div>
+          <h2>Improve fit for target roles</h2>
+          <p>Analyze your resume, match it to a role, close skill gaps, and generate tailored application materials from your profile.</p>
+          <div class="audience-actions">
+            <a href="/agent" class="btn-new">Open career agent</a>
+            <a href="/resume-builder" class="btn-secondary">Build resume</a>
+          </div>
+        </article>
+      </section>
 
       <!-- Premium Banner -->
       <div class="premium-banner">
@@ -364,7 +406,7 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
           <div class="premium-icon">AI</div>
           <div class="premium-text">
             <h3>Aptura Agent is ready</h3>
-            <p>Ask the agent to analyze your resume, match jobs, find skill gaps, tailor improvements, and prepare cover letters. WebMCP adds direct tool access for compatible AI-agent browsers.</p>
+            <p>For job candidates, the agent analyzes resumes, compares target roles, finds skill gaps, improves drafts, and prepares cover letters.</p>
           </div>
         </div>
         <a href="/agent" class="premium-btn">Ask Aptura Agent</a>

@@ -55,7 +55,6 @@ h1 { font: 400 clamp(42px, 7vw, 74px)/0.98 var(--ff-serif); letter-spacing: -0.0
 .role-card input:checked + .role-inner { border-color: var(--gold); background: linear-gradient(145deg, rgba(201,168,76,0.15), rgba(45,212,191,0.05)); box-shadow: 0 0 0 1px rgba(201,168,76,0.18) inset, 0 28px 70px rgba(0,0,0,0.28); }
 .role-card input:checked + .role-inner::after { content: "Selected"; position: absolute; top: 18px; right: 18px; color: #0A0B0E; background: var(--gold); border-radius: 999px; padding: 6px 10px; font-size: 11px; font-weight: 800; }
 .icon { width: 64px; height: 64px; display: grid; place-items: center; border-radius: 16px; border: 1px solid rgba(255,255,255,0.10); background: rgba(10,11,14,0.44); color: var(--gold); font: 700 20px var(--ff-serif); }
-.role-card[data-role="student"] .icon { color: var(--teal); }
 .role-card[data-role="candidate"] .icon { color: var(--blue); }
 .role-card[data-role="recruiter"] .icon { color: var(--gold); }
 .title { font: 500 28px/1.06 var(--ff-serif); max-width: 250px; }
@@ -119,7 +118,7 @@ h1 { font: 400 clamp(42px, 7vw, 74px)/0.98 var(--ff-serif); letter-spacing: -0.0
         <label class="role-card" data-role="{{ role.key }}">
           <input type="radio" name="role" value="{{ role.key }}" {% if loop.index == 2 %}checked{% endif %}>
           <span class="role-inner">
-            <span class="icon" aria-hidden="true">{% if role.key == 'student' %}ST{% elif role.key == 'candidate' %}CV{% else %}HR{% endif %}</span>
+            <span class="icon" aria-hidden="true">{% if role.key == 'candidate' %}CV{% else %}HR{% endif %}</span>
             <span class="title">{{ role.label }}</span>
             <span class="desc">{{ role.description }}</span>
             <span class="steps" aria-label="Short onboarding steps">

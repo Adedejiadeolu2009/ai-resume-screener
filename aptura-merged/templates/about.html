@@ -8,8 +8,10 @@
   <link rel="stylesheet" href="/static/premium-animations.css">
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{--bg:#0A0B0E;--panel:#13151C;--elev:#1A1D27;--border:rgba(255,255,255,.08);--border-lit:rgba(201,168,76,.35);--gold:#C9A84C;--teal:#2DD4BF;--green:#4ADE80;--text:#F0EDE6;--muted:#9A9691;--hint:#5A5750;--serif:'Cormorant Garamond',Georgia,serif;--sans:'Outfit',system-ui,sans-serif}
+    :root{--bg:#0B0D0F;--panel:#141711;--elev:#1B1E18;--border:rgba(255,255,255,.08);--border-lit:rgba(212,175,90,.35);--gold:#D4AF5A;--gold-light:#F0D993;--teal:#38C6B2;--green:#58D68D;--text:#F5F0E6;--muted:#AAA296;--hint:#696258;--serif:'Cormorant Garamond',Georgia,serif;--sans:'Outfit',system-ui,sans-serif}
     body{min-height:100vh;background:var(--bg);color:var(--text);font-family:var(--sans)}
+    body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 70% 45% at 12% 0%,rgba(212,175,90,.055),transparent 62%),radial-gradient(ellipse 54% 38% at 88% 100%,rgba(56,198,178,.038),transparent 58%)}
+    body>*{position:relative;z-index:1}
     nav{display:flex;align-items:center;justify-content:space-between;padding:16px 32px;border-bottom:1px solid var(--border);background:rgba(10,11,14,.9);position:sticky;top:0;z-index:20}
     .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--text)}
     .mark{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,var(--gold),#A07820);display:grid;place-items:center;color:#0A0B0E;font:700 16px var(--serif)}
@@ -73,16 +75,16 @@
     <section class="hero">
       <div class="hero-copy">
         <div class="eyebrow">About Aptura AI</div>
-        <h1>Resume screening built for faster, clearer hiring decisions.</h1>
-        <p class="lead">Aptura AI helps recruiters, founders, HR teams, and growing businesses move from resume overload to a ranked shortlist. It reads resumes against a role description, highlights fit signals, flags gaps, and keeps previous screening sessions available in your dashboard.</p>
+        <h1>AI workspaces for recruiters and job candidates.</h1>
+        <p class="lead">Aptura AI helps recruiters turn resume overload into ranked shortlists and helps job candidates turn target roles into stronger, better-matched applications.</p>
         <div class="cta">
           <a class="btn btn-primary" href="/screen">Start screening</a>
           <a class="btn" href="/plans">View packages</a>
         </div>
       </div>
       <aside class="hero-panel">
-        <div class="eyebrow">What the product focuses on</div>
-        <p class="lead" style="margin-top:0">The goal is not to replace human hiring judgement. The goal is to reduce first-pass review time and make every candidate comparison more consistent.</p>
+        <div class="eyebrow">Two focused lanes</div>
+        <p class="lead" style="margin-top:0">For recruiters, Aptura creates a structured first pass. For candidates, it creates practical resume analysis, matching, and preparation guidance.</p>
         <div class="metric-grid">
           <div class="metric"><strong>5</strong><span>Free monthly screenings for small tests</span></div>
           <div class="metric"><strong>100</strong><span>Pro monthly screenings for active hiring</span></div>
@@ -94,23 +96,23 @@
 
     <section class="section">
       <h2>Why we built it</h2>
-      <p>Hiring teams often receive more resumes than they can review properly. Strong candidates can be missed because formatting is different, keywords are buried, or reviewers are under time pressure. Aptura AI creates a structured first pass so teams can compare candidates with clearer evidence before deciding who to interview.</p>
+      <p>Hiring teams often receive more resumes than they can review properly, while candidates often struggle to understand why a good resume is not matching a target role. Aptura AI focuses on both sides of that moment: clearer candidate comparison for recruiters and clearer next steps for applicants.</p>
     </section>
 
     <section class="section">
       <h2>What Aptura AI does</h2>
       <div class="grid">
         <div class="card">
-          <h3>Ranks candidates</h3>
+          <h3>Ranks candidates for recruiters</h3>
           <p>Upload resumes with a job description and receive a ranked list based on experience, technical fit, education, communication signals, leadership, and role alignment.</p>
         </div>
         <div class="card">
-          <h3>Explains the score</h3>
+          <h3>Explains fit and gaps</h3>
           <p>Each result includes strengths, gaps, interview questions, red flags, key skills, and a short executive summary so your team can review quickly.</p>
         </div>
         <div class="card">
-          <h3>Keeps hiring history</h3>
-          <p>Your dashboard tracks previous screenings, total candidates processed, top candidates, recommendations, and analytics across your hiring activity.</p>
+          <h3>Guides job candidates</h3>
+          <p>The career agent analyzes resumes, compares target roles, identifies skill gaps, and drafts application material from the candidate's profile.</p>
         </div>
       </div>
     </section>
@@ -131,12 +133,12 @@
         </div>
         <div class="plan featured">
           <span class="tag">PRO</span>
-          <h3>Pro</h3>
-          <p>Built for recruiters, founders, and HR teams actively hiring for multiple roles.</p>
+          <h3>Pro Candidate</h3>
+          <p>Built for active job seekers improving resumes and tailoring applications.</p>
           <ul>
             <li>100 screenings per month</li>
-            <li>Advanced candidate reports</li>
-            <li>Analytics and priority support</li>
+            <li>Resume matching and improvement guidance</li>
+            <li>Skill gaps, cover letters, and priority support</li>
           </ul>
         </div>
         <div class="plan">
@@ -172,10 +174,10 @@
 
     <section class="band">
       <div>
-        <h2 style="margin-bottom:6px">Ready to screen your next batch?</h2>
-        <p>Open the screening workspace, paste the job description, and upload candidate resumes.</p>
+        <h2 style="margin-bottom:6px">Choose your workspace</h2>
+        <p>Recruiters can screen candidates. Job candidates can prepare stronger applications.</p>
       </div>
-      <a class="btn btn-primary" href="/screen">Open screener</a>
+      <a class="btn btn-primary" href="/dashboard">Open Aptura</a>
     </section>
   </main>
 </body>
