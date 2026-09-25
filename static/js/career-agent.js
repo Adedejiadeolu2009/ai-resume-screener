@@ -209,7 +209,8 @@
         </div>
         ${listBlock("Why these changes", resume.rewrite_advice)}
         ${listBlock("Still missing evidence for", resume.keyword_gaps)}
-        <button type="button" class="btn btn-primary btn-sm approve-btn" style="margin-top:12px;" data-target="${id}">Approve &amp; save this version</button>
+        <div class="review-copy">Review the evidence and wording before approving. Aptura will not replace your saved resume automatically.</div>
+        <button type="button" class="btn btn-primary btn-sm approve-btn" style="margin-top:12px;" data-target="${id}">Approve and save this version</button>
       </div>`;
   }
 

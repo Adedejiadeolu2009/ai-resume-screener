@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Choose Workspace - Aptura AI</title>
+<title>Choose Your Aptura Workspace</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/static/premium-animations.css">
 <style>
@@ -40,7 +40,7 @@ body::before {
 h1 { font: 400 clamp(42px, 7vw, 74px)/0.98 var(--ff-serif); letter-spacing: -0.02em; margin-bottom: 16px; }
 .sub { color: var(--muted); font: 300 17px/1.7 var(--ff-sans); max-width: 620px; }
 .error { margin: 22px 0; border: 1px solid rgba(248,113,113,0.25); background: rgba(248,113,113,0.08); color: #FCA5A5; border-radius: 10px; padding: 12px 14px; font-size: 13px; }
-.roles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 28px; }
+.roles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 28px; max-width: 860px; }
 .role-card { position: relative; min-height: 326px; cursor: pointer; }
 .role-card input { position: absolute; inset: 0; opacity: 0; }
 .role-inner {
@@ -102,9 +102,9 @@ h1 { font: 400 clamp(42px, 7vw, 74px)/0.98 var(--ff-serif); letter-spacing: -0.0
 
   <main class="content">
     <section class="intro" aria-labelledby="role-title">
-      <div class="eyebrow">Workspace setup</div>
-      <h1 id="role-title">How are you using Aptura?</h1>
-      <p class="sub">Choose the workspace that best fits you. You can change this later.</p>
+      <div class="eyebrow">Choose your path</div>
+      <h1 id="role-title">Are you hiring or building your career?</h1>
+      <p class="sub">Pick the Aptura workspace built around your next move. You can change this later.</p>
     </section>
 
     {% if error %}

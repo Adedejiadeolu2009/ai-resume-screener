@@ -304,6 +304,9 @@
 
   async function shortlistCandidate(r, btn) {
     if (!currentScreeningId) return;
+    const candidateName = r.candidate_name || r.filename || "this candidate";
+    const confirmed = window.confirm(`Shortlist ${candidateName} after reviewing the evidence? Aptura will record your decision, but will not contact or reject anyone automatically.`);
+    if (!confirmed) return;
     btn.disabled = true;
     btn.textContent = "Shortlisting\u2026";
     try {
@@ -338,6 +341,10 @@
     const strengths = (r.strengths || []).map((s) => `<li>${escapeHtml(s)}</li>`).join("");
     const gaps = (r.gaps || r.missing_skills || []).map((s) => `<li>${escapeHtml(s)}</li>`).join("");
     const questions = (r.interview_questions || []).map((s) => `<li>${escapeHtml(s)}</li>`).join("");
+    const scores = Object.entries(r.scores || {})
+      .map(([label, score]) => `<li>${escapeHtml(label.replaceAll("_", " "))}: ${escapeHtml(score)}</li>`)
+      .join("");
+    const redFlags = (r.red_flags || []).map((s) => `<li>${escapeHtml(s)}</li>`).join("");
     detail.innerHTML = `
       <p class="detail-summary">${escapeHtml(r.executive_summary || "No summary available.")}</p>
       <div class="detail-grid">
@@ -345,6 +352,12 @@
         <div><h4>Gaps</h4><ul>${gaps || "<li>\u2014</li>"}</ul></div>
         <div><h4>Ask in interview</h4><ul>${questions || "<li>\u2014</li>"}</ul></div>
       </div>
+      <div class="detail-grid evidence-grid">
+        <div><h4>Signal breakdown</h4><ul>${scores || "<li>No breakdown available</li>"}</ul></div>
+        <div><h4>Standout achievement</h4><ul><li>${escapeHtml(r.standout_achievements || "Not provided")}</li></ul></div>
+        <div><h4>Review flags</h4><ul>${redFlags || "<li>None returned by the analysis</li>"}</ul></div>
+      </div>
+      <div class="review-gate"><strong>Human review required</strong><span>This is an AI recommendation based on the uploaded resume and role description. Verify evidence before shortlisting.</span></div>
     `;
     row.after(detail);
   }

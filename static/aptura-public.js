@@ -50,6 +50,16 @@ function renderDemo(role) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  const nav = document.querySelector(".site-nav");
+  const mobileMenu = document.querySelector(".mobile-menu");
+  if (nav && mobileMenu) {
+    mobileMenu.addEventListener("click", () => {
+      const isOpen = nav.classList.toggle("menu-open");
+      mobileMenu.setAttribute("aria-expanded", String(isOpen));
+      mobileMenu.setAttribute("aria-label", isOpen ? "Close navigation" : "Open navigation");
+    });
+  }
+
   const demoSelect = document.querySelector("[data-demo-role]");
   if (demoSelect) {
     renderDemo(demoSelect.value);

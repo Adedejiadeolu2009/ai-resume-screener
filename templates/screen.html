@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recruiter Screening | Aptura</title>
+  <link rel="stylesheet" href="/static/aptura-theme.css">
+  <link rel="stylesheet" href="/static/premium-animations.css">
+  <style>
+    .screen-main { max-width: 1100px; margin: 0 auto; padding: 32px 28px 70px; }
+    .screen-header { display: flex; align-items: end; justify-content: space-between; gap: 20px; margin-bottom: 24px; }
+    .screen-header h1 { margin: 0; font: 500 38px/1 var(--serif); }
+    .screen-header p { max-width: 520px; margin: 8px 0 0; color: var(--muted); line-height: 1.6; font-size: 14px; }
+    .automation-note { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 20px; padding: 13px 15px; border: 1px solid rgba(45,212,191,.22); border-radius: var(--radius-sm); background: var(--teal-bg); color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .automation-note strong { color: var(--teal); white-space: nowrap; }
+    .screen-form { max-width: 760px; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .field { margin-bottom: 16px; }
+    .field label { display: block; margin-bottom: 7px; color: var(--hint); font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
+    .field textarea { min-height: 190px; resize: vertical; line-height: 1.5; }
+    .char-count { text-align: right; color: var(--hint); font-size: 11px; margin-top: 4px; }
+    .dropzone { padding: 26px 18px; border: 1px dashed var(--border-lit); border-radius: var(--radius-sm); background: rgba(255,255,255,.025); text-align: center; cursor: pointer; }
+    .dropzone.drag { background: var(--gold-bg); border-color: var(--gold); }
+    .dropzone strong { display: block; color: var(--text); font-size: 14px; }
+    .dropzone span { display: block; margin-top: 5px; color: var(--hint); font-size: 12px; }
+    .file-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .file-chip { display: inline-flex; gap: 8px; align-items: center; padding: 6px 9px 6px 12px; border: 1px solid var(--border); border-radius: 999px; background: var(--elev); color: var(--muted); font-size: 12px; }
+    .file-chip button { width: 20px; height: 20px; border: 0; border-radius: 50%; background: transparent; color: var(--muted); cursor: pointer; }
+    .file-chip button:hover { background: rgba(255,255,255,.08); color: var(--text); }
+    .form-error { margin-top: 14px; padding: 10px 12px; border: 1px solid rgba(248,113,113,.25); border-radius: var(--radius-sm); background: rgba(248,113,113,.08); color: var(--red); font-size: 13px; }
+    .form-footer { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-top: 18px; }
+    .form-footer small { color: var(--hint); }
+    .theater[hidden], .form-error[hidden] { display: none; }
+    .theater-head { margin-bottom: 18px; }
+    .theater-head h2 { margin: 0; font: 500 27px var(--serif); }
+    .theater-sub { min-height: 20px; margin-top: 5px; color: var(--muted); font-size: 12px; }
+    .progress-track { height: 7px; margin-top: 14px; overflow: hidden; border-radius: 999px; background: var(--elev); }
+    .progress-fill { width: 0; height: 100%; background: linear-gradient(90deg, var(--gold), var(--teal)); transition: width .35s ease; }
+    .progress-meta { display: flex; justify-content: space-between; gap: 12px; margin-top: 7px; color: var(--hint); font-size: 11px; }
+    .board { display: grid; gap: 10px; }
+    .theater-row { display: grid; grid-template-columns: 42px 1fr 54px 110px auto; gap: 13px; align-items: center; padding: 13px 15px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--panel); }
+    .rank-num { color: var(--hint); font: 600 15px var(--serif); }
+    .row-name { font-weight: 700; font-size: 13px; }
+    .row-file { overflow: hidden; color: var(--hint); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+    .row-score { text-align: center; color: var(--gold-light); font: 700 18px var(--serif); }
+    .row-badge { padding: 5px 8px; border: 1px solid var(--border); border-radius: 999px; color: var(--muted); font-size: 10px; font-weight: 800; text-align: center; }
+    .row-badge.strong-hire { border-color: rgba(201,168,76,.35); background: var(--gold-bg); color: var(--gold); }
+    .row-badge.hire { border-color: rgba(45,212,191,.3); background: var(--teal-bg); color: var(--teal); }
+    .row-actions { display: flex; gap: 6px; }
+    .row-actions button { padding: 7px 9px; border: 1px solid var(--border); border-radius: 6px; background: transparent; color: var(--muted); cursor: pointer; font: 700 11px var(--sans); }
+    .row-actions button:hover { border-color: var(--border-lit); color: var(--text); }
+    .row-shortlist.on { border-color: rgba(45,212,191,.3); color: var(--teal); }
+    .row-detail { padding: 15px 17px; border: 1px solid var(--border-soft); border-radius: var(--radius-sm); background: var(--elev); }
+    .detail-summary { margin: 0 0 13px; color: var(--text); font-size: 13px; line-height: 1.6; }
+    .detail-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .detail-grid h4 { margin: 0 0 7px; color: var(--hint); font-size: 10px; letter-spacing: .8px; text-transform: uppercase; }
+    .detail-grid ul { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+    .detail-grid li { color: var(--muted); font-size: 12px; line-height: 1.45; }
+    .evidence-grid { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border-soft); }
+    .review-gate { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border-soft); color: var(--hint); font-size: 11px; }
+    .review-gate strong { color: var(--gold-light); }
+    .error-list { margin-top: 15px; padding: 12px; border: 1px solid rgba(248,113,113,.22); border-radius: var(--radius-sm); background: rgba(248,113,113,.06); color: var(--muted); font-size: 12px; }
+    @media (max-width: 720px) { .screen-main { padding: 24px 16px 50px; } .screen-header { display: block; } .screen-header h1 { font-size: 32px; } .field-row, .detail-grid { grid-template-columns: 1fr; } .theater-row { grid-template-columns: 32px 1fr 45px; } .row-badge, .row-actions { grid-column: 2 / -1; } .row-actions { justify-content: flex-start; } }
+  </style>
+</head>
+<body>
+<div class="app-wrapper">
+  {% include "_app_sidebar.html" %}
+  <div class="content">
+    <nav>
+      <div class="nav-left"><button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle menu">&#9776;</button></div>
+      <div class="nav-right"><span class="lane-pill recruiter">Recruiter workspace</span><span class="quota-pill" id="quota-pill">{{ quota.remaining if quota.limit is not none else 'Unlimited' }}{% if quota.limit is not none %} screenings left{% endif %}</span><a href="/agent" class="btn-new">Candidate workspace</a>{% include "_app_user_menu.html" %}</div>
+    </nav>
+    <main class="screen-main">
+      <header class="screen-header"><div><h1>Review applicants with evidence</h1><p>Describe the role, add resumes, and let Aptura organize the first pass. Every recommendation stays reviewable by a human.</p></div></header>
+      <div class="automation-note" role="note"><strong>Human review stays in control.</strong><span>Aptura extracts signals and suggests a ranking. It does not auto-reject candidates or make the final hiring decision.</span></div>
+      <section id="setup-panel">
+        <form id="screening-form" class="panel screen-form">
+          <div class="field-row"><div class="field"><label for="job_title">Job title</label><input id="job_title" name="job_title" type="text" placeholder="Senior Backend Engineer" maxlength="255"></div><div class="field"><label for="company_name">Company</label><input id="company_name" name="company_name" type="text" placeholder="Acme Inc." maxlength="255"></div></div>
+          <div class="field"><label for="job_description">Role requirements</label><textarea id="job_description" name="job_description" maxlength="20000" required placeholder="Paste responsibilities, must-have skills, and the evidence you want to review."></textarea><div class="char-count"><span id="char-count">0</span> / 20,000</div></div>
+          <div class="field"><label>Candidate resumes</label><div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Upload candidate resumes"><strong>Drop resumes here or choose files</strong><span>PDF, DOCX, or TXT, up to 10MB each, up to 50 files</span></div><input id="file-input" type="file" accept=".pdf,.docx,.txt" multiple hidden><div class="file-chips" id="file-chips"></div></div>
+          <div id="form-error" class="form-error" role="alert" hidden></div>
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <div class="form-footer"><small>Step 1: organize evidence. Step 2: review recommendations. Step 3: decide.</small><button class="btn btn-primary" id="start-btn" type="submit" disabled>Start evidence review</button></div>
+        </form>
+      </section>
+      <section id="theater" class="theater" hidden aria-live="polite">
+        <div class="theater-head"><h2 id="theater-title"></h2><div class="theater-sub"><span id="now-reading"></span></div><div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div><div class="progress-meta"><span id="progress-label">0 / 0 processed</span><a href="/screen">New review</a></div></div>
+        <div class="board" id="board"></div><div class="error-list" id="error-list" hidden></div>
+      </section>
+    </main>
+  </div>
+</div>
+<div class="backdrop" id="backdrop"></div>
+{% if past_result %}
+<script id="theater-seed" type="application/json">{{ past_result | tojson }}</script>
+{% endif %}
+<script src="/static/js/app-shell.js" defer></script>
+<script src="/static/js/screening_theater.js" defer></script>
+</body>
+</html>

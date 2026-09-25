@@ -7,9 +7,9 @@
   --panel-2:#171914;
   --line:rgba(245,240,230,.12);
   --line-strong:rgba(201,168,76,.42);
-  --blue:#c9a84c;
+  --blue:#2dd4bf;
   --violet:#a07820;
-  --teal:#d6bd72;
+  --teal:#2dd4bf;
   --gold:#c9a84c;
   --green:#79d99a;
   --amber:#f3c35b;
@@ -30,7 +30,7 @@ a{color:inherit}
 .brand{display:flex;align-items:center;gap:11px;text-decoration:none}.brand-mark{width:36px;height:36px;border-radius:8px;display:grid;place-items:center;background:linear-gradient(135deg,var(--gold),var(--violet));font-weight:900;color:var(--ink);box-shadow:0 14px 38px rgba(201,168,76,.2)}.brand-name{font-weight:800;font-size:18px}.brand-name span{color:var(--gold)}
 .nav-links{display:flex;align-items:center;gap:18px}.nav-links a{color:var(--muted);text-decoration:none;font-size:13px;font-weight:700}.nav-links a:hover{color:var(--text)}
 .nav-actions{display:flex;align-items:center;gap:10px}.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:10px 15px;border:1px solid var(--line);border-radius:var(--radius);background:rgba(255,255,255,.035);color:var(--text);text-decoration:none;font-weight:800;font-size:13px;white-space:nowrap}.btn:hover{border-color:var(--line-strong);background:rgba(255,255,255,.06)}.btn-primary{border-color:transparent;background:linear-gradient(135deg,var(--blue),var(--violet));color:white;box-shadow:0 14px 40px rgba(93,168,255,.26)}.btn-ghost{background:transparent}
-.mobile-menu{display:none}
+.mobile-menu{display:none;align-items:center;justify-content:center;width:42px;height:42px;border:1px solid var(--line);border-radius:var(--radius);background:rgba(255,255,255,.035);color:var(--text);font:700 20px/1 'Outfit',sans-serif;cursor:pointer}
 .page{overflow:hidden}.section{padding:clamp(48px,7vw,84px) clamp(16px,5vw,72px)}.section-alt{background:rgba(255,255,255,.025);border-block:1px solid var(--line)}
 .hero{min-height:calc(100vh - 65px);display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,.92fr);gap:44px;align-items:center;padding:clamp(34px,6vw,76px) clamp(16px,5vw,72px) 42px}.hero-copy{max-width:790px}.eyebrow{display:inline-flex;align-items:center;gap:9px;color:var(--teal);font-size:12px;font-weight:900;letter-spacing:1.8px;text-transform:uppercase}.eyebrow::before{content:"";width:28px;height:1px;background:currentColor;opacity:.65}
 h1,.h1{margin:14px 0 0;font-size:clamp(44px,7vw,82px);line-height:.95;font-weight:850;letter-spacing:0;max-width:850px}.hero-line{display:block;color:var(--muted);font-weight:650}.lead{max-width:680px;margin:22px 0 0;color:var(--muted);font-size:17px;line-height:1.7}.hero-actions,.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
@@ -51,7 +51,7 @@ h1,.h1{margin:14px 0 0;font-size:clamp(44px,7vw,82px);line-height:.95;font-weigh
 .footer{display:grid;grid-template-columns:1fr auto;gap:18px;padding:26px clamp(16px,5vw,72px);border-top:1px solid var(--line);color:var(--soft);font-size:12px}.footer-links{display:flex;flex-wrap:wrap;gap:14px}.footer a{color:var(--muted);text-decoration:none}
 :focus-visible{outline:3px solid rgba(93,168,255,.65);outline-offset:3px}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
-@media (max-width:1040px){.nav-links{display:none}.mobile-menu{display:inline-flex}.hero,.demo{grid-template-columns:1fr}.grid-4{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:1040px){.nav-links{display:none}.mobile-menu{display:inline-flex}.site-nav.menu-open{flex-wrap:wrap}.site-nav.menu-open .nav-links{display:flex;order:3;width:100%;padding-top:12px;border-top:1px solid var(--line);flex-direction:column;align-items:flex-start;gap:0}.site-nav.menu-open .nav-links a{width:100%;padding:11px 0}.hero,.demo{grid-template-columns:1fr}.grid-4{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:720px){.site-nav{align-items:flex-start}.brand-name{font-size:16px}.nav-actions .btn-ghost{display:none}.hero{min-height:auto;padding-top:34px}.hero-proof,.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}.section-head{display:block}.section-head p{margin-top:12px}.candidate-card{grid-template-columns:44px 1fr}.decision{grid-column:1/-1;text-align:left}.cta-band{display:block}.cta-band .btn{width:100%;margin-top:18px}.footer{grid-template-columns:1fr}.screen-body{padding:12px}.pipeline-row{grid-template-columns:1fr}.arrow{display:none}h1,.h1{font-size:42px}.lead{font-size:16px}.hero-actions .btn{width:100%}}
 
 /* Final black-and-gold surface treatment for legacy public components. */
@@ -62,3 +62,11 @@ h1,.h1{margin:14px 0 0;font-size:clamp(44px,7vw,82px);line-height:.95;font-weigh
 .cta-band{border-color:rgba(201,168,76,.28);background:linear-gradient(135deg,rgba(201,168,76,.14),rgba(255,255,255,.025))}
 .features li::before{content:"";display:inline-block;width:6px;height:6px;margin:0 10px 2px 2px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.12)}
 :focus-visible{outline-color:rgba(201,168,76,.75)}
+
+/* Keep the public surface aligned with the authenticated Aptura workspace. */
+.screen,.card,.demo-panel{background-color:var(--panel)}
+.btn-primary{background:linear-gradient(135deg,var(--gold),var(--violet));color:var(--ink);box-shadow:0 14px 40px rgba(201,168,76,.2)}
+.pipeline-row,.proof,.candidate-card,.demo-item{background:rgba(255,255,255,.035)}
+.pill{background:rgba(201,168,76,.1);border-color:rgba(201,168,76,.25);color:var(--gold-light)}
+.arrow,.eyebrow{color:var(--teal)}
+.meter i{background:linear-gradient(90deg,var(--gold),var(--teal))}
