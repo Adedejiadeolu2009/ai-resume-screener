@@ -99,7 +99,8 @@ def normalize_screening_result(result: dict[str, Any]) -> dict[str, Any]:
 def analyze_resume(db: Session, user: models.User, resume_text: str | None = None, job_description: str | None = None, candidate_name: str | None = None) -> dict[str, Any]:
     text = current_resume_text(db, user, resume_text)
     if len(text) < 50:
-        raise HTTPException(400, "Upload, paste, or save resume text before analysis.")
+        raise HTTPException(
+            400, "Upload, paste, or save resume text before analysis.")
     provider, screen_fn = resolve_ai_provider()
     if not screen_fn:
         raise HTTPException(500, "AI service is not configured.")
@@ -116,12 +117,30 @@ def analyze_resume(db: Session, user: models.User, resume_text: str | None = Non
     return normalized
 
 
+def interview_prep(db: Session, user: models.User, target_role: str | None = None, job_description: str | None = None, resume_text: str | None = None) -> dict[str, Any]:
+    """Prepare interview questions from the candidate's real resume evidence."""
+    role = (target_role or "the target role").strip()
+    context = (job_description or default_job_description(db, user)).strip()
+    result = analyze_resume(db, user, resume_text,
+                            f"Target role: {role}\n\n{context}")
+    return {
+        "target_role": role,
+        "summary": result.get("summary"),
+        "questions": result.get("interview_questions") or [],
+        "strengths_to_prepare": result.get("strengths") or [],
+        "gaps_to_explain": result.get("weaknesses") or result.get("missing_skills") or [],
+        "recommended_improvements": result.get("recommended_improvements") or [],
+        "methodology": "Questions are generated from the saved resume and target-role context. Verify every answer reflects your real experience.",
+    }
+
+
 def save_resume_text(db: Session, user: models.User, resume_text: str, filename: str | None = None, target_role: str | None = None) -> models.CareerProfile:
     text = (resume_text or "").strip()
     if len(text) < 20:
         raise HTTPException(400, "Resume text is too short to save.")
     if len(text) > 12000:
-        raise HTTPException(400, "Resume text is too long. Keep it under 12,000 characters.")
+        raise HTTPException(
+            400, "Resume text is too long. Keep it under 12,000 characters.")
     profile = get_or_create_profile(db, user)
     profile.resume_text = text
     if filename:
@@ -139,7 +158,8 @@ def save_uploaded_resume(db: Session, user: models.User, filename: str, file_byt
     if ext not in {".pdf", ".docx", ".txt"}:
         raise HTTPException(400, "Upload a PDF, DOCX, or TXT resume.")
     if len(file_bytes) > 10 * 1024 * 1024:
-        raise HTTPException(400, "Resume file is too large. Maximum size is 10MB.")
+        raise HTTPException(
+            400, "Resume file is too large. Maximum size is 10MB.")
     text = extract_text(filename, file_bytes)
     return save_resume_text(db, user, text, filename=filename)
 
@@ -169,10 +189,13 @@ def skill_gap(db: Session, user: models.User, target_role: str, required_skills:
     analyzed = []
     if latest and latest.result_json:
         analyzed = latest.result_json.get("key_skills") or []
-    current = dedupe_skills([*analyzed, *[skill for skill in required if skill.casefold() in text]])
+    current = dedupe_skills(
+        [*analyzed, *[skill for skill in required if skill.casefold() in text]])
     current_keys = {skill.casefold() for skill in current}
-    matching = [skill for skill in required if skill.casefold() in current_keys]
-    missing = [skill for skill in required if skill.casefold() not in current_keys]
+    matching = [skill for skill in required if skill.casefold()
+                in current_keys]
+    missing = [skill for skill in required if skill.casefold()
+               not in current_keys]
     result = {
         "targetRole": target_role,
         "methodology": "Compares required skills against saved resume text and latest Aptura analysis. Aptura does not infer unverified skills.",
@@ -196,14 +219,16 @@ def skill_gap(db: Session, user: models.User, target_role: str, required_skills:
 def match_resume_to_job(db: Session, user: models.User, job_title: str, company: str | None, job_description: str, required_skills: list[str] | None = None, resume_text: str | None = None) -> dict[str, Any]:
     text = current_resume_text(db, user, resume_text)
     if len(text) < 50:
-        raise HTTPException(400, "Upload, paste, or save resume text before matching a job.")
+        raise HTTPException(
+            400, "Upload, paste, or save resume text before matching a job.")
     provider, screen_fn = resolve_ai_provider()
     if not screen_fn:
         raise HTTPException(500, "AI service is not configured.")
     skills = dedupe_skills(required_skills or [])
     job_context = f"Job title: {job_title}\nCompany: {company or 'Not specified'}\n\n{job_description}"
     if skills:
-        job_context += "\n\nRequired skills:\n" + "\n".join(f"- {skill}" for skill in skills)
+        job_context += "\n\nRequired skills:\n" + \
+            "\n".join(f"- {skill}" for skill in skills)
     result = screen_fn(job_context, text, user.name or "Current resume")
     normalized = normalize_screening_result(result)
     payload = {
@@ -235,7 +260,8 @@ def match_resume_to_job(db: Session, user: models.User, job_title: str, company:
 def improve_resume(db: Session, user: models.User, target_role: str, instructions: str | None = None, job_description: str | None = None, resume_text: str | None = None) -> dict[str, Any]:
     text = current_resume_text(db, user, resume_text)
     if len(text) < 50:
-        raise HTTPException(400, "Upload, paste, or save resume text before improving it.")
+        raise HTTPException(
+            400, "Upload, paste, or save resume text before improving it.")
     prompt = RESUME_BUILDER_PROMPT.format(
         job_title=target_role or instructions or "Target role",
         seniority="Mid-level",
@@ -271,7 +297,8 @@ def proposed_resume_text(result: dict[str, Any]) -> str:
 def cover_letter(db: Session, user: models.User, job_title: str, company: str | None, job_description: str, resume_text: str | None = None, tone: str = "professional") -> dict[str, Any]:
     text = current_resume_text(db, user, resume_text)
     if len(text) < 50:
-        raise HTTPException(400, "Upload, paste, or save resume text before generating a cover letter.")
+        raise HTTPException(
+            400, "Upload, paste, or save resume text before generating a cover letter.")
     prompt = f"""You are an expert career writer.
 
 Return ONLY valid JSON with this exact shape:
@@ -300,7 +327,8 @@ Do not invent credentials. If evidence is missing, keep the phrasing modest."""
 def career_plan(db: Session, user: models.User, target_role: str, required_skills: list[str] | None = None) -> dict[str, Any]:
     profile = get_or_create_profile(db, user)
     text = current_resume_text(db, user, None)
-    gaps = skill_gap(db, user, target_role, required_skills or [], text) if required_skills else profile.latest_skill_gap_json
+    gaps = skill_gap(db, user, target_role, required_skills or [],
+                     text) if required_skills else profile.latest_skill_gap_json
     prompt = f"""Return ONLY valid JSON for a practical career plan.
 
 Shape:

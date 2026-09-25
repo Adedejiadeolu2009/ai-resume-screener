@@ -196,6 +196,19 @@
       </div>`;
   }
 
+  function renderInterviewPrep(p) {
+    return `
+      <div class="result-card">
+        <div class="result-title" style="margin-bottom:6px;">Interview preparation: ${escapeHtml(p.target_role || "target role")}</div>
+        <p class="result-summary">${escapeHtml(p.summary || "Use the questions below to rehearse answers grounded in your experience.")}</p>
+        ${listBlock("Questions to rehearse", p.questions)}
+        ${listBlock("Strengths to demonstrate", p.strengths_to_prepare)}
+        ${listBlock("Gaps to explain honestly", p.gaps_to_explain)}
+        ${listBlock("Final preparation steps", p.recommended_improvements)}
+        <div class="review-copy">Keep your answers truthful and specific. Aptura provides preparation guidance, not a guarantee of interview outcomes.</div>
+      </div>`;
+  }
+
   function renderProposal(p) {
     const resume = (p.proposed_changes && p.proposed_changes.resume) || {};
     const id = "proposal-" + Math.random().toString(36).slice(2, 8);
@@ -232,6 +245,7 @@
     if (result.match) html += renderMatch(result.match);
     if (result.skill_gap) html += renderSkillGap(result.skill_gap);
     if (result.career_plan) html += renderCareerPlan(result.career_plan);
+    if (result.interview_prep) html += renderInterviewPrep(result.interview_prep);
     if (result.proposal) html += renderProposal(result.proposal);
     if (result.cover_letter) html += renderCoverLetter(result.cover_letter);
     return html || `<p>I couldn't generate anything useful from that - try rephrasing or adding more detail in the panel on the left.</p>`;
@@ -255,6 +269,7 @@
 
   function detectIntent(text) {
     const m = text.toLowerCase();
+    if (m.includes("interview") || m.includes("prepare")) return "interview";
     if (m.includes("cover")) return "cover";
     if (m.includes("match") || m.includes("internship") || m.includes("job")) return "match";
     if (m.includes("gap") || m.includes("plan")) return "gap_or_plan";
@@ -290,7 +305,7 @@
     const typingEl = addAssistantTyping();
     const payload = {
       message: text,
-      job_title: ctxJobTitle.value.trim() || null,
+      job_title: ctxJobTitle.value.trim() || ctxTargetRole.value.trim() || null,
       company: ctxCompany.value.trim(),
       job_description: ctxJobDescription.value.trim() || null,
       required_skills: skillsArray(),

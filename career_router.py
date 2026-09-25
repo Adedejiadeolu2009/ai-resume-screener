@@ -138,7 +138,8 @@ async def recruiter_page(request: Request, db: Session = Depends(get_db), curren
         return RedirectResponse("/onboarding/role")
     if workspace_utils.ROLE_RECRUITER not in workspace_utils.available_roles(current_user):
         return RedirectResponse("/dashboard?workspace_error=unauthorized")
-    workspace_utils.switch_role(db, current_user, workspace_utils.ROLE_RECRUITER)
+    workspace_utils.switch_role(
+        db, current_user, workspace_utils.ROLE_RECRUITER)
     return await _main.screen_page(request, db, current_user)
 
 
@@ -365,7 +366,17 @@ async def agent_chat(payload: AgentInput, db: Session = Depends(get_db), current
     try:
         activity: list[str] = []
         result: dict[str, Any] = {}
-        if "cover" in message:
+        if "interview" in message or "interview prep" in message or "prepare" in message:
+            result["interview_prep"] = career.interview_prep(
+                db,
+                current_user,
+                payload.job_title or payload.message,
+                payload.job_description,
+                payload.resume_text,
+            )
+            activity += ["Resume evidence reviewed",
+                         "Interview questions generated", "Preparation plan ready"]
+        elif "cover" in message:
             if not payload.job_description or not payload.job_title:
                 raise HTTPException(
                     400, "Add a job title and job description before generating a cover letter.")
