@@ -24,6 +24,11 @@
     transform: translateY(-2px);
   }
 
+  :where(.btn-primary, .premium-btn, .btn-submit) {
+    background-size: 180% 180%;
+    animation: gold-breathe 7s ease-in-out infinite;
+  }
+
   :where(.brand-mark, .sidebar-brand-mark, .mark) {
     position: relative;
     overflow: hidden;
@@ -66,4 +71,9 @@
 @keyframes mark-sheen {
   0%, 55% { transform: translateX(-120%) rotate(8deg); }
   78%, 100% { transform: translateX(120%) rotate(8deg); }
+}
+
+@keyframes gold-breathe {
+  0%, 100% { background-position: 0% 50%; box-shadow: 0 12px 32px rgba(201, 168, 76, .14); }
+  50% { background-position: 100% 50%; box-shadow: 0 16px 42px rgba(201, 168, 76, .22); }
 }

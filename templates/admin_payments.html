@@ -32,7 +32,7 @@
   <div class="wrap">
     <div class="notice">
       <strong>💡 Payment Confirmation Guide:</strong><br/>
-      <strong>Pending:</strong> Click the green ✓ Confirm button to verify payment and upgrade user.<br/>
+      <strong>Pending:</strong> Confirm the payment to upgrade the user account.<br/>
       <strong>Success:</strong> Payment already confirmed. Click Resend to email confirmation again if needed.<br/>
       <strong>Record Offline:</strong> Use the form above to manually record bank transfers.
     </div>
@@ -83,7 +83,7 @@
             <form method="post" action="/admin/confirm-upgrade" style="display:inline" class="confirm-form">
               <input type="hidden" name="request_ref" value="{{ p.request_ref }}" />
               <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
-              <button class="btn confirm-btn" type="submit" style="background:rgba(74,222,128,.12);color:#4ADE80;border-color:rgba(74,222,128,.25)">✓ Confirm</button>
+              <button class="btn confirm-btn" type="submit" style="background:rgba(201,168,76,.12);color:#E8D5A3;border-color:rgba(201,168,76,.3)">Confirm payment</button>
             </form>
             {% else %}
             <form method="post" action="/admin/resend-confirmation" style="display:inline" class="resend-form">
@@ -108,7 +108,7 @@
             }
             // disable button to avoid double-submit
             var btn = form.querySelector('.confirm-btn');
-            if(btn){ btn.disabled = true; btn.textContent = '✓ Confirming...'; }
+            if(btn){ btn.disabled = true; btn.textContent = 'Confirming...'; }
           });
         });
         
