@@ -19,6 +19,7 @@
     input,select{padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,.06); background:transparent; color:inherit}
     .notice{padding:14px 14px; background:rgba(201,168,76,.08); border:1px solid rgba(201,168,76,.25); border-radius:12px; color:#9A9691; line-height:1.6; font-size:13px;}
   </style>
+  <link rel="stylesheet" href="/static/aptura-polish.css">
 </head>
 <body>
   <nav>
@@ -44,6 +45,7 @@
     {% endif %}
 
     <form method="post" action="/admin/record-offline">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
       <div class="form-row">
         <input name="user_email" placeholder="User email" required />
         <input name="reference" placeholder="Reference (bank tx id)" required />

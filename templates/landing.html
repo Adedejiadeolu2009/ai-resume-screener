@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aptura | Career Intelligence for Nigeria and Africa</title>
-  <meta name="description" content="Aptura turns CVs and applications into evidence-backed career and hiring intelligence for job seekers, employers, and AI agents.">
+  <title>Aptura | Resume Intelligence for Candidates and Recruiters</title>
+  <meta name="description" content="Aptura helps candidates understand their CV and helps recruiters turn applications into evidence-backed shortlists.">
   <link rel="canonical" href="https://aptura.com.ng/">
   <meta property="og:title" content="Aptura Career Intelligence">
   <meta property="og:description" content="Turn your CV into career intelligence. Turn applications into evidence-backed shortlists.">
@@ -13,8 +13,9 @@
   <meta property="og:site_name" content="Aptura">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Aptura Career Intelligence">
-  <meta name="twitter:description" content="Career intelligence for people, employers, and AI agents.">
+  <meta name="twitter:description" content="Career intelligence for candidates and recruiters.">
   <link rel="stylesheet" href="/static/aptura-public.css">
+  <link rel="stylesheet" href="/static/aptura-polish.css">
 </head>
 <body>
 {% include "_public_nav.html" %}
@@ -22,16 +23,16 @@
   <section class="hero">
     <div class="hero-copy">
       <div class="eyebrow">Career Intelligence</div>
-      <h1>Your CV is more than a document. <span class="hero-line">Turn it into career intelligence.</span></h1>
-      <p class="lead">Aptura is a two-sided talent platform. Candidates build a permissioned portfolio of evidence; employers turn applications into explainable shortlists, assessments, and structured interviews.</p>
+      <h1>A premium hiring interface for both sides of the job market.</h1>
+      <p class="lead">Aptura helps candidates understand, improve, and position their CVs while giving recruiters a faster, evidence-backed way to review applicants, compare fit, and build fairer shortlists.</p>
       <div class="hero-actions">
         <a class="btn btn-primary" href="/login">Analyse my CV</a>
         <a class="btn" href="/employers">I'm hiring</a>
       </div>
       <div class="hero-proof">
-        <div class="proof"><strong>Career Passport</strong><span>Structured career identity based on skills, experience, and evidence.</span></div>
-        <div class="proof"><strong>Hiring Inbox</strong><span>Applications become ranked, explainable candidate intelligence.</span></div>
-        <div class="proof"><strong>Talent Graph</strong><span>Permissioned talent data for APIs, MCP, and WebMCP tools.</span></div>
+        <div class="proof"><strong>Candidate Clarity</strong><span>CV analysis, role fit, gaps, and practical next actions.</span></div>
+        <div class="proof"><strong>Recruiter Control</strong><span>Ranked applicants with explanations, gaps, and interview prompts.</span></div>
+        <div class="proof"><strong>Human Decisions</strong><span>AI assists the workflow. Candidates and recruiters stay in control.</span></div>
       </div>
     </div>
     <div class="screen" aria-label="Resume converted into structured intelligence">
@@ -53,12 +54,12 @@
   <section id="product" class="section section-alt">
     <div class="section-head">
       <h2>Show the work behind the score.</h2>
-      <p>Aptura connects candidate evidence with recruiter decisions. The first focus is simple: make matching clearer for both sides, then automate the repetitive work around applications and screening.</p>
+      <p>Aptura connects candidate readiness with recruiter decisions. The focus is simple: make matching clearer for both sides, then automate the repetitive work around applications and screening.</p>
     </div>
     <div class="grid grid-3">
       <article class="card"><h3>Resume intelligence</h3><p>Understand strengths, weak signals, role fit, missing skills, and the next practical action.</p><div class="metric"><span>Career readiness</span><span class="meter"><i style="--w:72%"></i></span></div></article>
       <article class="card"><h3>Evidence-backed shortlists</h3><p>Rank candidates with match explanations, gaps, verification states, and interview prompts for human review.</p><div class="metric"><span>Human decision</span><span class="meter"><i style="--w:100%"></i></span></div></article>
-      <article class="card"><h3>Assessments and interviews</h3><p>Give candidates a fair way to demonstrate skills through web tests and AI-led interview sessions, with human review built in.</p><div class="metric"><span>Human decision</span><span class="meter"><i style="--w:100%"></i></span></div></article>
+      <article class="card"><h3>Interview guidance</h3><p>Give candidates and recruiters role-specific questions, gap explanations, and a better path to the next conversation.</p><div class="metric"><span>Human decision</span><span class="meter"><i style="--w:100%"></i></span></div></article>
     </div>
   </section>
 
@@ -79,7 +80,7 @@
   <section class="section section-alt">
     <div class="section-head">
       <h2>Automate the first pass. Keep the decision human.</h2>
-      <p>Enterprise teams can connect application intake to resume screening, candidate matching, web assessments, and AI interview sessions without making AI the final decision-maker.</p>
+      <p>Recruiters can connect application intake to resume screening, candidate matching, and structured interview guidance without making AI the final decision-maker.</p>
     </div>
     <div class="screen">
       <div class="screen-top"><div class="dots"><i></i><i></i><i></i></div><span>recruiter workspace demo</span></div>
@@ -111,7 +112,7 @@
 
   <section class="section section-alt">
     <div class="grid grid-2">
-      <article class="copilot"><h3>Aptura Copilot</h3><p>On candidate pages, ask why you match a role. On resume pages, ask what is weakening your CV. On employer pages, ask why a candidate ranked here.</p></article>
+      <article class="copilot"><h3>Aptura Chat</h3><p>Ask why you match a role, what is weakening your CV, or why a candidate ranked where they did. The answer is presented like a modern executive assistant, grounded in the data you provide.</p></article>
       <article class="card"><h3>Aptura can recommend. You decide.</h3><p>Recommendations show evidence, gaps, and explanations. Profile changes and hiring actions require human approval.</p><div class="actions"><a class="btn" href="/trust">Review trust controls</a></div></article>
     </div>
   </section>
@@ -124,8 +125,7 @@
 {% include "_public_footer.html" %}
 <script src="/static/aptura-public.js" defer></script>
 <script type="application/ld+json">
-{"@context":"https://schema.org","@graph":[{"@type":"Organization","name":"Aptura","url":"https://aptura.com.ng/"},{"@type":"SoftwareApplication","name":"Aptura","applicationCategory":"BusinessApplication","operatingSystem":"Web","url":"https://aptura.com.ng/","description":"Career intelligence and talent infrastructure platform for resume analysis, skill matching, candidate screening, and human-approved AI workflows.","offers":{"@type":"Offer","price":"0","priceCurrency":"NGN"}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Is Aptura an AI CV builder?","acceptedAnswer":{"@type":"Answer","text":"Aptura includes resume improvement tools, but its broader role is career intelligence: mapping skills, evidence, gaps, role fit, and hiring decisions."}},{"@type":"Question","name":"Does AI make hiring decisions in Aptura?","acceptedAnswer":{"@type":"Answer","text":"No. Aptura provides recommendations and explanations for human review and human decision-making."}}]}]}
+{"@context":"https://schema.org","@graph":[{"@type":"Organization","name":"Aptura","url":"https://aptura.com.ng/"},{"@type":"SoftwareApplication","name":"Aptura","applicationCategory":"BusinessApplication","operatingSystem":"Web","url":"https://aptura.com.ng/","description":"Career and hiring intelligence platform for resume analysis, skill matching, candidate screening, and human-approved AI workflows.","offers":{"@type":"Offer","price":"0","priceCurrency":"NGN"}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Is Aptura an AI CV builder?","acceptedAnswer":{"@type":"Answer","text":"Aptura includes resume improvement tools, but its broader role is career intelligence: mapping skills, evidence, gaps, role fit, and hiring decisions."}},{"@type":"Question","name":"Does AI make hiring decisions in Aptura?","acceptedAnswer":{"@type":"Answer","text":"No. Aptura provides recommendations and explanations for human review and human decision-making."}}]}]}
 </script>
-{% include "_webmcp.html" %}
 </body>
 </html>

@@ -20,6 +20,7 @@ import security as auth
 import models
 from database import get_db
 from email_utils import send_email
+from rate_limit import enforce_rate_limit
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 logger = logging.getLogger(__name__)
@@ -39,6 +40,11 @@ def get_github_creds():
 
 def get_app_base_url() -> str:
     return os.getenv("APP_BASE_URL", "http://localhost:8000").strip().rstrip("/")
+
+
+def require_request_csrf(request: Request, token: str | None) -> None:
+    import main as _main
+    _main.require_csrf(request, token)
 
 
 async def read_request_data(request: Request) -> dict:
@@ -134,9 +140,9 @@ async def register(
     db: Session = Depends(get_db),
     request: Request = None,
 ):
+    enforce_rate_limit(request, "auth-register", limit=12, window_seconds=60 * 60)
     # CSRF validation
-    import main as _main
-    _main.require_csrf(request, csrf_token)
+    require_request_csrf(request, csrf_token)
 
     existing = db.query(models.User).filter(
         models.User.email == email.lower().strip()
@@ -189,7 +195,9 @@ async def login(
     request: Request,
     db: Session = Depends(get_db),
 ):
+    enforce_rate_limit(request, "auth-login", limit=20, window_seconds=15 * 60)
     data = await read_request_data(request)
+    require_request_csrf(request, data.get("csrf_token"))
     email = (data.get("email") or "").strip()
     password = data.get("password") or ""
     if not email or not password:
@@ -215,7 +223,9 @@ async def login(
 
 @router.post("/forgot-password")
 async def forgot_password(request: Request, db: Session = Depends(get_db)):
+    enforce_rate_limit(request, "auth-forgot-password", limit=8, window_seconds=60 * 60)
     data = await read_request_data(request)
+    require_request_csrf(request, data.get("csrf_token"))
     email = (data.get("email") or "").lower().strip()
     if not email:
         return JSONResponse({"error": "Email address is required."}, status_code=400)
@@ -268,7 +278,9 @@ async def forgot_password(request: Request, db: Session = Depends(get_db)):
 
 @router.post("/reset-password")
 async def reset_password(request: Request, db: Session = Depends(get_db)):
+    enforce_rate_limit(request, "auth-reset-password", limit=12, window_seconds=60 * 60)
     data = await read_request_data(request)
+    require_request_csrf(request, data.get("csrf_token"))
     email = (data.get("email") or "").lower().strip()
     otp = (data.get("otp") or "").strip()
     password = data.get("password") or ""
@@ -414,9 +426,13 @@ async def logout():
 @router.post("/request-upgrade")
 async def request_upgrade(
     plan: str = Form(...),
+    csrf_token: str = Form(...),
+    request: Request = None,
     db: Session = Depends(get_db),
     current_user: models.User = Depends(auth.get_current_user)
 ):
+    enforce_rate_limit(request, "auth-request-upgrade", limit=12, window_seconds=60 * 60)
+    require_request_csrf(request, csrf_token)
     plan = (plan or "").upper().strip()
     if plan not in {"PRO", "ENTERPRISE"}:
         return JSONResponse({"success": False, "message": "Invalid plan. Choose PRO or ENTERPRISE."}, status_code=400)

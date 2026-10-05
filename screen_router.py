@@ -28,6 +28,7 @@ import security as auth
 import models
 import workspace as workspace_utils
 from database import get_db
+from rate_limit import enforce_rate_limit
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api", tags=["screening"])
@@ -306,6 +307,7 @@ async def screen_resumes(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(auth.get_current_user),
 ):
+    enforce_rate_limit(request, "screen-resumes", limit=30, window_seconds=24 * 60 * 60)
     workspace_utils.require_role(current_user, workspace_utils.ROLE_RECRUITER)
     if not job_description.strip():
         raise HTTPException(400, "Job description is required.")

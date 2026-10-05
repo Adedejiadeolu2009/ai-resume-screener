@@ -1,0 +1,322 @@
+/* Aptura premium polish layer: shared public and workspace refinements. */
+:root {
+  --aptura-bg: #070809;
+  --aptura-panel: #101114;
+  --aptura-elev: #181a1f;
+  --aptura-line: rgba(245, 240, 230, .11);
+  --aptura-line-lit: rgba(201, 168, 76, .36);
+  --aptura-gold: #c9a84c;
+  --aptura-gold-dark: #a07820;
+  --aptura-gold-light: #e8d5a3;
+  --aptura-teal: #2dd4bf;
+  --aptura-text: #f0ede6;
+  --aptura-muted: #b8b2a8;
+  --aptura-hint: #8f897f;
+}
+
+body {
+  background:
+    radial-gradient(ellipse 72% 54% at 8% 0%, rgba(201,168,76,.11), transparent 60%),
+    radial-gradient(ellipse 58% 44% at 92% 100%, rgba(45,212,191,.055), transparent 62%),
+    linear-gradient(180deg, #070809 0%, #0d0f0d 54%, #070809 100%) !important;
+  color: var(--aptura-text);
+}
+
+.site-nav,
+body > nav,
+.content > nav {
+  background: rgba(7, 8, 9, .82) !important;
+  border-color: var(--aptura-line) !important;
+  backdrop-filter: blur(20px) saturate(140%);
+}
+
+.brand-mark,
+.sidebar-brand-mark,
+.btn-primary,
+.btn-new,
+.workspace-action.primary,
+.btn-submit,
+.vacancy-submit,
+.premium-btn {
+  background: linear-gradient(135deg, var(--aptura-gold-light), var(--aptura-gold) 48%, var(--aptura-gold-dark)) !important;
+  color: #080908 !important;
+  box-shadow: 0 16px 42px rgba(201,168,76,.18);
+}
+
+.btn,
+.workspace-action,
+.btn-logout,
+.back-btn,
+.chip,
+.sort-btn,
+.btn-print,
+.btn-view,
+.btn-again {
+  border-radius: 8px !important;
+}
+
+.screen,
+.card,
+.panel,
+.workspace-card,
+.passport-panel,
+.readiness-panel,
+.table-container,
+.empty-state,
+.steps,
+.vacancy-studio,
+.ccard,
+.chat-panel,
+.demo-panel,
+.faq details,
+.price {
+  background: linear-gradient(180deg, rgba(20,22,27,.94), rgba(13,14,17,.94)) !important;
+  border-color: var(--aptura-line) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.035), 0 18px 58px rgba(0,0,0,.18);
+}
+
+.card:hover,
+.workspace-card:hover,
+.ccard:hover,
+.panel:hover,
+.price:hover {
+  border-color: var(--aptura-line-lit) !important;
+}
+
+.section-alt {
+  background: linear-gradient(180deg, rgba(201,168,76,.045), rgba(255,255,255,.012)) !important;
+  border-color: var(--aptura-line) !important;
+}
+
+.eyebrow,
+.workspace-kicker,
+.context-kicker,
+.vacancy-kicker,
+.passport-kicker,
+.brand-name span,
+.sidebar-brand-name span,
+.sidebar-nav a.active,
+.amount,
+.score-pill.strong-hire,
+.btn-view {
+  color: var(--aptura-gold) !important;
+}
+
+.lead,
+.card p,
+.section-head p,
+.footer,
+.footer a,
+.nav-links a,
+.hero-line,
+.muted,
+.page-sub,
+.welcome p,
+.workspace-hero p,
+.workspace-card p,
+.passport-head p,
+.empty-sub {
+  color: var(--aptura-muted) !important;
+}
+
+.pill,
+.tag,
+.cpill,
+.status,
+.workspace-card-pill,
+.score-badge,
+.sum-card,
+.passport-item,
+.readiness-item,
+.demo-item,
+.pipeline-row,
+.proof {
+  background: rgba(255,255,255,.035) !important;
+  border-color: rgba(255,255,255,.08) !important;
+}
+
+.meter i,
+.usage-fill,
+.progress-fill,
+.workspace-hero::before,
+.ccard::before {
+  background: linear-gradient(90deg, var(--aptura-gold), var(--aptura-teal)) !important;
+}
+
+.hero,
+.section,
+main {
+  position: relative;
+}
+
+.hero::after,
+main::after {
+  content: "";
+  position: absolute;
+  inset: auto clamp(16px, 5vw, 72px) 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(201,168,76,.22), transparent);
+  pointer-events: none;
+}
+
+.agent-shell main {
+  max-width: 1360px !important;
+  grid-template-columns: minmax(0, 1fr) 360px !important;
+  gap: 20px !important;
+}
+
+.agent-shell .agent-page-heading {
+  align-items: center !important;
+  padding: 18px 0 8px;
+}
+
+.agent-shell .agent-page-heading h1 {
+  font-family: var(--sans, 'Outfit', system-ui, sans-serif) !important;
+  font-size: clamp(32px, 4vw, 52px) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0 !important;
+}
+
+.agent-shell .col-main {
+  grid-column: 1;
+  grid-row: 4 / span 3;
+  min-width: 0;
+}
+
+.agent-shell .col-side {
+  grid-column: 2;
+  grid-row: 3 / span 4;
+  top: 88px !important;
+}
+
+.agent-shell .agent-steps {
+  grid-column: 1;
+  grid-row: 3;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+
+.agent-shell .chat-panel {
+  height: min(760px, calc(100vh - 134px)) !important;
+  min-height: 640px;
+  border-color: rgba(201,168,76,.28) !important;
+}
+
+.agent-shell .chat-thread {
+  padding: 26px !important;
+  background:
+    radial-gradient(ellipse 70% 48% at 50% 0%, rgba(201,168,76,.08), transparent 62%),
+    linear-gradient(180deg, rgba(255,255,255,.018), transparent 30%) !important;
+}
+
+.agent-shell .agent-intro {
+  padding: 14px !important;
+  border: 1px solid rgba(201,168,76,.22);
+  border-radius: 8px;
+  background: rgba(201,168,76,.055);
+}
+
+.agent-shell .agent-avatar {
+  border-radius: 8px !important;
+}
+
+.agent-shell .msg {
+  max-width: 76% !important;
+}
+
+.agent-shell .msg-bubble {
+  border-radius: 8px !important;
+  font-size: 14px !important;
+  box-shadow: 0 10px 28px rgba(0,0,0,.16);
+}
+
+.agent-shell .msg.assistant .msg-bubble {
+  background: rgba(24,26,31,.94) !important;
+  border-color: rgba(255,255,255,.1) !important;
+}
+
+.agent-shell .msg.user .msg-bubble {
+  background: linear-gradient(135deg, var(--aptura-gold-light), var(--aptura-gold) 54%, var(--aptura-gold-dark)) !important;
+  color: #070809 !important;
+}
+
+.agent-shell .chips {
+  padding: 0 18px 14px !important;
+  background: rgba(7,8,9,.36);
+}
+
+.agent-shell .composer {
+  padding: 16px 18px !important;
+  background: rgba(7,8,9,.7) !important;
+}
+
+.agent-shell .composer input {
+  min-height: 48px;
+  border-radius: 8px;
+}
+
+.agent-shell .composer button {
+  min-height: 48px;
+  min-width: 92px;
+}
+
+.agent-pulse {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.agent-pulse .bars {
+  display: inline-flex;
+  align-items: end;
+  gap: 3px;
+  height: 18px;
+}
+
+.agent-pulse .bars span {
+  width: 3px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--aptura-gold);
+  animation: aptura-bars 1s ease-in-out infinite;
+}
+
+.agent-pulse .bars span:nth-child(2) { animation-delay: .08s; }
+.agent-pulse .bars span:nth-child(3) { animation-delay: .16s; }
+.agent-pulse .bars span:nth-child(4) { animation-delay: .24s; }
+.agent-pulse .bars span:nth-child(5) { animation-delay: .32s; }
+
+@keyframes aptura-bars {
+  0%, 100% { height: 7px; opacity: .45; }
+  50% { height: 18px; opacity: 1; }
+}
+
+@media (max-width: 980px) {
+  .agent-shell main {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+  }
+
+  .agent-shell .col-main,
+  .agent-shell .col-side,
+  .agent-shell .agent-steps {
+    grid-column: 1 !important;
+    grid-row: auto !important;
+  }
+
+  .agent-shell .col-side {
+    position: static !important;
+  }
+
+  .agent-shell .agent-steps {
+    grid-template-columns: 1fr !important;
+  }
+
+  .agent-shell .chat-panel {
+    height: auto !important;
+    min-height: 620px;
+  }
+
+  .agent-shell .msg {
+    max-width: 90% !important;
+  }
+}

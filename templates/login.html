@@ -162,6 +162,7 @@ body::after {
 .space-name { color:var(--text); font-size:12px; font-weight:700; }.space-hint { color:var(--hint); font-size:10px; }
 @media(max-width:420px){.space-options{gap:5px}.space-card{min-height:108px;padding-left:3px;padding-right:3px}.space-avatar{width:54px;height:54px;font-size:30px}}
 </style>
+<link rel="stylesheet" href="/static/aptura-polish.css">
 </head>
 <body>
 <div class="login-wrap">
@@ -368,6 +369,7 @@ async function requestPasswordReset() {
   if (!email) { errEl.textContent = 'Please enter your email address.'; errEl.style.display = 'block'; return; }
   const form = new FormData();
   form.append('email', email);
+  form.append('csrf_token', '{{ csrf_token }}');
   try {
     const res = await fetch('/auth/forgot-password', { method: 'POST', body: form });
     const data = await res.json();
@@ -392,6 +394,7 @@ async function resetPassword() {
   if (!email || !otp || !pass) { errEl.textContent = 'Please fill in all fields.'; errEl.style.display = 'block'; return; }
   const form = new FormData();
   form.append('email', email); form.append('otp', otp); form.append('password', pass);
+  form.append('csrf_token', '{{ csrf_token }}');
   try {
     const res = await fetch('/auth/reset-password', { method: 'POST', body: form });
     const data = await res.json();

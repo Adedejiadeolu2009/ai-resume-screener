@@ -69,7 +69,7 @@
       if (!state.available) return;
       const navRight = document.querySelector(".nav-right") || document.querySelector("nav") || document.body;
       const existingBadge = document.getElementById("webmcpBadge");
-      if (!navRight || !existingBadge) {
+      if (!navRight) {
         if (existingBadge) existingBadge.remove();
         return;
       }
