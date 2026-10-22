@@ -731,6 +731,7 @@ async def resume_builder_page(request: Request, current_user: models.User = Depe
         context={
             "user": current_user,
             "csrf_token": get_csrf_token(request),
+            "workspace_roles": workspace_utils.available_roles(current_user),
         },
     )
 
@@ -806,6 +807,7 @@ async def settings_page(request: Request, db: Session = Depends(get_db), current
             "tier": current_user.tier or "FREE",
             "premium_until": current_user.premium_until,
             "is_admin": admin_router.is_admin(current_user),
+            "workspace_roles": workspace_utils.available_roles(current_user),
         }
     )
 

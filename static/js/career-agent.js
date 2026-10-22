@@ -4,6 +4,7 @@
   const thread = document.getElementById("chat-thread");
   const composer = document.getElementById("composer");
   const chatInput = document.getElementById("chat-input");
+  const sendButton = composer && composer.querySelector('button[type="submit"]');
   const chips = document.querySelectorAll(".chip");
 
   const ctxResume = document.getElementById("ctx-resume");
@@ -25,6 +26,16 @@
     return String(s == null ? "" : s).replace(/[&<>"']/g, (c) => (
       { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]
     ));
+  }
+
+  function responseError(data, fallback) {
+    if (data && typeof data.error === "string") return data.error;
+    if (data && typeof data.detail === "string") return data.detail;
+    if (data && Array.isArray(data.detail)) {
+      const messages = data.detail.map((item) => item && item.msg).filter(Boolean);
+      if (messages.length) return messages.join(" ");
+    }
+    return fallback;
   }
 
   function skillsArray() {
@@ -291,7 +302,7 @@
 
   async function sendMessage(text) {
     text = text.trim();
-    if (!text) return;
+    if (!text || composer.dataset.busy === "true") return;
     addUserMessage(text);
 
     const intent = detectIntent(text);
@@ -302,6 +313,9 @@
       return;
     }
 
+    composer.dataset.busy = "true";
+    if (sendButton) sendButton.disabled = true;
+    chips.forEach((chip) => { chip.disabled = true; });
     const typingEl = addAssistantTyping();
     const payload = {
       message: text,
@@ -322,11 +336,17 @@
       data = await res.json();
     } catch (e) {
       setAssistantHtml(typingEl, "I couldn't reach the server - check your connection and try again.", true);
+      composer.dataset.busy = "false";
+      if (sendButton) sendButton.disabled = false;
+      chips.forEach((chip) => { chip.disabled = false; });
       return;
     }
 
-    if (!data.success) {
-      setAssistantHtml(typingEl, escapeHtml(data.error || "Something went wrong. Try again."), true);
+    if (!res.ok || !data.success) {
+      setAssistantHtml(typingEl, escapeHtml(responseError(data, "Something went wrong. Try again.")), true);
+      composer.dataset.busy = "false";
+      if (sendButton) sendButton.disabled = false;
+      chips.forEach((chip) => { chip.disabled = false; });
       return;
     }
 
@@ -339,10 +359,15 @@
     if (data.result && data.result.skill_gap) {
       updateReadiness(data.result.analysis || { score: null }, data.result.skill_gap);
     }
+    composer.dataset.busy = "false";
+    if (sendButton) sendButton.disabled = false;
+    chips.forEach((chip) => { chip.disabled = false; });
+    chatInput.focus();
   }
 
   composer.addEventListener("submit", (e) => {
     e.preventDefault();
+    if (composer.dataset.busy === "true") return;
     const text = chatInput.value;
     chatInput.value = "";
     sendMessage(text);
@@ -366,7 +391,7 @@
           body: JSON.stringify({ approved_resume_text: proposedText, target_role: ctxTargetRole.value.trim() || null }),
         });
         const data = await res.json();
-        if (data.success) {
+        if (res.ok && data.success) {
           ctxResume.value = data.profile.resume_text || proposedText;
           approveBtn.textContent = "Saved";
         } else {

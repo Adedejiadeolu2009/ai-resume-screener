@@ -24,11 +24,6 @@
     transform: translateY(-2px);
   }
 
-  :where(.btn-primary, .premium-btn, .btn-submit) {
-    background-size: 180% 180%;
-    animation: gold-breathe 7s ease-in-out infinite;
-  }
-
   :where(.brand-mark, .sidebar-brand-mark, .mark) {
     position: relative;
     overflow: hidden;
@@ -40,7 +35,7 @@
     inset: -45%;
     background: linear-gradient(120deg, transparent 35%, rgba(255, 255, 255, .45), transparent 65%);
     transform: translateX(-120%) rotate(8deg);
-    animation: mark-sheen 5.5s ease-in-out infinite;
+    animation: mark-sheen 5.5s ease-in-out 1;
   }
 
   :where(tbody tr, .file-item, .ccard, .sum-card, .metric, .fcard, .li, .qb) {
@@ -76,4 +71,25 @@
 @keyframes gold-breathe {
   0%, 100% { background-position: 0% 50%; box-shadow: 0 12px 32px rgba(201, 168, 76, .14); }
   50% { background-position: 100% 50%; box-shadow: 0 16px 42px rgba(201, 168, 76, .22); }
+}
+
+/* Keep interactive feedback crisp and visible for keyboard users. */
+:where(a, button, input, textarea, select, [tabindex]):focus-visible {
+  outline: 2px solid var(--gold, #C9A84C);
+  outline-offset: 3px;
+}
+
+:where(button, .btn, .btn-primary, .btn-submit, .btn-new):disabled {
+  cursor: not-allowed;
+  opacity: .62;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
 }

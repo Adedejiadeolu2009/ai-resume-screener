@@ -164,10 +164,10 @@ main { flex: 1; max-width: 1280px; width: 100%; margin: 0 auto; padding: 32px 28
 
     <nav class="sidebar-nav">
       <a href="/dashboard">🏠 Dashboard</a>
-      <a href="/screen">📄 Screenings</a>
+      {% if 'recruiter' in workspace_roles %}<a href="/screen">📄 Screenings</a>{% endif %}
       <a href="/resume-builder">📝 Resume Builder</a>
       <a href="/plans">💎 Plans & Upgrade</a>
-      <a href="/analytics">📊 Analytics</a>
+      {% if 'recruiter' in workspace_roles %}<a href="/analytics">📊 Analytics</a>{% endif %}
       {% if is_admin %}
       <a href="/admin">🛡️ Admin</a>
       {% endif %}

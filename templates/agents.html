@@ -59,7 +59,8 @@
       border: 1px solid var(--border); background: rgba(255,255,255,.03); color: var(--muted);
       border-radius: 999px; padding: 7px 13px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: var(--sans);
     }
-    .chip:hover { color: var(--text); border-color: rgba(201,168,76,.4); background: var(--gold-bg); }
+    .chip:hover:not(:disabled) { color: var(--text); border-color: rgba(201,168,76,.4); background: var(--gold-bg); }
+    .chip:disabled { cursor: wait; opacity: .55; }
 
     .agent-intro { display:flex; align-items:center; gap:12px; margin-bottom:16px; padding:0 4px; }
     .agent-avatar { width:42px; height:42px; border-radius:10px; display:grid; place-items:center; flex:0 0 42px; color:var(--bg); font:700 20px var(--serif); background:radial-gradient(circle at 32% 28%,var(--gold-light),var(--gold) 42%,var(--gold-dark) 100%); border:1px solid rgba(232,213,163,.55); box-shadow:0 0 26px rgba(201,168,76,.16); position:relative; }
@@ -129,8 +130,8 @@
     .sidebar-footer { margin-top:auto; padding:14px 12px; border:1px solid var(--border); border-radius:10px; background:linear-gradient(145deg,rgba(201,168,76,.08),rgba(45,212,191,.025)); }.sidebar-footer-title { font:600 16px var(--serif); color:var(--gold-light); }.sidebar-footer-desc { margin-top:3px; color:var(--hint); font-size:11px; line-height:1.4; }.sidebar-footer-link { display:inline-block; margin-top:12px; color:var(--gold); font-size:12px; font-weight:700; text-decoration:none; }
     .content { min-width:0; flex:1; }.content > nav { height:68px; padding:14px 32px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border); background:rgba(10,11,14,.78); position:sticky; top:0; z-index:100; backdrop-filter:blur(18px); }.hamburger-btn { display:none; background:none; border:0; color:var(--text); font-size:22px; cursor:pointer; }.content .aptura-nav { display:none; }.nav-right { display:flex; align-items:center; gap:10px; }.btn-new { display:inline-flex; align-items:center; min-height:34px; padding:8px 11px; border:1px solid var(--border); border-radius:7px; color:var(--muted); font-size:11px; font-weight:700; text-decoration:none; white-space:nowrap; }.btn-new:hover { border-color:rgba(201,168,76,.35); color:var(--gold); }.user-profile { display:flex; align-items:center; gap:8px; margin-left:4px; }.user-avatar { width:28px; height:28px; border-radius:50%; display:grid; place-items:center; overflow:hidden; background:rgba(201,168,76,.1); border:1px solid rgba(201,168,76,.35); color:var(--gold); font-size:10px; font-weight:700; }.user-avatar img { width:100%; height:100%; object-fit:cover; }.user-name { color:var(--muted); font-size:12px; }.content > main { max-width:1160px; padding:28px 32px 56px; }
     .context-kicker { display:flex; align-items:center; gap:9px; margin-bottom:8px; color:var(--gold); font-size:10px; font-weight:800; letter-spacing:1.8px; text-transform:uppercase; }.context-kicker::before { content:''; width:24px; height:1px; background:var(--gold); opacity:.7; }
-    @media(max-width:900px) { .sidebar { position:fixed; left:0; top:0; z-index:300; transform:translateX(-100%); transition:transform .25s ease; box-shadow:20px 0 70px rgba(0,0,0,.35); }.sidebar.open { transform:translateX(0); }.hamburger-btn { display:block; }.content > nav { padding:14px 18px; }.user-name { display:none; }.btn-new { padding:7px 8px; font-size:10px; }.content > main { padding:26px 18px 48px; } }
-    @media(max-width:600px) { .content .nav-right .btn-new:nth-child(1), .user-profile { display:none; }.content > main { padding:22px 14px 40px; }.chat-panel { height:calc(100vh - 150px); min-height:560px; }.ctx-row { flex-wrap:wrap; }.ctx-row input { min-width:150px; } }
+    @media(max-width:900px) { .sidebar { position:fixed; left:0; top:0; z-index:501; transform:translateX(-100%); transition:transform .25s ease; box-shadow:20px 0 70px rgba(0,0,0,.35); }.sidebar.open { transform:translateX(0); }.backdrop { z-index:500; }.hamburger-btn { display:block; }.content > nav { padding:14px 18px; }.user-name { display:none; }.btn-new { padding:7px 8px; font-size:10px; }.content > main { padding:26px 18px 48px; } }
+    @media(max-width:600px) { .content .nav-right .btn-new:nth-child(1), .user-profile { display:none; }.content > main { padding:22px 14px 40px; }.chat-panel { height:min(640px, calc(100dvh - 190px)); min-height:420px; }.ctx-row { flex-wrap:wrap; }.ctx-row input { min-width:150px; } }
     @media(max-width:700px) { .agent-page-heading { display:block; }.agent-page-heading p { margin-top:10px; }.agent-steps { grid-template-columns:1fr; } }
 
     /* Keep the agent aligned with the authenticated black-and-gold workspace. */
@@ -149,9 +150,9 @@
       <div class="sidebar-brand"><div class="sidebar-brand-mark">A</div><div class="sidebar-brand-name">Ap<span>tura</span></div></div>
       <nav class="sidebar-nav">
         <a href="/agent" class="active">Aptura Agent</a>
-        <a href="/recruiter">Recruiter Workspace</a>
+        {% if 'recruiter' in workspace_roles %}<a href="/recruiter">Recruiter Workspace</a>{% endif %}
         <a href="/dashboard">Dashboard</a>
-        <a href="/screen">Screenings</a>
+        {% if 'recruiter' in workspace_roles %}<a href="/screen">Screenings</a>{% endif %}
         <a href="/resume-builder">Resume Builder</a>
         <a href="/plans">Plans &amp; Upgrade</a>
         <a href="/analytics">Analytics</a>
@@ -163,8 +164,8 @@
     </aside>
     <div class="content">
       <nav>
-        <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle menu">&#9776;</button>
-        <div class="nav-right"><a href="/screen" class="btn-new">Screen Resumes</a><a href="/resume-builder" class="btn-new">Build Resume</a><div class="user-profile"><div class="user-avatar">{% if user.avatar_url %}<img src="{{ user.avatar_url }}" alt="{{ user.name }}">{% else %}{{ (user.name or user.email)[:2] | upper }}{% endif %}</div><span class="user-name">{{ user.name or user.email.split('@')[0] }}</span></div><a href="/auth/logout" class="btn-logout">Sign out</a></div>
+        <button class="hamburger-btn" id="hamburgerBtn" aria-label="Open navigation menu" aria-controls="sidebar" aria-expanded="false">&#9776;</button>
+        <div class="nav-right">{% if 'recruiter' in workspace_roles %}<a href="/screen" class="btn-new">Screen Resumes</a>{% endif %}<a href="/resume-builder" class="btn-new">Build Resume</a><div class="user-profile"><div class="user-avatar">{% if user.avatar_url %}<img src="{{ user.avatar_url }}" alt="{{ user.name }}">{% else %}{{ (user.name or user.email)[:2] | upper }}{% endif %}</div><span class="user-name">{{ user.name or user.email.split('@')[0] }}</span></div><a href="/auth/logout" class="btn-logout">Sign out</a></div>
       </nav>
 
   <main>
@@ -241,8 +242,8 @@
     </div>
 
     <div class="col-main">
-      <div class="panel chat-panel">
-        <div class="chat-thread" id="chat-thread">
+      <div class="panel chat-panel" role="region" aria-label="Career agent chat">
+        <div class="chat-thread" id="chat-thread" role="log" aria-live="polite" aria-relevant="additions text" aria-label="Conversation">
           <div class="agent-intro"><div class="agent-avatar" aria-label="Aptura Agent avatar">A</div><div class="agent-intro-copy"><strong>Aptura Agent</strong><span>Resume intelligence, without the guesswork</span></div></div>
           <div class="msg assistant">
             <div class="msg-bubble">Hi{{ ' ' + user.name if user.name else '' }} - I'm your Aptura career agent. Add your resume on the left, then ask me to analyze it, compare it with a role, find skill gaps, build a plan, or prepare a cover letter.</div>
@@ -258,7 +259,7 @@
           <button class="chip" data-msg="Improve my resume">Improve my resume</button>
         </div>
         <form class="composer" id="composer">
-          <input type="text" id="chat-input" placeholder="Ask the agent anything..." autocomplete="off" />
+          <input type="text" id="chat-input" placeholder="Ask the agent anything..." autocomplete="off" aria-label="Message Aptura Agent" />
           <button type="submit" class="btn btn-primary">Send</button>
         </form>
       </div>
@@ -266,7 +267,7 @@
   </main>
     </div>
   </div>
-  <div class="backdrop" id="backdrop"></div>
+  <div class="backdrop" id="backdrop" aria-hidden="true"></div>
 
   <script id="latest-match-seed" type="application/json">{{ (latest_match or {}) | tojson }}</script>
   <script src="/static/js/career-agent.js" defer></script>
@@ -275,9 +276,28 @@
     const sidebar = document.getElementById('sidebar');
     const backdrop = document.getElementById('backdrop');
     if (hamburgerBtn && sidebar && backdrop) {
-      hamburgerBtn.addEventListener('click', () => { sidebar.classList.toggle('open'); backdrop.style.display = sidebar.classList.contains('open') ? 'block' : 'none'; });
-      backdrop.addEventListener('click', () => { sidebar.classList.remove('open'); backdrop.style.display = 'none'; });
-      document.querySelectorAll('.sidebar-nav a').forEach((link) => link.addEventListener('click', () => { sidebar.classList.remove('open'); backdrop.style.display = 'none'; }));
+      const closeSidebar = () => {
+        sidebar.classList.remove('open');
+        backdrop.style.display = 'none';
+        hamburgerBtn.setAttribute('aria-expanded', 'false');
+        hamburgerBtn.setAttribute('aria-label', 'Open navigation menu');
+      };
+      hamburgerBtn.addEventListener('click', () => {
+        const isOpen = sidebar.classList.toggle('open');
+        backdrop.style.display = isOpen ? 'block' : 'none';
+        hamburgerBtn.setAttribute('aria-expanded', String(isOpen));
+        hamburgerBtn.setAttribute('aria-label', isOpen ? 'Close navigation menu' : 'Open navigation menu');
+        if (isOpen) sidebar.querySelector('a')?.focus();
+        else hamburgerBtn.focus();
+      });
+      backdrop.addEventListener('click', closeSidebar);
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && sidebar.classList.contains('open')) {
+          closeSidebar();
+          hamburgerBtn.focus();
+        }
+      });
+      document.querySelectorAll('.sidebar-nav a').forEach((link) => link.addEventListener('click', closeSidebar));
     }
 
     async function loadOpenOpportunities() {
@@ -287,8 +307,35 @@
         const data = await response.json();
         if (!response.ok || data.success === false) throw new Error(data.error || 'Unable to load roles.');
         const jobs = data.vacancies || [];
-        list.innerHTML = jobs.length ? jobs.slice(0, 6).map(job => `<div class="opportunity-item"><strong>${job.title}</strong><span>${job.company || 'Company'}${job.location ? ` · ${job.location}` : ''}</span><button type="button" onclick="matchOpportunity(${job.id}, this)">Match my resume</button></div>`).join('') : '<div class="opportunity-status">No open roles yet. Check back soon.</div>';
-      } catch (error) { list.innerHTML = '<div class="opportunity-status">Open roles will appear here when companies publish them.</div>'; }
+        list.replaceChildren();
+        if (!jobs.length) {
+          const empty = document.createElement('div');
+          empty.className = 'opportunity-status';
+          empty.textContent = 'No open roles yet. Check back soon.';
+          list.append(empty);
+          return;
+        }
+        jobs.slice(0, 6).forEach((job) => {
+          const item = document.createElement('div');
+          item.className = 'opportunity-item';
+          const title = document.createElement('strong');
+          title.textContent = job.title || 'Untitled role';
+          const details = document.createElement('span');
+          details.textContent = [job.company || 'Company', job.location].filter(Boolean).join(' · ');
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.textContent = 'Match my resume';
+          button.addEventListener('click', () => matchOpportunity(job.id, button));
+          item.append(title, details, button);
+          list.append(item);
+        });
+      } catch (error) {
+        list.replaceChildren();
+        const status = document.createElement('div');
+        status.className = 'opportunity-status';
+        status.textContent = 'Open roles will appear here when companies publish them.';
+        list.append(status);
+      }
     }
 
     async function matchOpportunity(jobId, button) {

@@ -121,6 +121,7 @@ async def agent_page(request: Request, db: Session = Depends(get_db), current_us
             "latest_match": latest_match.result_json if latest_match else None,
             "tier": current_user.tier or "FREE",
             "is_admin": admin_router.is_admin(current_user),
+            "workspace_roles": workspace_utils.available_roles(current_user),
         },
     )
 

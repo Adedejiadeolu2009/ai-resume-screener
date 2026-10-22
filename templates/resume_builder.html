@@ -89,7 +89,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--border-lit);box-shado
   </div>
   <div class="nav-right">
     <a href="/" class="nav-link">Website</a>
-    <a href="/screen" class="nav-link">Screen Candidates</a>
+    {% if 'recruiter' in workspace_roles %}<a href="/screen" class="nav-link">Screen Candidates</a>{% endif %}
     <div class="user-chip">
       <div class="user-av">
         {% if user.avatar_url %}<img src="{{ user.avatar_url }}" alt="avatar">{% else %}{{ (user.name or user.email or 'U')[:1].upper() }}{% endif %}
