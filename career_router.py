@@ -112,6 +112,9 @@ async def agent_page(request: Request, db: Session = Depends(get_db), current_us
         .order_by(models.JobMatch.created_at.desc())
         .first()
     )
+    task = request.query_params.get("task", "").strip().lower()
+    if task not in {"", "interview"}:
+        task = ""
     return templates.TemplateResponse(
         request=request,
         name="agents.html",
@@ -122,6 +125,7 @@ async def agent_page(request: Request, db: Session = Depends(get_db), current_us
             "tier": current_user.tier or "FREE",
             "is_admin": admin_router.is_admin(current_user),
             "workspace_roles": workspace_utils.available_roles(current_user),
+            "task": task,
         },
     )
 

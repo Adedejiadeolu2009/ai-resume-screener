@@ -19,6 +19,8 @@
   const ctxSkills = document.getElementById("ctx-skills");
 
   const readinessCard = document.getElementById("readiness-card");
+  const interviewStartButton = document.getElementById("interview-start-btn");
+  const interviewTask = new URLSearchParams(window.location.search).get("task") === "interview";
 
   if (!thread) return;
 
@@ -297,7 +299,35 @@
     if (intent === "gap_or_plan" && !skillsArray().length) {
       return "Add a few required skills (comma-separated) in the panel on the left first, so I know what to check your resume against.";
     }
+    if (intent === "interview" && !ctxResume.value.trim()) {
+      return "Upload or paste your resume first. I use your real experience to make the interview plan useful and truthful.";
+    }
+    if (intent === "interview" && !(ctxTargetRole.value.trim() || ctxJobTitle.value.trim())) {
+      return "Add the target role or job title first so I can prepare questions for the interview you are pursuing.";
+    }
     return null;
+  }
+
+  function startInterviewPrep() {
+    if (!ctxResume.value.trim()) {
+      ctxResume.focus();
+      addAssistantMessage("Start by uploading or pasting your resume below. Then add the role you are interviewing for.");
+      return;
+    }
+    if (!(ctxTargetRole.value.trim() || ctxJobTitle.value.trim())) {
+      ctxTargetRole.focus();
+      addAssistantMessage("What role are you interviewing for? Add it below, then create your plan.");
+      return;
+    }
+    sendMessage("Prepare me for an interview");
+  }
+
+  function addAssistantMessage(message) {
+    const el = document.createElement("div");
+    el.className = "msg assistant";
+    el.innerHTML = `<div class="msg-bubble">${escapeHtml(message)}</div>`;
+    thread.appendChild(el);
+    thread.scrollTop = thread.scrollHeight;
   }
 
   async function sendMessage(text) {
@@ -376,6 +406,20 @@
   chips.forEach((chip) => {
     chip.addEventListener("click", () => sendMessage(chip.dataset.msg));
   });
+
+  if (interviewStartButton) {
+    interviewStartButton.addEventListener("click", startInterviewPrep);
+  }
+
+  if (interviewTask) {
+    chatInput.placeholder = "Add your CV and target role, then create your plan...";
+    setTimeout(() => {
+      if (!ctxResume.value.trim()) {
+        ctxResume.focus();
+        addAssistantMessage("I’ll create a focused interview plan once you add your resume and target role.");
+      }
+    }, 0);
+  }
 
   thread.addEventListener("click", async (e) => {
     const approveBtn = e.target.closest(".approve-btn");

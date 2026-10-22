@@ -172,10 +172,18 @@
     <div class="context-kicker">Career intelligence workspace</div>
     <header class="agent-page-heading">
       <div>
-        <h1>Your career copilot</h1>
+        <h1>{% if task == 'interview' %}Prepare for your interview{% else %}Your career copilot{% endif %}</h1>
       </div>
-      <p>Bring your resume and a target role. Aptura will explain your fit, show what is missing, and help you decide what to do next.</p>
+      <p>{% if task == 'interview' %}Build an honest preparation plan from your resume and the role you are pursuing.{% else %}Bring your resume and a target role. Aptura will explain your fit, show what is missing, and help you decide what to do next.{% endif %}</p>
     </header>
+    {% if task == 'interview' %}
+    <section class="panel" id="interview-prep-start" aria-label="Start interview preparation" style="margin-bottom:18px;">
+      <div class="block-title">Create a role-specific interview plan</div>
+      <p class="readiness-empty">Add your CV and target role below. Aptura will generate questions to rehearse, strengths to demonstrate, gaps to explain honestly, and final preparation steps.</p>
+      <button class="btn btn-primary btn-sm" type="button" id="interview-start-btn" style="margin-top:12px;">Create my interview plan</button>
+      <p class="review-copy" style="margin-top:10px;">This is preparation support, not a prediction of an interview outcome.</p>
+    </section>
+    {% endif %}
     <section class="agent-steps" aria-label="How Aptura Agent works">
       <div class="agent-step"><span class="agent-step-number">1</span><div><strong>Add your context</strong><span>Save a resume, role, or job description.</span></div></div>
       <div class="agent-step"><span class="agent-step-number">2</span><div><strong>Ask a clear question</strong><span>Choose a prompt or write your own.</span></div></div>

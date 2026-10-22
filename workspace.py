@@ -28,7 +28,7 @@ ROLE_META = {
             ("Career Passport", "/agent"),
             ("Resume Intelligence", "/resume-builder"),
             ("Opportunities", "/job-match"),
-            ("Interview Prep", "/agent"),
+            ("Interview Prep", "/agent?task=interview"),
             ("Copilot", "/agent"),
         ],
         "onboarding_steps": ["Target role", "Experience", "Skills", "CV upload", "Career preferences"],
