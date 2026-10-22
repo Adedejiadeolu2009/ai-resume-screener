@@ -17,6 +17,20 @@ router = APIRouter(prefix="", tags=["plans"])
 templates = Jinja2Templates(directory="templates")
 
 
+def manual_transfer_details() -> dict[str, str | bool]:
+    bank_name = os.getenv("MANUAL_TRANSFER_BANK_NAME", "").strip()
+    account_name = os.getenv("MANUAL_TRANSFER_ACCOUNT_NAME", "").strip()
+    account_number = os.getenv("MANUAL_TRANSFER_ACCOUNT_NUMBER", "").strip()
+    instructions = os.getenv("MANUAL_TRANSFER_INSTRUCTIONS", "").strip()
+    return {
+        "bank_name": bank_name,
+        "account_name": account_name,
+        "account_number": account_number,
+        "instructions": instructions,
+        "configured": bool(bank_name and account_name and account_number),
+    }
+
+
 def get_csrf_token(request: Request) -> str:
     token = request.session.get("csrf_token")
     if not token:
@@ -55,6 +69,7 @@ async def plans_page(
         context={
             "pro_amount": os.getenv("PRO_AMOUNT_NGN", "2500"),
             "enterprise_amount": os.getenv("ENTERPRISE_AMOUNT_NGN", "7500"),
+            "transfer": manual_transfer_details(),
         },
     )
 
@@ -69,6 +84,7 @@ async def create_request_get(request: Request, current_user: models.User = Depen
             "csrf_token": get_csrf_token(request),
             "pro_amount": os.getenv("PRO_AMOUNT_NGN", "2500"),
             "enterprise_amount": os.getenv("ENTERPRISE_AMOUNT_NGN", "7500"),
+            "transfer": manual_transfer_details(),
         },
     )
 
@@ -76,6 +92,10 @@ async def create_request_get(request: Request, current_user: models.User = Depen
 @router.post("/create-request", response_class=HTMLResponse)
 async def create_request_post(request: Request, plan: str = Form(...), amount: int = Form(...), csrf_token: str = Form(...), db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     require_csrf(request, csrf_token)
+    transfer = manual_transfer_details()
+    if not transfer["configured"]:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=503, detail="Payment instructions are not configured yet. Please contact Aptura support.")
     expected_amount = configured_plan_amount(plan)
     if amount != expected_amount:
         from fastapi import HTTPException
@@ -104,6 +124,7 @@ async def create_request_post(request: Request, plan: str = Form(...), amount: i
             "csrf_token": get_csrf_token(request),
             "pro_amount": os.getenv("PRO_AMOUNT_NGN", "2500"),
             "enterprise_amount": os.getenv("ENTERPRISE_AMOUNT_NGN", "7500"),
+            "transfer": transfer,
         },
     )
 
@@ -112,7 +133,7 @@ async def create_request_post(request: Request, plan: str = Form(...), amount: i
 async def plan_status(request: Request, ref: str = None, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     """Show payment status for a given request reference."""
     if not ref:
-        return templates.TemplateResponse(request=request, name='payment_pending.html', context={})
+        return templates.TemplateResponse(request=request, name='payment_pending.html', context={"transfer": manual_transfer_details()})
 
     payment = db.query(models.Payment).filter(
         models.Payment.paystack_ref == ref,
@@ -120,10 +141,10 @@ async def plan_status(request: Request, ref: str = None, db: Session = Depends(g
     ).first()
     if not payment:
         # show pending page with message
-        return templates.TemplateResponse(request=request, name='payment_pending.html', context={"message": "No matching payment found. Please check your reference."})
+        return templates.TemplateResponse(request=request, name='payment_pending.html', context={"message": "No matching payment found. Please check your reference.", "transfer": manual_transfer_details()})
 
     if payment.status == 'pending':
-        return templates.TemplateResponse(request=request, name='payment_pending.html', context={"reference": ref, "message": "Your payment is pending verification."})
+        return templates.TemplateResponse(request=request, name='payment_pending.html', context={"reference": ref, "message": "Your payment is pending verification.", "transfer": manual_transfer_details()})
     elif payment.status == 'success':
         # show confirmation page (reuse email template for consistency)
         try:
@@ -137,6 +158,6 @@ async def plan_status(request: Request, ref: str = None, db: Session = Depends(g
             )
             return HTMLResponse(content=html)
         except Exception:
-            return templates.TemplateResponse(request=request, name='payment_pending.html', context={"message": "Payment confirmed."})
+            return templates.TemplateResponse(request=request, name='payment_pending.html', context={"message": "Payment confirmed.", "transfer": manual_transfer_details()})
     else:
-        return templates.TemplateResponse(request=request, name='payment_pending.html', context={"message": f"Payment status: {payment.status}"})
+        return templates.TemplateResponse(request=request, name='payment_pending.html', context={"message": f"Payment status: {payment.status}", "transfer": manual_transfer_details()})

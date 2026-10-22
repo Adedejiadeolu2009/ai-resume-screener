@@ -66,6 +66,10 @@
         </div>
         {% endif %}
 
+        {% if transfer.configured %}
+        <div class="reference"><div class="label">Transfer account</div><div class="value">{{ transfer.bank_name }} · {{ transfer.account_name }} · {{ transfer.account_number }}</div></div>
+        {% endif %}
+
         <div class="steps">
           <div class="step"><div class="num">1</div><div><strong>Complete the bank transfer</strong><p>Use the exact amount shown on the plans page and include your reference if your bank app supports narration.</p></div></div>
           <div class="step"><div class="num">2</div><div><strong>Admin verifies the payment</strong><p>Once confirmed, your account is upgraded immediately and the confirmation email is sent to your account email address.</p></div></div>

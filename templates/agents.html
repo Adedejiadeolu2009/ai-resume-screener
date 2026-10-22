@@ -154,13 +154,13 @@
         <a href="/dashboard">Dashboard</a>
         {% if 'recruiter' in workspace_roles %}<a href="/screen">Screenings</a>{% endif %}
         <a href="/resume-builder">Resume Builder</a>
-        <a href="/plans">Plans &amp; Upgrade</a>
+        <a href="/create-request">Plans &amp; Upgrade</a>
         <a href="/analytics">Analytics</a>
         {% if is_admin %}<a href="/admin">Admin</a>{% endif %}
         <a href="/contact">Support</a>
         <a href="/settings">Settings</a>
       </nav>
-      <div class="sidebar-footer"><div class="sidebar-footer-title">{{ tier or 'FREE' }} Plan</div><div class="sidebar-footer-desc">{% if tier == 'PRO' or tier == 'ENTERPRISE' %}Premium active{% else %}5 free screenings/month{% endif %}</div><a href="/plans" class="sidebar-footer-link">Review plan &rarr;</a></div>
+      <div class="sidebar-footer"><div class="sidebar-footer-title">{{ tier or 'FREE' }} Plan</div><div class="sidebar-footer-desc">{% if tier == 'PRO' or tier == 'ENTERPRISE' %}Premium active{% else %}5 free screenings/month{% endif %}</div><a href="/create-request" class="sidebar-footer-link">Review plan &rarr;</a></div>
     </aside>
     <div class="content">
       <nav>
@@ -179,8 +179,7 @@
     {% if task == 'interview' %}
     <section class="panel" id="interview-prep-start" aria-label="Start interview preparation" style="margin-bottom:18px;">
       <div class="block-title">Create a role-specific interview plan</div>
-      <p class="readiness-empty">Add your CV and target role below. Aptura will generate questions to rehearse, strengths to demonstrate, gaps to explain honestly, and final preparation steps.</p>
-      <button class="btn btn-primary btn-sm" type="button" id="interview-start-btn" style="margin-top:12px;">Create my interview plan</button>
+      <p class="readiness-empty">Your career agent has started an interview-prep request. Add your CV and target role below if either is missing; it will then generate questions to rehearse, strengths to demonstrate, gaps to explain honestly, and final preparation steps.</p>
       <p class="review-copy" style="margin-top:10px;">This is preparation support, not a prediction of an interview outcome.</p>
     </section>
     {% endif %}

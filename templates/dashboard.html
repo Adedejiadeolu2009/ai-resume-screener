@@ -404,7 +404,7 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
       {% for item in workspace_meta.nav %}
       <a href="{{ item[1] }}" class="{% if loop.first %}active{% endif %}">{{ item[0] }}</a>
       {% endfor %}
-      <a href="/plans">Plans & Upgrade</a>
+      <a href="/create-request">Plans & Upgrade</a>
       {% if is_admin %}
       <a href="/admin">Admin</a>
       {% endif %}
@@ -415,7 +415,7 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
     <div class="sidebar-footer">
       <div class="sidebar-footer-title">{{ tier or 'FREE' }} Plan</div>
       <div class="sidebar-footer-desc">{% if tier == 'PRO' or tier == 'ENTERPRISE' %}Premium active{% else %}5 free screenings/month{% endif %}</div>
-      <a href="/plans" class="sidebar-footer-link">Upgrade →</a>
+      <a href="/create-request" class="sidebar-footer-link">Upgrade →</a>
     </div>
   </aside>
 

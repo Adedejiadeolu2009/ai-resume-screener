@@ -166,7 +166,7 @@ main { flex: 1; max-width: 1280px; width: 100%; margin: 0 auto; padding: 32px 28
       <a href="/dashboard">🏠 Dashboard</a>
       {% if 'recruiter' in workspace_roles %}<a href="/screen">📄 Screenings</a>{% endif %}
       <a href="/resume-builder">📝 Resume Builder</a>
-      <a href="/plans">💎 Plans & Upgrade</a>
+      <a href="/create-request">💎 Plans & Upgrade</a>
       {% if 'recruiter' in workspace_roles %}<a href="/analytics">📊 Analytics</a>{% endif %}
       {% if is_admin %}
       <a href="/admin">🛡️ Admin</a>
@@ -178,7 +178,7 @@ main { flex: 1; max-width: 1280px; width: 100%; margin: 0 auto; padding: 32px 28
     <div class="sidebar-footer">
       <div class="sidebar-footer-title">{{ tier or 'FREE' }} Plan</div>
       <div class="sidebar-footer-desc">Premium account active</div>
-      <a href="/plans" class="sidebar-footer-link">Manage →</a>
+      <a href="/create-request" class="sidebar-footer-link">Manage →</a>
     </div>
   </aside>
 
@@ -237,7 +237,7 @@ main { flex: 1; max-width: 1280px; width: 100%; margin: 0 auto; padding: 32px 28
               <span>Plan Type</span>
               <small>{{ tier }}</small>
             </div>
-            <a href="/plans" class="btn btn-primary">Change Plan</a>
+            <a href="/create-request" class="btn btn-primary">Change Plan</a>
           </div>
           {% if premium_until %}
           <div class="setting-row">

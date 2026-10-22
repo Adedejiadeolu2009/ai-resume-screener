@@ -19,7 +19,6 @@
   const ctxSkills = document.getElementById("ctx-skills");
 
   const readinessCard = document.getElementById("readiness-card");
-  const interviewStartButton = document.getElementById("interview-start-btn");
   const interviewTask = new URLSearchParams(window.location.search).get("task") === "interview";
 
   if (!thread) return;
@@ -308,28 +307,6 @@
     return null;
   }
 
-  function startInterviewPrep() {
-    if (!ctxResume.value.trim()) {
-      ctxResume.focus();
-      addAssistantMessage("Start by uploading or pasting your resume below. Then add the role you are interviewing for.");
-      return;
-    }
-    if (!(ctxTargetRole.value.trim() || ctxJobTitle.value.trim())) {
-      ctxTargetRole.focus();
-      addAssistantMessage("What role are you interviewing for? Add it below, then create your plan.");
-      return;
-    }
-    sendMessage("Prepare me for an interview");
-  }
-
-  function addAssistantMessage(message) {
-    const el = document.createElement("div");
-    el.className = "msg assistant";
-    el.innerHTML = `<div class="msg-bubble">${escapeHtml(message)}</div>`;
-    thread.appendChild(el);
-    thread.scrollTop = thread.scrollHeight;
-  }
-
   async function sendMessage(text) {
     text = text.trim();
     if (!text || composer.dataset.busy === "true") return;
@@ -407,17 +384,12 @@
     chip.addEventListener("click", () => sendMessage(chip.dataset.msg));
   });
 
-  if (interviewStartButton) {
-    interviewStartButton.addEventListener("click", startInterviewPrep);
-  }
-
   if (interviewTask) {
     chatInput.placeholder = "Add your CV and target role, then create your plan...";
     setTimeout(() => {
-      if (!ctxResume.value.trim()) {
-        ctxResume.focus();
-        addAssistantMessage("I’ll create a focused interview plan once you add your resume and target role.");
-      }
+      if (!ctxResume.value.trim()) ctxResume.focus();
+      else if (!(ctxTargetRole.value.trim() || ctxJobTitle.value.trim())) ctxTargetRole.focus();
+      sendMessage("Prepare me for an interview");
     }, 0);
   }
 
