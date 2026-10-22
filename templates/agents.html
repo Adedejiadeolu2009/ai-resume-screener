@@ -181,6 +181,11 @@
       <div class="agent-step"><span class="agent-step-number">2</span><div><strong>Ask a clear question</strong><span>Choose a prompt or write your own.</span></div></div>
       <div class="agent-step"><span class="agent-step-number">3</span><div><strong>Review the next step</strong><span>Use evidence-backed guidance before acting.</span></div></div>
     </section>
+    <section class="panel" aria-label="Your first career review" style="margin-bottom:18px;">
+      <div class="block-title">Your first review takes three steps</div>
+      <p class="readiness-empty">1. Upload your CV. 2. Add a target role or job description. 3. Choose “Analyze my resume.” You will get a score, evidence-based strengths, gaps, and practical next actions.</p>
+      <p class="review-copy" style="margin-top:12px;">Your CV is used to create guidance for your account. Review every suggestion before using it, and only upload documents you are authorized to share.</p>
+    </section>
     <div class="col-side">
       <!-- Career readiness -->
       <div class="panel" id="readiness-card">
@@ -209,7 +214,7 @@
       <!-- Context panel -->
       <div class="panel">
         <div class="ctx-section">
-          <label for="ctx-resume">Your resume</label>
+          <label for="ctx-resume">Your resume <span style="color:var(--hint);font-size:11px;">(private to your signed-in account)</span></label>
           <textarea id="ctx-resume" placeholder="Paste your resume text here...">{{ profile.resume_text or '' }}</textarea>
           <div class="ctx-row" style="margin-top:8px;">
             <input type="file" id="ctx-resume-file" accept=".pdf,.docx,.txt" hidden />

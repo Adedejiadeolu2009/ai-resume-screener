@@ -368,7 +368,7 @@ textarea{min-height:140px;resize:vertical}
 <main>
   <div class="page-header">
     <h1 class="page-title">Recruiter Workspace</h1>
-    <p class="page-sub">Create a role, add candidate resumes, screen, rank, compare, and shortlist. Aptura provides AI recommendations, not autonomous hiring decisions.</p>
+    <p class="page-sub">Run a clear first-pass review: define the role, add candidates, then verify the evidence behind every recommendation before making a decision.</p>
   </div>
 
   <!-- Steps -->
@@ -387,11 +387,11 @@ textarea{min-height:140px;resize:vertical}
     </div>
   </div>
 
-  <section class="vacancy-studio" aria-label="Publish a vacancy">
-    <div class="vacancy-head">
-      <div><div class="vacancy-kicker">Recruiter tools</div><div class="vacancy-title">Publish a vacancy for better-fit talent</div><div class="vacancy-sub">Save the role once, then reuse its requirements for screening and candidate matching.</div></div>
+  <details class="vacancy-studio" aria-label="Save a vacancy for later" style="margin-bottom:24px;">
+    <summary class="vacancy-head" style="cursor:pointer; list-style:none;">
+      <div><div class="vacancy-kicker">Recruiter tools</div><div class="vacancy-title">Save a role for later matching</div><div class="vacancy-sub">Optional: save a role once, then reuse its requirements for screening and candidate matching.</div></div>
       <div class="vacancy-mark" aria-hidden="true">+</div>
-    </div>
+    </summary>
     <div class="vacancy-body">
       <div class="vacancy-fields">
         <div class="vacancy-field"><label for="vacancyTitle">Role title *</label><input id="vacancyTitle" type="text" placeholder="e.g. Product Designer"></div>
@@ -405,15 +405,15 @@ textarea{min-height:140px;resize:vertical}
       <div class="vacancy-actions"><button class="vacancy-submit" id="publishVacancyBtn" type="button" onclick="publishVacancy()">Publish vacancy</button><span class="vacancy-status" id="vacancyStatus">Your open roles will appear here.</span></div>
       <div class="vacancy-list" id="vacancyList"><span class="vacancy-empty">Loading saved vacancies...</span></div>
     </div>
-  </section>
+  </details>
 
   <div class="screen-grid">
     <!-- ── Left: Form ── -->
     <div id="formPanel">
       <div class="panel">
         <div class="panel-hdr">
-            <div class="panel-title">Create or Paste Job Description</div>
-          <div class="panel-sub">Tell us about the position you're hiring for</div>
+            <div class="panel-title">1. Define the role</div>
+          <div class="panel-sub">Tell Aptura what evidence matters for this position</div>
         </div>
         <div class="panel-body">
           <div class="frow">
@@ -435,7 +435,7 @@ textarea{min-height:140px;resize:vertical}
           </div>
 
           <div class="field">
-            <label>Candidate Resumes *</label>
+            <label>2. Add candidate resumes *</label>
             <div class="dropzone" id="dropzone">
               <span class="dz-icon">📂</span>
               <div class="dz-title" id="dzTitle">Drop resume files here</div>
@@ -465,7 +465,7 @@ textarea{min-height:140px;resize:vertical}
       <div class="empty-state" id="emptyState">
         <div class="empty-ico">🎯</div>
         <div class="empty-title">Results appear here</div>
-        <div class="empty-sub">Configure the role and upload resumes to get started</div>
+        <div class="empty-sub">Your ranked, reviewable shortlist will appear here.</div>
         <div class="how-it-works">
           <div class="hiw-step">
             <div class="hiw-num">1</div>
@@ -473,11 +473,11 @@ textarea{min-height:140px;resize:vertical}
           </div>
           <div class="hiw-step">
             <div class="hiw-num">2</div>
-            <div class="hiw-txt">Upload as many resumes as you like (PDF or DOCX)</div>
+            <div class="hiw-txt">Upload up to 50 PDF, DOCX, or TXT resumes (10MB each)</div>
           </div>
           <div class="hiw-step">
             <div class="hiw-num">3</div>
-            <div class="hiw-txt">AI ranks and scores every candidate in seconds</div>
+            <div class="hiw-txt">Review evidence, gaps, and interview prompts before shortlisting</div>
           </div>
         </div>
       </div>

@@ -18,6 +18,7 @@ from sqlalchemy.orm import Session
 
 import security as auth
 import models
+import workspace as workspace_utils
 from database import get_db
 from email_utils import send_email
 from rate_limit import enforce_rate_limit
@@ -172,6 +173,7 @@ async def register(
     workspace = (workspace or "APPLICANT").strip().upper()
     if workspace not in {"STUDENT", "APPLICANT", "RECRUITER"}:
         workspace = "APPLICANT"
+    role = workspace_utils.normalize_role(workspace) or workspace_utils.ROLE_CANDIDATE
 
     user = models.User(
         email=email.lower().strip(),
@@ -179,13 +181,18 @@ async def register(
         hashed_password=hashed,
         provider="email",
         workspace=workspace,
+        primary_role=role,
+        active_workspace=role,
+        available_roles=[role],
+        onboarding_completed=True,
         last_login=datetime.utcnow()
     )
     db.add(user)
     db.commit()
     db.refresh(user)
 
-    response = JSONResponse({"success": True, "redirect": "/workspace"})
+    redirect = "/screen" if role == workspace_utils.ROLE_RECRUITER else "/agent"
+    response = JSONResponse({"success": True, "redirect": redirect})
     return set_auth_cookie(response, user)
 
 

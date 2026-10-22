@@ -428,10 +428,13 @@ async def login_page(request: Request):
     if request.cookies.get("access_token"):
         return RedirectResponse("/workspace")
     error = request.query_params.get("error", "")
+    journey = request.query_params.get("journey", "candidate").lower()
+    if journey not in {"candidate", "recruiter"}:
+        journey = "candidate"
     return templates.TemplateResponse(
         request=request,
         name="login.html",
-        context={"error": error, "csrf_token": get_csrf_token(request)}
+        context={"error": error, "csrf_token": get_csrf_token(request), "journey": journey}
     )
 
 
@@ -455,6 +458,7 @@ async def role_onboarding_page(request: Request, current_user: models.User = Dep
             "user": current_user,
             "roles": workspace_utils.ROLE_META,
             "csrf_token": get_csrf_token(request),
+            "selected_role": workspace_utils.normalize_role(current_user.workspace) or workspace_utils.ROLE_CANDIDATE,
             "workspace_options": [
                 {"key": key, **meta}
                 for key, meta in workspace_utils.ROLE_META.items()
@@ -483,6 +487,7 @@ async def save_role_onboarding(
                 "user": current_user,
                 "roles": workspace_utils.ROLE_META,
                 "csrf_token": get_csrf_token(request),
+                "selected_role": workspace_utils.normalize_role(current_user.workspace) or workspace_utils.ROLE_CANDIDATE,
                 "workspace_options": [
                     {"key": key, **meta}
                     for key, meta in workspace_utils.ROLE_META.items()

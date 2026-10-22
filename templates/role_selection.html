@@ -117,7 +117,7 @@ h1 { font: 400 clamp(42px, 7vw, 74px)/0.98 var(--ff-serif); letter-spacing: -0.0
       <div class="roles" role="radiogroup" aria-label="Choose how you are using Aptura">
         {% for role in workspace_options %}
         <label class="role-card" data-role="{{ role.key }}">
-          <input type="radio" name="role" value="{{ role.key }}" {% if loop.index == 2 %}checked{% endif %}>
+          <input type="radio" name="role" value="{{ role.key }}" {% if role.key == selected_role %}checked{% endif %}>
           <span class="role-inner">
             <span class="icon" aria-hidden="true">{% if role.key == 'candidate' %}CV{% else %}HR{% endif %}</span>
             <span class="title">{{ role.label }}</span>

@@ -178,12 +178,12 @@ body::after {
     </div>
 
     <div class="left-content">
-      <div class="left-eyebrow">Resume Intelligence Platform</div>
-      <h1 class="left-h1">Screen smarter,<br>hire <em>better</em></h1>
-      <p class="left-sub">Upload any number of resumes and let our AI instantly rank, score, and surface your ideal candidates — saving you hours every hire.</p>
+      <div class="left-eyebrow">Career &amp; Hiring Intelligence</div>
+      <h1 class="left-h1">Know your next<br><em>best move.</em></h1>
+      <p class="left-sub">Understand your CV and role fit, or review candidates with evidence-backed recommendations. Aptura keeps the final decision with you.</p>
       <div class="features">
         <div class="feature"><div class="feat-icon">📊</div>6-dimension AI scoring per candidate</div>
-        <div class="feature"><div class="feat-icon">⚡</div>Screen unlimited resumes in under 30s</div>
+        <div class="feature"><div class="feat-icon">⚡</div>Guided CV analysis and role matching</div>
         <div class="feature"><div class="feat-icon">💾</div>Full history saved to your dashboard</div>
         <div class="feature"><div class="feat-icon">🎯</div>Interview questions auto-generated</div>
       </div>
@@ -352,7 +352,7 @@ async function doRegister() {
   if (!name || !email || !pass) { errEl.textContent = 'Please fill in all fields.'; errEl.style.display = 'block'; return; }
   const form = new FormData();
   form.append('name', name); form.append('email', email); form.append('password', pass);
-  form.append('workspace', 'APPLICANT');
+  form.append('workspace', '{{ 'RECRUITER' if journey == 'recruiter' else 'APPLICANT' }}');
   form.append('csrf_token', '{{ csrf_token }}');
   try {
     const res  = await fetch('/auth/register', { method: 'POST', body: form });

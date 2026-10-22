@@ -32,12 +32,12 @@
   <section class="section">
     <div class="section-head">
       <h1 class="h1">Pricing that separates candidates and hiring teams.</h1>
-      <p>Public pricing is visible before sign in. Exact billing and activation use the limits currently supported by the Aptura backend.</p>
+      <p>Public pricing is visible before sign in. Paid plans currently use a manual bank-transfer request and are activated after verification; self-serve card billing is not yet available.</p>
     </div>
     <h2>Candidate plans</h2>
     <div class="grid grid-3">
       <article class="card price"><div class="price-title"><h3>Free</h3><span class="status self">Start</span></div><div class="amount">NGN 0 <small>/ month</small></div><ul class="features"><li>5 resume analyses per month</li><li>Basic career readiness dashboard</li><li>Resume builder access</li><li>Job match from user-provided job descriptions</li></ul><a class="btn" href="/login">Start Free</a></article>
-      <article class="card price"><div class="price-title"><h3>Career Passport / Pro</h3><span class="status doc">Configured</span></div><div class="amount">NGN {{ pro_amount }} <small>/ month</small></div><ul class="features"><li>100 resume analyses per month</li><li>Skill-gap analysis</li><li>Cover letter drafts</li><li>Career readiness and job matching workflows</li></ul><a class="btn btn-primary" href="/login">Build my Career Passport</a></article>
+      <article class="card price"><div class="price-title"><h3>Career Passport / Pro</h3><span class="status doc">Manual activation</span></div><div class="amount">NGN {{ pro_amount }} <small>/ month</small></div><ul class="features"><li>100 resume analyses per month</li><li>Skill-gap analysis</li><li>Cover letter drafts</li><li>Career readiness and job matching workflows</li></ul><a class="btn btn-primary" href="/login?journey=candidate">Start with a free account</a></article>
       <article class="card price"><div class="price-title"><h3>Premium AI Career Agent</h3><span class="status assessment">Coming layer</span></div><div class="amount">Custom <small>/ month</small></div><ul class="features"><li>Deeper interview preparation</li><li>Application package workflows</li><li>Human-approved AI actions</li><li>Priority career support options</li></ul><a class="btn" href="/contact">Request access</a></article>
     </div>
   </section>
@@ -46,7 +46,7 @@
     <h2>Employer plans</h2>
     <div class="grid grid-4">
       <article class="card price"><h3>Free trial</h3><div class="amount">Contact <small>sales</small></div><ul class="features"><li>Sample candidate screening</li><li>Role fit explanations</li><li>Human review workflow preview</li></ul><a class="btn" href="/contact">Book a demo</a></article>
-      <article class="card price"><h3>Hiring</h3><div class="amount">NGN {{ enterprise_amount }} <small>/ month</small></div><ul class="features"><li>Recruiter screening workflow</li><li>Candidate ranking and comparison</li><li>Evidence and gap summaries</li></ul><a class="btn btn-primary" href="/login">Screen candidates</a></article>
+      <article class="card price"><h3>Hiring</h3><div class="amount">NGN {{ enterprise_amount }} <small>/ month</small></div><ul class="features"><li>Recruiter screening workflow</li><li>Candidate ranking and comparison</li><li>Evidence and gap summaries</li></ul><a class="btn btn-primary" href="/login?journey=recruiter">Start a recruiter account</a></article>
       <article class="card price"><h3>Team</h3><div class="amount">Custom <small>/ month</small></div><ul class="features"><li>Team review workflow</li><li>Recruiter and company verification</li><li>Shortlist collaboration</li></ul><a class="btn" href="/contact">Talk to us</a></article>
       <article class="card price"><h3>Enterprise Talent Automation</h3><div class="amount">Custom <small>/ month</small></div><ul class="features"><li>Automated application intake and resume screening</li><li>Candidate matching, web tests, and AI interview sessions</li><li>Permissioned portfolio and talent workflows</li><li>API, MCP, security, and governance review</li></ul><a class="btn" href="/contact">Automate screening</a></article>
     </div>
@@ -55,7 +55,7 @@
   <section class="section faq">
     <div class="section-head"><h2>Pricing questions</h2><p>No invented unlimited claims. Public copy follows the current backend limits for free and pro screening.</p></div>
     <details><summary>Why are some plans custom?</summary><p>Team, enterprise, and advanced agent workflows depend on permissions, verification, support, and integration needs.</p></details>
-    <details><summary>Can I pay by bank transfer?</summary><p>Signed-in users can request manual activation using the bank transfer flow configured by Aptura administrators.</p></details>
+    <details><summary>How do paid plans work today?</summary><p>Create a free account first. Signed-in users can then request manual activation using the bank transfer flow configured by Aptura administrators. Activation follows payment verification.</p></details>
     <details><summary>Does Aptura sell candidate data?</summary><p>This page does not grant data access. Employer access should be permissioned and visible to candidates where applicable.</p></details>
   </section>
 </main>
